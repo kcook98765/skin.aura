@@ -130,7 +130,7 @@
                     <right>-10</right>
                     <bottom>50</bottom>
                     <top>-10</top>
-                    <visible>Container.Content(tvshows) | Container.Content(movies) | Container.Content(sets)</visible>
+                    <visible>Container.Content(tvshows) | Container.Content(movies) | Container.Content(sets) | Container.Content(videos) | Container.Content(unknown)</visible>
                     <pagecontrol>60</pagecontrol>
                     <include>View_NotTheseWindows</include>
                     <viewtype label="$LOCALIZE[31370]">icon</viewtype>
