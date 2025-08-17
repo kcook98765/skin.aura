@@ -921,7 +921,7 @@
                         <control type="image">
                             <bordersize>10</bordersize>
                             <aspectratio aligny="center" scalediffuse="false">scale</aspectratio>
-                            <texture background="true" diffuse="diffuse/banner.png">$VAR[Image_Banner]</texture>
+                            <texture background="true" diffuse="diffuse/banner.png" fallback="$INFO[ListItem.Icon]">$VAR[Image_Banner]</texture>
                         </control>
                         <control type="image">
                             <bordersize>30</bordersize>
