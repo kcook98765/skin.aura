@@ -152,9 +152,17 @@
     </variable>
 
     <variable name="Image_Banner">
+        <!-- TV first (library TV items often expose tvshow.banner) -->
         <value condition="!String.IsEmpty(ListItem.Art(tvshow.banner))">$INFO[ListItem.Art(tvshow.banner)]</value>
+        <!-- True banner for movies/episodes if present -->
         <value condition="!String.IsEmpty(ListItem.Art(banner))">$INFO[ListItem.Art(banner)]</value>
+        <!-- PLUGIN-FRIENDLY: many addons set landscape instead of banner -->
+        <value condition="!String.IsEmpty(ListItem.Art(landscape))">$INFO[ListItem.Art(landscape)]</value>
+        <!-- Next-best wide-ish art -->
         <value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+        <!-- Library/movie poster in a pinch (skin will letterbox via diffuse/aspect) -->
+        <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+        <!-- Absolute fallback: icon -->
         <value>$INFO[ListItem.Icon]</value>
     </variable>
 
