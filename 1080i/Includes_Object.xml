@@ -322,6 +322,10 @@
                         <param name="episodelayout" value="$PARAM[episodelayout]" />
                         <param name="aspect" value="$PARAM[aspect]" />
                         <param name="fallbackimage" value="$PARAM[fallbackimage]" />
+                        <!-- NEW: force cast art to use the actor headshot -->
+                        <param name="artTexture" value="$INFO[ListItem.Icon]" />
+                        <!-- Optional but recommended: actor placeholder if no headshot -->
+                        <param name="fallbackimage" value="DefaultActor.png" />
                     </include>
                     <include condition="$PARAM[include_content_nextup]">Object_VideoInfo_CastList_Content_NextUp</include>
                     <include content="Object_VideoInfo_CastList_Content" condition="$PARAM[include_content]">
