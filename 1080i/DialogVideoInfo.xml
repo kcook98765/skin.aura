@@ -344,6 +344,7 @@
                                 <include content="View_Actor_Layout">
                                     <param name="id" value="50" />
                                     <param name="altfocus" value="Control.HasFocus(9950)" />
+									<param name="artTexture" value="$INFO[ListItem.Icon]" />
                                 </include>
                             </control>
                             <include content="Dialog_VideoInfo_BusyIndicator">
