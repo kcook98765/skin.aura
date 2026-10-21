@@ -2,6 +2,7 @@
 
 import ast
 import copy
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -15,7 +16,7 @@ import zipfile
 from build_omega import build, new_output
 from check_omega import Checks, DEFAULT_TYPES, ENGLISH_LOCALES, INFO_BLUR_WINDOWS, LEGACY_DEPENDENCIES, OFFICIAL_MINIMUMS, ROOT, SEEK_COUNTS, STYLE_INCLUDES, check_source, main as check_main, online_toggle_errors, po_messages, provider_boundary_checks, python_expressions, source_providers
 from check_official_dependencies import CORE, compare_versions, dependency_closure, main as closure_main
-from omega_common import DIRECTORIES, FOCUSED_DELTA, GENERATED, OPTIONAL_DOCS, ROOT_FILES, Source, payload_path
+from omega_common import BASELINE_VERSION, DIRECTORIES, FOCUSED_DELTA, GENERATED, OPTIONAL_DOCS, ROOT_FILES, RUNTIME_MANIFEST, VERSION, Source, payload_path, runtime_path
 
 
 class MemorySource:
@@ -42,6 +43,8 @@ class MemorySource:
     def provenance(self):
         return {"starting_commit": "203aba5117f185a34fef773134d3cf955cbf2c7a",
                 "head": "fixture", "branch": "fixture", "runtime_git_diff": self.deltas(),
+                "runtime_manifest": {"kind": "in-memory-test-fixture", "file_count": len(self.files),
+                                     "sha256": hashlib.sha256(("\n".join(self.files) + "\n").encode()).hexdigest()},
                 "source": "baseline" if self.baseline else "worktree"}
 
 
@@ -873,9 +876,10 @@ class OfficialClosureRegressions(unittest.TestCase):
 
 class PackagingRegressions(unittest.TestCase):
     def source(self, root, baseline=False):
-        data = {name + "/fixture.bin": b"runtime bytes\x00\xff" for name in DIRECTORIES}
+        data = {name + "/fixture.png": b"runtime bytes\x00\xff" for name in DIRECTORIES}
         data.update({name: b"root bytes" for name in ROOT_FILES})
-        data["addon.xml"] = b'<addon id="skin.aura" name="Aura" provider-name="kcook98765" version="2.0.23"/>'
+        version = BASELINE_VERSION if baseline else VERSION
+        data["addon.xml"] = ('<addon id="skin.aura" name="Aura" provider-name="kcook98765" version="%s"/>' % version).encode()
         return MemorySource(data, {}, baseline=baseline, root=root)
 
     def test_explicit_runtime_allowlist_and_exclusions(self):
@@ -886,11 +890,12 @@ class PackagingRegressions(unittest.TestCase):
                       "resources/accounts/token.xml", "resources/userdata/guisettings.xml", "media/TOOLS/helper.xml"):
             with self.subTest(excluded=name):
                 self.assertFalse(payload_path(name))
-        for name in (*ROOT_FILES, *OPTIONAL_DOCS, *(directory + "/runtime.bin" for directory in DIRECTORIES)):
-            self.assertTrue(payload_path(name), name)
-        self.assertTrue(payload_path("1080i/Settings.xml"))
+        for name in (*ROOT_FILES, *(directory + "/runtime.png" for directory in DIRECTORIES)):
+            self.assertTrue(runtime_path(name), name)
+        self.assertTrue(runtime_path("1080i/Settings.xml"))
+        self.assertEqual(OPTIONAL_DOCS, ())
 
-    def test_optional_docs_inventory_and_payload(self):
+    def test_operational_docs_never_enter_inventory_or_payload(self):
         with tempfile.TemporaryDirectory(prefix="omega-docs-", dir="/tmp") as temporary:
             parent = Path(temporary)
             root = parent / "source"
@@ -900,24 +905,31 @@ class PackagingRegressions(unittest.TestCase):
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(data)
+            (root / "tools").mkdir()
+            (root / RUNTIME_MANIFEST).write_text("\n".join(source.files) + "\n")
             records = b"\0".join(b"100644 blob " + b"0" * 40 + b"\t" + name.encode() for name in source.files) + b"\0"
 
             def inventory():
-                with mock.patch("omega_common.git", side_effect=[b"starting", b"head", b"fixture", records]):
+                with mock.patch("omega_common.git", side_effect=[b"starting", b"head", b"fixture", records]), \
+                     mock.patch("omega_common.RUNTIME_MANIFEST_SHA256", hashlib.sha256((root / RUNTIME_MANIFEST).read_bytes()).hexdigest()):
                     return Source(root)
 
-            self.assertTrue(set(OPTIONAL_DOCS).isdisjoint(inventory().files))
-            for name in OPTIONAL_DOCS:
+            docs = ("OMEGA.md", "DEPENDENCIES-OMEGA.md", "MIGRATION-DECISIONS.md",
+                    "OFFICIAL-DEPENDENCY-RESEARCH.md", "PVR-EPG-DESIGN-RESEARCH.md", "MIGRATION-RESULTS.md")
+            self.assertEqual(inventory().files, source.files)
+            for name in docs:
                 (root / name).write_bytes(("Documentation: " + name).encode())
-                self.assertIn(name, inventory().files)
-                self.assertIn(name, FOCUSED_DELTA)
+                self.assertNotIn(name, inventory().files)
+                self.assertFalse(payload_path(name))
             selected = inventory()
             # Use a miniature fixture, not an actual final skin build.
             packaged = MemorySource({name: selected.read(name) for name in selected.files}, {}, root=root)
             receipt = build(packaged, parent / "fixture-build")
             with zipfile.ZipFile(parent / "fixture-build" / receipt["zip"]["name"]) as tree:
-                for name in OPTIONAL_DOCS:
-                    self.assertEqual(tree.read("skin.aura/" + name), (root / name).read_bytes())
+                self.assertEqual({n.removeprefix("skin.aura/") for n in tree.namelist() if not n.endswith("/")},
+                                 set(source.files))
+                for name in docs:
+                    self.assertNotIn("skin.aura/" + name, tree.namelist())
 
     def test_deterministic_zip_hash_receipt_modes_crc_and_readback(self):
         with tempfile.TemporaryDirectory(prefix="omega-build-", dir="/tmp") as temporary:
@@ -930,7 +942,8 @@ class PackagingRegressions(unittest.TestCase):
                              (parent / "two" / two["zip"]["name"]).read_bytes())
             self.assertTrue(one["zip"]["crc_verified"])
             self.assertTrue(one["zip"]["readback_tree_consistent"])
-            self.assertEqual(one["zip"]["name"], "skin.aura-2.0.23-omega-official-local.zip")
+            self.assertEqual(one["zip"]["name"], "skin.aura-2.1.0-omega-official-local.zip")
+            self.assertEqual(one["addon"]["version"], "2.1.0")
             self.assertEqual(set(one["files"]), set(source.files))
             self.assertEqual(json.loads((parent / "one/receipt.json").read_text()), one)
             with zipfile.ZipFile(parent / "one" / one["zip"]["name"]) as tree:

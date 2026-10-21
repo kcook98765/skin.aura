@@ -1,72 +1,80 @@
-To use this skin:
+# Aura Omega 2.1.0 — DEVELOPMENT CANDIDATE
 
-Install each of the below in this order (be sure to wait for each to install before moving on to the next):
+Aura is a customisable Kodi skin with a horizontal home menu and multiple
+widgets. Original project: [jurialmunkey/skin.aura](https://github.com/jurialmunkey/skin.aura).
+This fork: [kcook98765/skin.aura](https://github.com/kcook98765/skin.aura).
+The add-on identity remains `skin.aura`.
 
+**Development candidate, not a completed release.** The intended target is
+Kodi **21.3 Omega**, skin GUI API **5.17.0**. Candidate packages must have matching
+`2.1.0` manifest and tooling expectations; a documentation label alone does not
+establish that agreement or change the installed version.
+Exact static counts and results are **PENDING fresh validation**. Phase 2
+preserves the original, imports the existing migration into an isolated clone,
+and prepares metadata, documentation and packaging. No Kodi runtime testing
+was performed in Phase 2.
 
-script.module.cherrypy
-https://github.com/kodi-community-addons/script.module.cherrypy/archive/master.zip
+**PUBLIC DISTRIBUTION BLOCKERS remain unresolved**, including bundled font
+restrictions and asset provenance. Read
+[Third-party license review](docs/THIRD-PARTY-LICENSE-REVIEW.md) before publishing
+source or packages. A successful build or checker run would not clear them.
 
-script.module.musicbrainz
-https://github.com/kodi-community-addons/script.module.musicbrainz/archive/master.zip
+## Branch policy
 
-script.module.thetvdb
-https://github.com/kodi-community-addons/script.module.thetvdb/archive/master.zip
+The proposed publication layout is local only; these changes do not publish
+branches. `main` is the Omega development line. Lowercase `matrix` preserves the
+exact historical Matrix line, capitalised `Nexus` is retained, and `master` is
+preserved. These names do not establish fresh runtime support for older Kodi
+versions. See [Compatibility decisions](docs/COMPATIBILITY.md).
 
-script.module.metadatautils
-https://github.com/kodi-community-addons/script.module.metadatautils/archive/master.zip
+## Dependencies and migration
 
-script.skin.helper.service
-https://github.com/kodi-community-addons/script.skin.helper.service/archive/master.zip
+Use the official Kodi Add-on repository for the declared dependencies and their
+transitive requirements. Let Kodi resolve versions appropriate to Omega; do not
+follow the former manual GitHub ZIP chain or beta-repository setup. An offline
+index audit checks declarations, not actual installation or availability.
 
-script.skin.helper.widgets
-https://github.com/kodi-community-addons/script.skin.helper.widgets/archive/master.zip
+Online metadata enrichment is optional and **off by default**. Stored library
+metadata is the baseline; extra ratings, awards and artwork depend on provider
+coverage and may be unavailable. This guide requires no credentials or account
+setup. Enrichment being off does not make every installed dependency network-free.
 
-script.skin.helper.skinbackup
-https://github.com/kodi-community-addons/script.skin.helper.skinbackup/archive/master.zip
+Existing widgets pointing at removed Skin Helper providers need **manual source
+reselection** in the menu/widget editor. Saved shortcuts are not automatically
+translated. Review affected widgets individually; do not reset a working profile
+to force migration. The airing calendar is not a replacement with identical
+behaviour for the old Next Aired guide.
 
-script.skin.helper.backgrounds
-https://github.com/kodi-community-addons/script.skin.helper.backgrounds/archive/master.zip
+## Bounded testing and recovery
 
-script.tv.show.next.aired
-https://github.com/kodi-community-addons/script.tv.show.next.aired/archive/master.zip
+Test only in a disposable Kodi profile with synthetic data and a recoverable
+configuration. Before switching skins, keep **Estuary** available; use
+**Settings → Interface → Skin → Estuary** to roll back. Switching skins does not
+restore changed widgets, add-on data or other settings.
 
-Once the above are installed, then download the Aura skin from my repository (new version that has requirements for the above is live), it will take time to install, please wait until completed.
+The Backup add-on (`script.xbmcbackup`) must be configured before use: select a
+destination, enable **Add-on Data**, include custom asset folders and verify a
+restore in the disposable profile. Installing Backup alone creates no backup.
+Old Skin Helper backup archives are not supported. Keep backups and saved
+settings out of the source tree and public reports.
 
-Once installed, you can switch to Aura skin and try it out.
+- [Development and Git policy](docs/DEVELOPMENT.md)
+- [Packaging and current builder limits](docs/PACKAGING.md)
+- [Static checks and future runtime acceptance](docs/TESTING.md)
 
------------------------------
+These development links refer to the source checkout; `docs/` is deliberately
+excluded from the installable skin ZIP.
 
-RottenTomatoes and Metacritic Setup via SkinHelper and OMDB api
+## Attribution and licensing
 
-1. Install the beta version of skin helper from marcelveldt's beta repository (and update all relevant dependencies e.g. metadatautils , skin helper and simplecache).
-https://github.com/kodi-community-addons/repository.marcelveldt/raw/master/repository.marcelveldt-1.0.3.zip
+Aura's project license is **Creative Commons Attribution-NonCommercial-ShareAlike
+4.0 International (CC BY-NC-SA 4.0)**:
+https://creativecommons.org/licenses/by-nc-sa/4.0/ . Retain attribution to the
+original project and this fork and identify changes. The existing `LICENSE.txt`
+is retained verbatim, including its historical “Unported” wording.
 
-
-
-2. Go to omdb and get an API key. If you are lucky you can get a free key, but please consider donating to omdb via Patreon to keep omdb alive
-http://www.omdbapi.com/apikey.aspx
-
-3. Once you have an API key, go to Skin Settings > Manage Dependencies and click "script.module.metadatautils" to open it's settings
-
-4. Go to the API section of the settings and enter your omdb api key, then press OK to save your settings.
-
-5. Close Kodi and delete simplecache.db from kodi/userdata/addon_data/script.module.simplecache/simplecache.db - this step is not necessary, but it will force skin helper to rebuild its info cache and retrieve the ratings.
-
-6. Open kodi and your ratings should now work. It can take a little while for skin helper to retrieve ratings for the focused item the first time around, so make sure you give it a little bit of time before reporting problems.
-
-7. SkinHelper is heavily rate limited if you do not also have api keys for TMDb and Fanart.tv - I recommend also getting api keys for these.
-
-
-------------------
-
-
-Still many fine details to work out, but in general it is useable.
-
-------------------
-
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported License.
-To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/
-or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
-
-Icon images from iconmonstr.com see website for license terms
+Icon images from **iconmonstr.com** have separate terms:
+https://iconmonstr.com/license/ . Fonts and other third-party assets retain
+their own notices and terms; Aura's license does not relicense them. The
+third-party review is a list of findings and unresolved questions, not legal
+clearance.

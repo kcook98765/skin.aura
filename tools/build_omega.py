@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 sys.dont_write_bytecode = True
-from omega_common import DIRECTORIES, Source
+from omega_common import BASELINE_VERSION, DIRECTORIES, VERSION, Source
 
 ROOT = Path(__file__).resolve().parents[1]
 STAMP = (1980, 1, 1, 0, 0, 0)
@@ -40,7 +40,8 @@ def new_output(path, source_root):
 def build(source, output):
     output = new_output(output, source.root)
     identity = ET.fromstring(source.read("addon.xml"))
-    expected = {"id": "skin.aura", "name": "Aura", "provider-name": "kcook98765", "version": "2.0.23"}
+    version = BASELINE_VERSION if source.baseline else VERSION
+    expected = {"id": "skin.aura", "name": "Aura", "provider-name": "kcook98765", "version": version}
     if any(identity.get(key) != value for key, value in expected.items()):
         raise ValueError("Manifest identity/version differs from the fixed local package identity")
     provenance = source.provenance()
@@ -63,7 +64,7 @@ def build(source, output):
         path.chmod(0o644)
         files[name] = {"sha256": sha256(data), "size": len(data), "mode": "0644"}
     label = "omega-baseline-local" if source.baseline else "omega-official-local"
-    archive = output / ("skin.aura-2.0.23-" + label + ".zip")
+    archive = output / ("skin.aura-" + version + "-" + label + ".zip")
     entries = {directory + "/": b"" for directory in directories}
     entries.update({"skin.aura/" + name: data for name, data in payload.items()})
     with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as tree:

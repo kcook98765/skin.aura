@@ -12,7 +12,7 @@ from urllib.parse import parse_qsl
 import xml.etree.ElementTree as ET
 
 sys.dont_write_bytecode = True
-from omega_common import ADDED_RUNTIME, FOCUSED_DELTA, REMOVED_RUNTIME, Source
+from omega_common import ADDED_RUNTIME, BASELINE_VERSION, FOCUSED_DELTA, REMOVED_RUNTIME, VERSION, Source
 from check_official_dependencies import CORE, dependency_closure, version_key
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -359,7 +359,8 @@ def check_source(source, index_bytes=None):
                        "Includes absence of defaults for types with no baseline entry")
 
     addon = xml("addon.xml")
-    identity = {"id": "skin.aura", "name": "Aura", "provider-name": "kcook98765", "version": "2.0.23"}
+    identity = {"id": "skin.aura", "name": "Aura", "provider-name": "kcook98765",
+                "version": BASELINE_VERSION if source.baseline else VERSION}
     checks.require("manifest:identity", all(addon.get(key) == value for key, value in identity.items()), str(addon.attrib))
     for dependency, expected in OFFICIAL_MINIMUMS.items():
         imports = addon.findall("./requires/import[@addon='%s']" % dependency)

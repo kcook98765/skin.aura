@@ -268,3 +268,25 @@ Add Simple and Dark Glass color schemes
 
 [B]0.9.0[/B]
 Initial commit
+
+[B]2.1.0 Omega - DEVELOPMENT CANDIDATE (unreleased)[/B]
+Phase 2, 2026-10-20: isolated preparation; original checkout preserved unchanged.
+Import the existing official-only Omega migration and its regression tooling.
+Replace legacy Skin Helper integrations with native Kodi and official providers;
+retain default-off optional enrichment, native palette and calendar/PVR changes.
+Set current candidate metadata/tooling to 2.1.0; preserve baseline 2.0.23 bytes.
+Require an exact reviewed runtime-file manifest; reject unapproved disk additions,
+missing files, malformed lists, symlinks and nonregular files before packaging.
+Document the Kodi 21.3 Omega / GUI 5.17.0 target and proposed local branch policy.
+Replace historical manual dependency/API-key setup with official dependency guidance.
+Document default-off enrichment, manual old-widget source reselection, Backup setup
+and disposable testing with Estuary rollback.
+Add development, packaging, testing, compatibility and third-party license review docs.
+Retain all supplied licenses/notices, fonts and legacy screenshots unchanged.
+Flag unresolved PUBLIC DISTRIBUTION BLOCKERS; these are not new Omega-only issues.
+Player.Cutlist remains unchanged: pinned Omega retains it as an Editlist equivalent.
+Use automatic text detection with LF endings, explicit binary attributes and
+development-file archive exclusions; remove misleading merge=ours attributes.
+Keep development tests/docs in Git, outside the installable runtime payload.
+Exact static counts/results PENDING fresh validation. No runtime testing in Phase 2.
+This entry is candidate documentation, not a completed release or runtime proof.
