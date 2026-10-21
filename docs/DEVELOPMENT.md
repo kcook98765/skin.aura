@@ -62,8 +62,9 @@ warnings and exit statuses for review. Before making anything public, sanitize
 reports and captures: remove personal identifiers, machine-specific locations,
 network details, secrets and saved user data.
 
-Exact static inventory counts and results are **PENDING fresh validation**.
-Do not reuse historical totals as evidence for this candidate. Publishing is
+Fresh preparation checks passed 85 regression tests and 399 source assertions;
+the official Omega checker failed with five errors and three warnings. See
+[Testing](TESTING.md) for the exact scope and retained limits. Publishing is
 blocked until the [third-party issues](THIRD-PARTY-LICENSE-REVIEW.md), repository
 asset requirements and candidate version consistency are checked and appropriate
 static and runtime acceptance is recorded.

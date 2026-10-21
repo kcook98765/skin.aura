@@ -4,22 +4,63 @@
 
 Phase 2 covers local preservation, isolated preparation and static validation.
 **No runtime testing was performed in Phase 2.**
-The following results are **PENDING fresh validation** for the resulting
-candidate; no historical count or pass is adopted here:
+Fresh local results recorded on **2026-10-20** for implementation commit
+`a426f21b1c2d29a204d198dcee24b89bddc446df`; subsequent result recording changes
+documentation only. These are new static results, not adopted historical totals:
 
 | Area | Status |
 | --- | --- |
-| Exact XML/XSP inventory and embedded Python-expression counts | PENDING |
-| Focused source assertions, failures and warnings | PENDING |
-| Full discovered regression suite, including confirmation tests | PENDING |
-| Official-index required, optional and active-provider closure | PENDING |
-| Toolkit / official addon-check stages and warnings | PENDING |
-| Exact package inventory, hashes and readback results | PENDING |
+| Exact XML/XSP inventory and embedded Python-expression counts | 127 XML, 19 XSP, 32 AST-parsed expressions |
+| Focused source assertions, failures and warnings | 399 passed, 0 failed, 8 retained warnings; exit 0 |
+| Full discovered regression suite, including confirmation/packaging tests | 85 passed, no failures/errors/skips; exit 0 |
+| Official-index required, optional and active-provider closure | No failures with supplied snapshot; exit 0; not live installation proof |
+| Toolkit syntax, manifest, paths and package stages | Passed against the built 1,801-file payload |
+| Toolkit Python typing | Not applicable: no runtime Python source; no Omega-stub or rendering proof |
+| Official addon-check | Completed, failed: five errors / three warnings; exit 1 |
+| Exact package inventory and readback | 1,801 approved files; deterministic-fixture, CRC and source/stage/ZIP readback checks passed |
 | Kodi rendering, navigation, installation and functional acceptance | Not tested in Phase 2 |
 
 Source inspection, static checks, package consistency and actual Kodi execution
 are distinct evidence. None provides legal clearance; the
 [public distribution blockers](THIRD-PARTY-LICENSE-REVIEW.md) remain unresolved.
+
+### Official checker errors and warnings retained
+
+Each of `resources/screenshot-01.jpg`, `screenshot-02.jpg`, `screenshot-03.jpg`,
+`screenshot-04.jpg` and `screenshot-05.jpg` is **1366 × 768**. Each produces one
+error because the checker requires **1280 × 720 or 1920 × 1080**. These inherited
+assets were not resized, fabricated or replaced by untested candidate captures.
+
+All three official warnings remain:
+
+1. Offline replay leaves `https://forum.kodi.tv/showthread.php?tid=328558`
+   unverified.
+2. Offline replay leaves `https://github.com/kcook98765/skin.aura` unverified.
+3. `fonts/lyrics/nasalization_license.pdf` has a non-whitelisted extension.
+   The supplied license is intentionally preserved, not deleted to suppress it.
+
+There were no official dependency errors in this run. The offline replay used
+the explicitly prepared cache and the official checker completed; this is not
+a clean pass or live repository-submission approval.
+
+### Eight focused-source warning categories retained
+
+1. Embedded Python is AST-parsed only; no Kodi modules are executed.
+2. Dependency installation, native dialogs, focus and rendering need runtime tests.
+3. Style/include checks cover known patterns, not full Kodi include expansion.
+4. Migration assertions are scoped guards, not a full condition evaluator/renderer.
+5. Offline index provenance/freshness and live availability remain separate.
+6. Declared-optional branch audits found no failures but have separate coverage limits.
+7. Active-provider audit covered 17 IDs with no unavailable optional edges or
+   published-optional failures; this is source evidence, not provider execution.
+8. Legacy Next Up/Extended Info window localization references remain diagnostic;
+   localization-only references do not establish provider availability or behavior.
+
+The separate dependency audit used a supplied official Omega snapshot with
+2,336 entries and SHA-256
+`5d8dcda715ee7ff4d8ae8dd327df4066bcfcf1165937c09fc64da3cf4ef2b408`.
+This audit is not a fresh network fetch. Complete raw reports, process exit
+receipts and artifact hashes are retained privately outside the repository.
 
 ## Project-relative static commands
 

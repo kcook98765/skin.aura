@@ -288,5 +288,7 @@ Player.Cutlist remains unchanged: pinned Omega retains it as an Editlist equival
 Use automatic text detection with LF endings, explicit binary attributes and
 development-file archive exclusions; remove misleading merge=ours attributes.
 Keep development tests/docs in Git, outside the installable runtime payload.
-Exact static counts/results PENDING fresh validation. No runtime testing in Phase 2.
+Fresh static checks: 85 regressions and 399 source assertions passed; official
+Omega checker failed with five screenshot errors and three retained warnings.
+No runtime testing in Phase 2; see source docs/TESTING.md for coverage limits.
 This entry is candidate documentation, not a completed release or runtime proof.

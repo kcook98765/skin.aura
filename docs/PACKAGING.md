@@ -41,8 +41,12 @@ The builder creates a `skin.aura/` stage, a ZIP and `receipt.json` in that outpu
 directory. It snapshots its selected payload, uses sorted entries, fixed ZIP
 timestamps and normalized file/directory modes, then checks CRCs and source,
 stage and ZIP readback consistency. Those checks are packaging checks only;
-the builder explicitly does not run validation. Fresh build results, file
-counts, sizes and hashes are **PENDING**.
+the builder explicitly does not run validation. The fresh candidate build
+contains **1,801 payload files** and passed its CRC/readback/tree checks.
+The exact manifest's SHA-256 is
+`4a3231e6418d66471727c18c69078457ab12d2e9c339a24809b4f8d2e79d4c87`.
+Raw build receipts and artifact hashes stay outside this source tree; consult
+[Testing](TESTING.md) for the separate checker outcome and retained blockers.
 
 For a separate historical comparison, use a different new output directory:
 
@@ -77,15 +81,15 @@ attribution and modification notice in any eventual distribution.
 
 - Resolve font distribution restrictions, provenance and notice compliance;
   retain every supplied notice. A project-level license alone is insufficient.
-- Verify candidate metadata, exact payload membership and builder expectations
-  agree; separately review any required implementation changes.
+- Candidate metadata, exact payload membership and builder expectations passed
+  fresh static checks; recheck them after any subsequent implementation change.
 - Replace the five legacy `resources/screenshot-01.jpg` through
   `resources/screenshot-05.jpg` only with authentic captures at an appropriate
   repository-accepted resolution. They are all **1366 × 768** and fail the
   repository screenshot dimension requirement. They remain unchanged here;
   resizing or fabricating images would not supply authentic candidate captures.
-- Run the complete fresh static workflow against the exact intended payload,
-  retain warnings, and then perform separately authorized disposable runtime
+- Retain the fresh static/checker results and every warning, repeat affected
+  checks after changes, and perform separately authorized disposable runtime
   acceptance. No runtime testing was performed in Phase 2.
 
 Keep raw receipts and reports outside the source/package. They may contain

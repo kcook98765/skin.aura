@@ -9,7 +9,9 @@ The add-on identity remains `skin.aura`.
 Kodi **21.3 Omega**, skin GUI API **5.17.0**. Candidate packages must have matching
 `2.1.0` manifest and tooling expectations; a documentation label alone does not
 establish that agreement or change the installed version.
-Exact static counts and results are **PENDING fresh validation**. Phase 2
+Fresh static results: **85 regression tests and 399 source checks passed**;
+the official Omega checker still **failed with five errors and three warnings**.
+See [the complete static results and limits](docs/TESTING.md). Phase 2
 preserves the original, imports the existing migration into an isolated clone,
 and prepares metadata, documentation and packaging. No Kodi runtime testing
 was performed in Phase 2.
