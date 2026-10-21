@@ -16,7 +16,7 @@ import zipfile
 from build_omega import build, new_output
 from check_omega import Checks, DEFAULT_TYPES, ENGLISH_LOCALES, INFO_BLUR_WINDOWS, LEGACY_DEPENDENCIES, OFFICIAL_MINIMUMS, ROOT, SEEK_COUNTS, STYLE_INCLUDES, check_source, main as check_main, online_toggle_errors, po_messages, provider_boundary_checks, python_expressions, source_providers
 from check_official_dependencies import CORE, compare_versions, dependency_closure, main as closure_main
-from omega_common import BASELINE_VERSION, DIRECTORIES, FOCUSED_DELTA, GENERATED, OPTIONAL_DOCS, ROOT_FILES, RUNTIME_MANIFEST, VERSION, Source, payload_path, runtime_path
+from omega_common import BASELINE_VERSION, DIRECTORIES, FOCUSED_DELTA, GENERATED, OPTIONAL_DOCS, ROOT_FILES, RUNTIME_MANIFEST, RUNTIME_REVIEW_ADDITIONS, VERSION, Source, payload_path, runtime_path
 
 
 class MemorySource:
@@ -53,7 +53,8 @@ class StaticRegressions(unittest.TestCase):
     def setUpClass(cls):
         source = Source(ROOT)
         cls.data = {name: source.read(name) for name in source.files
-                     if Path(name).suffix.lower() in (".xml", ".xsp") or name in ENGLISH_LOCALES}
+                     if Path(name).suffix.lower() in (".xml", ".xsp") or name in ENGLISH_LOCALES
+                     or name in RUNTIME_REVIEW_ADDITIONS}
         cls.original = {name: source.original(name) for name in source.original_files
                          if Path(name).suffix.lower() in (".xml", ".xsp") or name in ENGLISH_LOCALES}
 
@@ -877,7 +878,8 @@ class OfficialClosureRegressions(unittest.TestCase):
 class PackagingRegressions(unittest.TestCase):
     def source(self, root, baseline=False):
         data = {name + "/fixture.png": b"runtime bytes\x00\xff" for name in DIRECTORIES}
-        data.update({name: b"root bytes" for name in ROOT_FILES})
+        data.update({name: b"root bytes" for name in ROOT_FILES
+                     if not baseline or name not in RUNTIME_REVIEW_ADDITIONS})
         version = BASELINE_VERSION if baseline else VERSION
         data["addon.xml"] = ('<addon id="skin.aura" name="Aura" provider-name="kcook98765" version="%s"/>' % version).encode()
         return MemorySource(data, {}, baseline=baseline, root=root)
@@ -896,7 +898,7 @@ class PackagingRegressions(unittest.TestCase):
         self.assertEqual(OPTIONAL_DOCS, ())
 
     def test_operational_docs_never_enter_inventory_or_payload(self):
-        with tempfile.TemporaryDirectory(prefix="omega-docs-", dir="/tmp") as temporary:
+        with tempfile.TemporaryDirectory(prefix="omega-docs-", dir=tempfile.gettempdir()) as temporary:
             parent = Path(temporary)
             root = parent / "source"
             root.mkdir()
@@ -932,7 +934,7 @@ class PackagingRegressions(unittest.TestCase):
                     self.assertNotIn("skin.aura/" + name, tree.namelist())
 
     def test_deterministic_zip_hash_receipt_modes_crc_and_readback(self):
-        with tempfile.TemporaryDirectory(prefix="omega-build-", dir="/tmp") as temporary:
+        with tempfile.TemporaryDirectory(prefix="omega-build-", dir=tempfile.gettempdir()) as temporary:
             parent = Path(temporary)
             source = self.source(parent / "source")
             one = build(source, parent / "one")
@@ -957,7 +959,7 @@ class PackagingRegressions(unittest.TestCase):
             self.assertEqual(baseline["zip"]["name"], "skin.aura-2.0.23-omega-baseline-local.zip")
 
     def test_refuse_files_directories_symlinks_and_missing_parent(self):
-        with tempfile.TemporaryDirectory(prefix="omega-output-", dir="/tmp") as temporary:
+        with tempfile.TemporaryDirectory(prefix="omega-output-", dir=tempfile.gettempdir()) as temporary:
             parent = Path(temporary)
             (parent / "file").write_bytes(b"keep")
             (parent / "directory").mkdir()

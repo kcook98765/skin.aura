@@ -12,7 +12,7 @@ from urllib.parse import parse_qsl
 import xml.etree.ElementTree as ET
 
 sys.dont_write_bytecode = True
-from omega_common import ADDED_RUNTIME, BASELINE_VERSION, FOCUSED_DELTA, REMOVED_RUNTIME, VERSION, Source
+from omega_common import ADDED_RUNTIME, BASELINE_VERSION, FOCUSED_DELTA, REMOVED_RUNTIME, RUNTIME_REVIEW_ADDITIONS, VERSION, Source
 from check_official_dependencies import CORE, dependency_closure, version_key
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -320,7 +320,12 @@ def check_source(source, index_bytes=None):
         except ValueError as error:
             checks.require("python:" + name, False, str(error))
     required = (set(source.original_files) - REMOVED_RUNTIME) | ADDED_RUNTIME
-    missing = sorted(name for name in required if Path(name).suffix.lower() in (".xml", ".xsp") and name not in source.files)
+    # Preserve every existing XML/XSP guard and explicitly require the one new
+    # distribution notice for candidates. Historical baseline bytes omit it.
+    required = {name for name in required if Path(name).suffix.lower() in (".xml", ".xsp")}
+    if not source.baseline:
+        required |= RUNTIME_REVIEW_ADDITIONS
+    missing = sorted(required - set(source.files))
     checks.require("inventory:required-runtime", not missing, ", ".join(missing))
     checks.require("inventory:removed-runtime", not REMOVED_RUNTIME.intersection(source.files),
                    ", ".join(sorted(REMOVED_RUNTIME.intersection(source.files))))

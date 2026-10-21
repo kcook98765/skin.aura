@@ -1,33 +1,39 @@
 # Aura Omega 2.1.0 — DEVELOPMENT CANDIDATE
 
-Aura is a customisable Kodi skin with a horizontal home menu and multiple
-widgets. Original project: [jurialmunkey/skin.aura](https://github.com/jurialmunkey/skin.aura).
+This is a personal continuation of Aura, updated primarily to keep using the
+skin on **Kodi 21.3 Omega**. Its implementation and visual appearance are retained.
+Original project: [jurialmunkey/skin.aura](https://github.com/jurialmunkey/skin.aura).
 This fork: [kcook98765/skin.aura](https://github.com/kcook98765/skin.aura).
 The add-on identity remains `skin.aura`.
 
-**Development candidate, not a completed release.** The intended target is
-Kodi **21.3 Omega**, skin GUI API **5.17.0**. Candidate packages must have matching
-`2.1.0` manifest and tooling expectations; a documentation label alone does not
-establish that agreement or change the installed version.
-Fresh static results: **85 regression tests and 399 source checks passed**;
-the official Omega checker still **failed with five errors and three warnings**.
-See [the complete static results and limits](docs/TESTING.md). Phase 2
-preserves the original, imports the existing migration into an isolated clone,
-and prepares metadata, documentation and packaging. No Kodi runtime testing
-was performed in Phase 2.
+**2.1.0 is a development candidate, not an officially validated release.** The
+target skin GUI API is **5.17.0**. Static checks are not proof of complete Kodi
+functionality; populated-library widgets, playback, full PVR behavior and
+Backup/Restore acceptance remain incomplete. This notice/documentation update
+does not add skin features, replace assets or establish new runtime acceptance.
+See [test status and retained checker findings](docs/TESTING.md).
 
-**PUBLIC DISTRIBUTION BLOCKERS remain unresolved**, including bundled font
-restrictions and asset provenance. Read
-[Third-party license review](docs/THIRD-PARTY-LICENSE-REVIEW.md) before publishing
-source or packages. A successful build or checker run would not clear them.
+**Known third-party redistribution restrictions remain unresolved.** Read
+[THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt), included with the skin package.
+Attribution and disclosure do not grant missing permissions. Publishing source
+and distributing a ZIP both redistribute assets; personal use and candidate
+status do not clear those restrictions. No broad asset reconstruction or
+replacement is part of this continuation's current preparation scope.
 
 ## Branch policy
 
-The proposed publication layout is local only; these changes do not publish
-branches. `main` is the Omega development line. Lowercase `matrix` preserves the
-exact historical Matrix line, capitalised `Nexus` is retained, and `master` is
-preserved. These names do not establish fresh runtime support for older Kodi
-versions. See [Compatibility decisions](docs/COMPATIBILITY.md).
+The layout is prepared locally, not yet published:
+
+| Branch | Purpose |
+| --- | --- |
+| `main` | Omega 2.1.0 development candidate |
+| `matrix` | Exact historical commit `203aba5117f185a34fef773134d3cf955cbf2c7a` |
+| `master` | Existing historical branch, unchanged |
+| `Nexus` | Existing Nexus branch, unchanged, including its capitalization |
+
+Historical tags remain unchanged. No history rewrite, old-version support
+guarantee or automatic Kodi update is implied. See the bounded
+[publication proposal](docs/PUBLICATION.md).
 
 ## Dependencies and migration
 
@@ -65,7 +71,9 @@ settings out of the source tree and public reports.
 - [Static checks and future runtime acceptance](docs/TESTING.md)
 
 These development links refer to the source checkout; `docs/` is deliberately
-excluded from the installable skin ZIP.
+excluded from the installable skin ZIP. The root third-party notice and existing
+license files are included. The five legacy screenshots remain 1366x768 and
+fail official repository dimensions; no images were replaced to mask that finding.
 
 ## Attribution and licensing
 

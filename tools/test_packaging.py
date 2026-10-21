@@ -16,14 +16,14 @@ import zipfile
 from build_omega import ROOT, build
 from omega_common import (
     ADDED_RUNTIME, BASELINE_VERSION, DIRECTORIES, FOCUSED_DELTA, GENERATED,
-    REMOVED_RUNTIME, ROOT_FILES, RUNTIME_MANIFEST, RUNTIME_REVIEW_COMMIT,
+    REMOVED_RUNTIME, ROOT_FILES, RUNTIME_MANIFEST, RUNTIME_REVIEW_COMMIT, RUNTIME_REVIEW_ADDITIONS,
     RUNTIME_MANIFEST_SHA256, VERSION, Source, git, parse_runtime_manifest, payload_path, runtime_path,
 )
 
 
 class ManifestRegressions(unittest.TestCase):
     def setUp(self):
-        temporary = tempfile.TemporaryDirectory(prefix="aura-packaging-", dir="/tmp")
+        temporary = tempfile.TemporaryDirectory(prefix="aura-packaging-", dir=tempfile.gettempdir())
         self.addCleanup(temporary.cleanup)
         self.parent = Path(temporary.name)
         self.root = self.parent / "source"
@@ -117,6 +117,7 @@ class ManifestRegressions(unittest.TestCase):
             b"", self.manifest_bytes()[:-1], self.manifest_bytes().replace(b"\n", b"\r\n"),
             self.manifest_bytes(list(reversed(self.files))),
             self.manifest_bytes([name for name in self.files if name != "README"]),
+            self.manifest_bytes([name for name in self.files if name != "THIRD-PARTY-NOTICES.txt"]),
             self.manifest_bytes([name for name in self.files if not name.startswith("themes/")]),
             b"\xef\xbb\xbf" + self.manifest_bytes(),
         ):
@@ -158,7 +159,7 @@ class ManifestRegressions(unittest.TestCase):
     def test_symlinked_files_and_runtime_directories_are_rejected(self):
         target = self.parent / "external.png"
         target.write_bytes(b"external bytes")
-        for name in ("README", "media/fixture.png", "media/unlisted.png"):
+        for name in ("README", "THIRD-PARTY-NOTICES.txt", "media/fixture.png", "media/unlisted.png"):
             with self.subTest(name=name):
                 path = self.root / name
                 existed = path.exists()
@@ -213,8 +214,8 @@ class ManifestRegressions(unittest.TestCase):
             source.read("media/fixture.png")
 
     def test_root_development_artifacts_are_excluded_and_receipts_bind_manifest(self):
-        for name in ("OMEGA.md", "OPERATIONS.md", "tools/test_omega.py", "tests/fixture.xml",
-                     ".git/config", "evidence/receipt.json", "accounts/token.json"):
+        for name in ("OMEGA.md", "OPERATIONS.md", "docs/notes.txt", "tools/test_omega.py", "tests/fixture.xml",
+                     ".git/config", ".local/private.txt", "private/notes.txt", "evidence/receipt.json", "accounts/token.json"):
             self.inject(name)
         source = self.source()
         # This test isolates packaging, not real Git diff provenance.
@@ -225,7 +226,8 @@ class ManifestRegressions(unittest.TestCase):
         self.assertEqual(first["runtime_manifest"], {
             "kind": "reviewed-exact-file-list", "path": RUNTIME_MANIFEST,
             "sha256": hashlib.sha256(self.manifest_bytes()).hexdigest(),
-            "reviewed_commit": RUNTIME_REVIEW_COMMIT, "file_count": len(self.files),
+            "reviewed_commit": RUNTIME_REVIEW_COMMIT,
+            "reviewed_additions": ["THIRD-PARTY-NOTICES.txt"], "file_count": len(self.files),
         })
         self.assertEqual(json.loads((self.parent / "one/receipt.json").read_text()), first)
         self.assertEqual((self.parent / "one" / first["zip"]["name"]).read_bytes(),
@@ -245,10 +247,20 @@ class ReviewedInventoryRegressions(unittest.TestCase):
         source = Source(ROOT)
         reviewed = {name for name in git(ROOT, "ls-tree", "-r", "--name-only", RUNTIME_REVIEW_COMMIT).decode().splitlines()
                     if payload_path(name)}
-        self.assertEqual(set(source.files), reviewed)
+        # The real import commit is unchanged; the notice is the ONLY approved
+        # membership addition since it, not a claim that a new commit exists.
+        self.assertEqual(RUNTIME_REVIEW_COMMIT, "2402785e7f5e16184955a5bc1f1e92ef666fb7da")
+        self.assertEqual(RUNTIME_REVIEW_ADDITIONS, {"THIRD-PARTY-NOTICES.txt"})
+        self.assertEqual(len(reviewed), 1801)
+        self.assertTrue(reviewed.isdisjoint(RUNTIME_REVIEW_ADDITIONS))
+        self.assertEqual(set(source.files) - reviewed, {"THIRD-PARTY-NOTICES.txt"})
+        self.assertFalse(reviewed - set(source.files))
+        self.assertEqual(len(source.files), 1802)
         self.assertEqual(set(source.files), (source.original_files - REMOVED_RUNTIME) | ADDED_RUNTIME)
         self.assertEqual(parse_runtime_manifest((ROOT / RUNTIME_MANIFEST).read_bytes()), source.files)
         self.assertEqual(source.runtime_manifest["sha256"], RUNTIME_MANIFEST_SHA256)
+        self.assertEqual(source.runtime_manifest["reviewed_commit"], RUNTIME_REVIEW_COMMIT)
+        self.assertEqual(source.runtime_manifest["reviewed_additions"], ["THIRD-PARTY-NOTICES.txt"])
         self.assertEqual({n for n in source.files if "/" not in n}, set(ROOT_FILES))
         self.assertEqual({n.split("/")[0] for n in source.files if "/" in n}, set(DIRECTORIES))
         self.assertFalse(any(n.lower().endswith((".md", ".markdown")) for n in source.files))
@@ -261,16 +273,22 @@ class ReviewedInventoryRegressions(unittest.TestCase):
         self.assertEqual(BASELINE_VERSION, "2.0.23")
         self.assertEqual(VERSION, "2.1.0")
         self.assertEqual(source.files, sorted(source.original_files))
+        self.assertEqual(len(source.files), 1802)
+        self.assertNotIn("THIRD-PARTY-NOTICES.txt", source.files)
         self.assertEqual(source.runtime_manifest["kind"], "historical-git-tree-inventory")
         self.assertEqual(source.runtime_manifest["commit"], source.starting_commit)
-        with tempfile.TemporaryDirectory(prefix="aura-historical-build-", dir="/tmp") as temporary:
+        with tempfile.TemporaryDirectory(prefix="aura-historical-build-", dir=tempfile.gettempdir()) as temporary:
             output = Path(temporary) / "baseline"
             receipt = build(source, output)
             self.assertEqual(receipt["addon"]["version"], "2.0.23")
+            self.assertEqual(receipt["file_count"], 1802)
+            self.assertNotIn("reviewed_additions", receipt["runtime_manifest"])
             self.assertEqual(receipt["zip"]["name"], "skin.aura-2.0.23-omega-baseline-local.zip")
             with zipfile.ZipFile(output / receipt["zip"]["name"]) as archive:
                 self.assertEqual(archive.read("skin.aura/addon.xml"), source.original("addon.xml"))
                 self.assertEqual(set(receipt["files"]), source.original_files)
+                self.assertNotIn("skin.aura/THIRD-PARTY-NOTICES.txt", archive.namelist())
+                self.assertFalse((output / "skin.aura/THIRD-PARTY-NOTICES.txt").exists())
             print("Historical baseline: %d files; version=2.0.23; zip_sha256=%s" % (
                 receipt["file_count"], receipt["zip"]["sha256"]))
 
@@ -285,7 +303,7 @@ class ReviewedInventoryRegressions(unittest.TestCase):
 
         current = Source(ROOT)
         data = {name: current.read(name) for name in current.files
-                if Path(name).suffix.lower() in (".xml", ".xsp", ".po")}
+                if Path(name).suffix.lower() in (".xml", ".xsp", ".po") or name in RUNTIME_REVIEW_ADDITIONS}
         original = {name: current.original(name) for name in current.original_files
                     if Path(name).suffix.lower() in (".xml", ".xsp", ".po")}
         for baseline, expected, wrong in ((False, "2.1.0", "2.0.23"), (True, "2.0.23", "2.1.0")):
@@ -300,7 +318,7 @@ class ReviewedInventoryRegressions(unittest.TestCase):
                     identity = next(n for n in report["checks"] if n["check"] == "manifest:identity")
                     self.assertEqual(identity["passed"], version == expected)
                     if version == wrong:
-                        with tempfile.TemporaryDirectory(prefix="aura-version-reject-", dir="/tmp") as temporary:
+                        with tempfile.TemporaryDirectory(prefix="aura-version-reject-", dir=tempfile.gettempdir()) as temporary:
                             output = Path(temporary) / "rejected"
                             with self.assertRaisesRegex(ValueError, "identity/version"):
                                 build(fixture, output)

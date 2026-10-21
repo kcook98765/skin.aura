@@ -111,6 +111,7 @@
 1080i/script-skinshortcuts.xml
 LICENSE.txt
 README
+THIRD-PARTY-NOTICES.txt
 addon.xml
 changelog.txt
 colors/Dark Dialogs.xml

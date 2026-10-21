@@ -1,0 +1,84 @@
+Aura Omega 2.1.0 - development candidate
+Third-party attribution and known licensing limitations
+
+Original Aura: jurialmunkey, https://github.com/jurialmunkey/skin.aura
+Continuation: kcook98765, https://github.com/kcook98765/skin.aura
+
+Aura's existing LICENSE.txt is retained. Its project-level Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 notice does not replace the separate
+rights and terms of bundled fonts, icons, photographs or other third-party work.
+All existing copyright notices, embedded metadata and supplied licenses remain.
+This summary is attribution and disclosure, not legal advice or a new license.
+
+FONT ATTRIBUTION AND SUPPLIED LICENSES
+
+Apache License 2.0:
+- Roboto Condensed Regular/Bold/Light and Roboto Regular: Google, 2014.
+- Roboto Mono Bold: Google, 2015.
+- Luckiest Guy: Brian J. Bonislawsky / Astigmatic (AOETI), 2010.
+  The complete Apache license is included in:
+  fonts/lyrics/Luckiest Guy_LICENSE.txt
+  Retain each font's embedded attribution and applicable license/change notices.
+
+Roboto-Regular-LineSpacingMod.ttf is a modified Roboto font. jurialmunkey
+introduced this exact binary in Horizon commit
+499b3044d358c6b26d7be826482df43dc4f15d26 on 2017-07-19, described as
+"linespacing mod of font so that textboxes play nice". It retains Google's
+2014 copyright and embedded Apache licensing. This records the known change;
+it is not a certification that every modified-file notice obligation is resolved.
+Source: https://github.com/jurialmunkey/skin.horizon/commit/499b3044d358c6b26d7be826482df43dc4f15d26
+
+SIL Open Font License 1.1 (preserve the full copyright/license and Reserved Font
+Name conditions; these fonts are not relicensed under Aura's project license):
+- Exo 2: Natanael Gama, 2013; fonts/lyrics/Exo2 License.txt (RFN: Exo).
+- Poller One: Sorkin Type Co, 2011;
+  fonts/lyrics/Poller One_licence.txt (RFNs: Poller, Poller One).
+- Fredoka One: Milena Brandao, 2011;
+  fonts/lyrics/Fredoka One_license.txt (RFN: Fredoka).
+- Ranchers: Pablo Impallari and Brenda Gallo, 2012;
+  fonts/lyrics/Ranchers-Regular_license.txt (RFN: Ranchers).
+Exact-build/modification provenance remains incomplete for Exo 2 and Roboto
+Mono. A missing binary match is not by itself a prohibition or a new grant.
+
+Other supplied font notices, preserved verbatim:
+- SF Distant Galaxy / ShyFonts: fonts/lyrics/SF Distant Galaxy_Readme.txt
+- Nasalization / Typodermic: fonts/lyrics/nasalization_license.pdf
+- Geomancy / Natasha Maria Fernandez-Fountain, One by Four:
+  fonts/lyrics/Geomancy License.txt
+- BOXING / Tano Veron: fonts/lyrics/BOXING License.txt
+- The Bold Font / PINDAROTS: fonts/lyrics/Theboldfont License.txt
+
+KNOWN UNRESOLVED REDISTRIBUTION RESTRICTIONS
+
+- SF Distant Galaxy's supplied terms prohibit inclusion as part of another
+  product and impose original-package conditions. No applicable permission
+  clearing public skin-source and ZIP distribution has been established.
+- Nasalization's supplied EULA restricts public sharing; its free-font exception
+  is company/household sharing. No applicable broader redistribution grant has
+  been established for this binary. Other Typodermic public-domain fonts do not
+  establish that this Nasalization edition is public domain.
+- Geomancy permits free distribution of unmodified fonts but prohibits edited
+  versions, renaming and sale. The provenance of this TTF build remains unclear.
+- BOXING has personal-use, commercial-use and no-alteration/no-profit conditions;
+  public skin-bundling permission remains unclear. The Bold Font's "free font"
+  description alone does not establish redistribution permission.
+- Icon images credited to iconmonstr.com have separate terms:
+  https://iconmonstr.com/license/
+  Application-design use is permitted, while redistribution/transfer restrictions
+  also exist. Exact asset mapping, applicable historical terms and permission for
+  reusable public source/downstream distribution remain unresolved. This is not
+  a finding that all application-bundled icons are categorically forbidden.
+- Language flags in media/lang/ embed the condition "Free for opensource
+  non-profitable projects. For anything else contact herbert@knavs.net".
+  Retain that notice. Its intended redistribution scope has not been established;
+  source-available and NonCommercial do not automatically mean open source.
+- Provenance/use permissions for some inherited photographs, backgrounds and
+  media-art previews remain unverified. Third-party logos/brands retain their
+  owners' rights; a project or icon license does not grant trademark rights.
+
+Publishing raw files on GitHub and distributing an installable ZIP both involve
+redistribution. Acknowledging restrictions does not satisfy them or authorize
+publication. Existing public history, personal use, candidate status and a
+successful build/checker run do not establish permission. No fonts or artwork
+have been removed, replaced or cleared by adding this notice. Further asset
+changes require a separate decision; all supplied notices must remain available.

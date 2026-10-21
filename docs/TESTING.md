@@ -1,12 +1,43 @@
 # Testing status and procedure
 
-## Current status
+## Notice-only preparation results - 2026-10-20
+
+The simplified preparation changes only documentation, a shipped notice and
+packaging/regression tooling. It is an **uncommitted worktree candidate**, not a
+new release or runtime test. The earlier full-suite results below remain separate.
+
+| Check | Result |
+| --- | --- |
+| Documentation, links, attribution and unchanged manifest | 6 tests passed |
+| Focused packaging, notices, confirmation and selected manifest/source regressions | 30 tests passed |
+| Source assertions | 399 passed, 0 failed, 8 retained coverage warnings |
+| Parsed source | 127 XML, 19 XSP, 32 AST-only expressions |
+| Explicit cached Omega dependency audit | Passed; no live index fetch or dependency installation |
+| Toolkit syntax, manifest, paths and package | Passed on the 1,802-file candidate |
+| Runtime Python typing | Not applicable: no runtime Python files |
+| Official checker | Completed, failed: five screenshot errors / three warnings; exit 1 |
+| ZIP inspection | Notice verbatim; all 10 supplied font notices and LICENSE.txt preserved; CRC/source/stage/readback passed |
+| Kodi runtime acceptance | Not performed or newly established |
+
+The exact manifest adds only `THIRD-PARTY-NOTICES.txt` to the previous candidate.
+The genuine 2.0.23 baseline still has its original 1,802 files and omits that
+notice; equal file counts do not mean equal inventories. Existing skin XML,
+fonts, artwork, manifest and license files are unchanged. The current full suite
+was not rerun; 36 focused tests plus source/toolkit checks cover this bounded edit.
+
+The five screenshot errors and all three official warnings are the same findings
+listed below. The eight source-coverage warning categories also remain. None is
+suppressed or treated as a pass, and technical validation supplies no missing
+redistribution permission. No broad asset investigation or replacement occurred.
+
+## Earlier Phase 2 results
 
 Phase 2 covers local preservation, isolated preparation and static validation.
 **No runtime testing was performed in Phase 2.**
 Fresh local results recorded on **2026-10-20** for implementation commit
 `a426f21b1c2d29a204d198dcee24b89bddc446df`; subsequent result recording changes
-documentation only. These are new static results, not adopted historical totals:
+documentation only. These results belong to that checkpoint, not automatically
+to later notice/packaging changes:
 
 | Area | Status |
 | --- | --- |
@@ -67,6 +98,10 @@ receipts and artifact hashes are retained privately outside the repository.
 Run commands from the repository root with Python 3.10 or newer. The source
 checker and suite require Git and the retained baseline history described in
 [Packaging](PACKAGING.md). No command below starts Kodi.
+
+Packaging fixtures use Python's temporary-directory policy (`TMPDIR` when
+provided); no workstation-specific directory is required. Use a native Linux
+temporary parent under `/tmp` for builder fixtures and staged validation.
 
 Run the **full** suite using the discovery pattern, rather than only the older
 single-file invocation:

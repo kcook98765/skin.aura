@@ -19,7 +19,7 @@ Moving development documentation is not a substitute for release-pinned source.
 The public **2.1.0 DEVELOPMENT CANDIDATE** label is an intended version, not proof
 of matching manifest and tooling bytes. Verify their agreement before packaging;
 the historical **2.0.23** baseline is a separate comparison artifact.
-Fresh results are recorded in [Testing](TESTING.md): 85 tests and 399 source
+Earlier Phase 2 results are recorded in [Testing](TESTING.md): 85 tests and 399 source
 checks passed, while the official Omega checker failed with five errors and
 three warnings. Phase 2 preserves
 and imports the existing migration and prepares publication metadata, packaging

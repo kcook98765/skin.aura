@@ -14,15 +14,19 @@ VERSION = "2.1.0"
 BASELINE_VERSION = "2.0.23"
 RUNTIME_MANIFEST = "tools/runtime-files.txt"
 RUNTIME_REVIEW_COMMIT = "2402785e7f5e16184955a5bc1f1e92ef666fb7da"
+# The import commit remains the runtime review anchor. The sole subsequent
+# path approval is this root notice; no other import-tree delta is authorized.
+RUNTIME_REVIEW_ADDITIONS = frozenset({"THIRD-PARTY-NOTICES.txt"})
 # Membership approval, not content hashes: a new path review must update both
 # this pin and the exact manifest. Never regenerate approval during a build.
-RUNTIME_MANIFEST_SHA256 = "4a3231e6418d66471727c18c69078457ab12d2e9c339a24809b4f8d2e79d4c87"
+RUNTIME_MANIFEST_SHA256 = "200b1d2aa5d11e83afa0cc725d3feb112900d74a4681a805304044ef8e831979"
 DIRECTORIES = (
     "1080i", "colors", "extras", "fonts", "language", "media", "resources",
     "shortcuts", "themes",
 )
 ROOT_FILES = (
     "addon.xml", "README", "LICENSE.txt", "changelog.txt", "icon.png", "fanart.jpg",
+    *sorted(RUNTIME_REVIEW_ADDITIONS),
 )
 OPTIONAL_DOCS = ()  # Compatibility only: operational documentation is never runtime.
 GENERATED = "1080i/script-skinshortcuts-includes.xml"
@@ -34,9 +38,10 @@ REMOVED_RUNTIME = frozenset("1080i/" + name + ".xml" for name in (
 ADDED_RUNTIME = frozenset("1080i/" + name + ".xml" for name in (
     "DialogColorPicker", "MyFavourites", "DialogVideoManager",
     "Custom_1140_AiringCalendar", "Includes_PVR_Omega",
-))
+)) | RUNTIME_REVIEW_ADDITIONS
 FOCUSED_DELTA = frozenset((
     "addon.xml", "README", "changelog.txt", "shortcuts/overrides.xml",
+    *RUNTIME_REVIEW_ADDITIONS,
     # New calendar/PVR/settings labels in the three bundled locales.
     "language/resource.language.en_gb/strings.po", "language/resource.language.en_us/strings.po",
     "language/resource.language.de_de/strings.po",
@@ -62,8 +67,9 @@ FOCUSED_DELTA = frozenset((
 
 def git(root, *args):
     result = subprocess.run(
-        ["git", "-C", str(root), *args], stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, check=False,
+        ["git", "-c", "diff.autoRefreshIndex=false", "-C", str(root), *args],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"},
     )
     if result.returncode:
         raise ValueError(result.stderr.decode("utf-8", "replace").strip())
@@ -110,7 +116,7 @@ def runtime_path(name):
     if any(part.lower() in {"docs", "documentation", "internal", "generated"} for part in path.parts):
         return False
     # Exact membership is still mandatory, including for these admissible formats.
-    # Bundled font licenses/readmes and the six root distribution files remain.
+    # Bundled font licenses/readmes and the seven root distribution files remain.
     return path.suffix.lower() in {
         ".xml", ".xsp", ".po", ".png", ".jpg", ".jpeg", ".ttf", ".otf",
         ".xbt", ".txt", ".pdf",
@@ -133,7 +139,7 @@ def parse_runtime_manifest(data):
     if files != sorted(files):
         raise ValueError("Runtime manifest paths must be sorted")
     if not set(ROOT_FILES) <= seen:
-        raise ValueError("Runtime manifest must include all six root files")
+        raise ValueError("Runtime manifest must include all required root files")
     for directory in DIRECTORIES:
         if not any(name.startswith(directory + "/") for name in files):
             raise ValueError("Runtime manifest missing directory: " + directory)
@@ -207,6 +213,7 @@ class Source:
                 "kind": "reviewed-exact-file-list", "path": RUNTIME_MANIFEST,
                 "sha256": digest,
                 "reviewed_commit": RUNTIME_REVIEW_COMMIT,
+                "reviewed_additions": sorted(RUNTIME_REVIEW_ADDITIONS),
                 "file_count": len(self.files),
             }
             # Scan disk, not git's tracked/ignored view. Even admissible additions

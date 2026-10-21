@@ -41,10 +41,10 @@ The builder creates a `skin.aura/` stage, a ZIP and `receipt.json` in that outpu
 directory. It snapshots its selected payload, uses sorted entries, fixed ZIP
 timestamps and normalized file/directory modes, then checks CRCs and source,
 stage and ZIP readback consistency. Those checks are packaging checks only;
-the builder explicitly does not run validation. The fresh candidate build
-contains **1,801 payload files** and passed its CRC/readback/tree checks.
-The exact manifest's SHA-256 is
-`4a3231e6418d66471727c18c69078457ab12d2e9c339a24809b4f8d2e79d4c87`.
+the builder explicitly does not run validation. The notice-only candidate now
+approves **1,802 payload files**, adding only `THIRD-PARTY-NOTICES.txt` to the
+previous 1,801-file inventory. The exact current manifest's SHA-256 is
+`200b1d2aa5d11e83afa0cc725d3feb112900d74a4681a805304044ef8e831979`.
 Raw build receipts and artifact hashes stay outside this source tree; consult
 [Testing](TESTING.md) for the separate checker outcome and retained blockers.
 
@@ -63,8 +63,12 @@ Keep comparison artifacts clearly distinguished from the current candidate.
 The builder's payload rules live in `tools/omega_common.py`, with exact
 current-source membership in `tools/runtime-files.txt`; they are not derived
 from `.gitignore` or the new archive attributes. The reviewed list covers runtime
-directories and named root files, including `README`, `LICENSE.txt` and
-`changelog.txt`. Development tooling, generated shortcut includes and saved user
+directories and named root files, including `README`, `LICENSE.txt`,
+`changelog.txt` and `THIRD-PARTY-NOTICES.txt`. The root notice is mandatory for
+current builds and omitted from the genuine historical baseline. Once the
+reviewed changes are committed, it will also be retained in source archives;
+unlike `docs/`, it is not export-ignored. Uncommitted files are not in HEAD's archive.
+Development tooling, generated shortcut includes and saved user
 data do not belong in that list. The new `docs/` directory is development-only.
 All bundled font notices, including the Nasalization PDF, remain assets in the
 runtime tree; do not strip notices to quiet a checker or shrink a package.
@@ -75,7 +79,9 @@ exclusion is source-export hygiene only. A repository download or `git archive`
 is **not documented as a supported Kodi installer** and does not replace the
 builder's payload review. The new license review being excluded from the local
 payload does not remove the obligation to deliver every required license,
-attribution and modification notice in any eventual distribution.
+attribution and modification notice in any eventual distribution. The root
+notice and every existing supplied font license are delivered without replacing
+or truncating them. Adding the notice does not clear unresolved permissions.
 
 ## Outstanding package gates
 
