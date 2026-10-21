@@ -55,6 +55,18 @@
     <include name="Global_FadeTime_600"><fadetime>600</fadetime></include>
 
     <include name="Global_Background">
+        <!-- Probe the native local extra-fanart folder offscreen so a missing folder
+             falls through to selected native fanart instead of a blank background. -->
+        <control type="list" id="7979">
+            <left>-2160</left>
+            <width>1</width>
+            <height>1</height>
+            <itemlayout width="1" height="1" />
+            <focusedlayout width="1" height="1" />
+            <content>$VAR[Aura_ExtraFanartFolder]</content>
+        </control>
+        <!-- Resolve a folder/slideshow to an actual image before asking SkinInfo
+             to blur it. This probe NEVER reads the visible/blurred background. -->
         <control type="multiimage" id="7975">
             <left>-2160</left>
             <width>1</width>
@@ -62,20 +74,11 @@
             <timeperimage>7000</timeperimage>
             <randomize>true</randomize>
             <fadetime>600</fadetime>
+            <loop>true</loop>
             <imagepath background="true">$VAR[Global_Background_Image_Var]</imagepath>
-            <visible>System.HasAddon(script.colorbox)</visible>
-            <visible>Skin.HasSetting(EnableBlur)</visible>
+            <visible>Skin.HasSetting(EnableBlur) + Skin.HasSetting(SkinInfo.Blur) + Skin.HasSetting(SkinInfo.Service.Library) + System.AddonIsEnabled(script.skin.info.service)</visible>
         </control>
-        <control type="multiimage" id="7977">
-            <left>-2160</left>
-            <width>1</width>
-            <height>1</height>
-            <timeperimage>5000</timeperimage>
-            <randomize>true</randomize>
-            <imagepath background="true">$VAR[Image_Poster_Color]</imagepath>
-            <visible>System.HasAddon(script.colorbox)</visible>
-            <visible>Skin.HasSetting(CycleColors) | Skin.HasSetting(MatchOverlayColors) | Skin.HasSetting(MatchColors)</visible>
-        </control>
+        <include>Object_Aura_BlurSource</include>
         <include>Global_Videowindow</include>
         <include>Global_Visualisation</include>
         <control type="group">
@@ -147,9 +150,36 @@
         <value>common/null.png</value>
     </variable>
 
+    <expression name="Aura.ExtraFanartEligible">Skin.HasSetting(SkinHelper.EnableExtraFanart) + !ListItem.IsParentFolder + [String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)] + !String.IsEmpty(ListItem.Path) + !String.StartsWith(ListItem.Path,plugin://) + !String.StartsWith(ListItem.Path,videodb://)</expression>
+    <variable name="Aura_ExtraFanartFolder">
+        <!-- Keep the existing saved toggle. It controls native folders now, not a
+             helper's account/cache directory. No plugin/non-file path inference. -->
+        <value condition="$EXP[Aura.ExtraFanartEligible]">$INFO[ListItem.Path,,extrafanart/]</value>
+    </variable>
+
+    <!-- Evaluated at native info-dialog entry, before any cast/gallery row gets
+         focus. Only native image art is eligible; never a slideshow directory. -->
+    <variable name="Aura_InfoBlurNative">
+        <value condition="!String.IsEmpty(ListItem.Art(tvshow.fanart))">$INFO[ListItem.Art(tvshow.fanart)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(artist.fanart))">$INFO[ListItem.Art(artist.fanart)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
+    </variable>
+
+    <!-- Explicit window properties make the modal service lookup and base-window
+         underlay agree. Info art is a dialog-entry snapshot, refreshed on reopen;
+         it does not follow an in-place artwork edit until then. No preview layer.
+         Non-info windows still resolve directories through their own multiimage. -->
+    <variable name="Aura_BlurImage">
+        <value condition="Window.IsVisible(DialogAddonInfo.xml)">$INFO[Window(addoninformation).Property(Aura.Blur.InfoImage)]</value>
+        <value condition="Window.IsVisible(DialogMusicInfo.xml)">$INFO[Window(musicinformation).Property(Aura.Blur.InfoImage)]</value>
+        <value condition="Window.IsVisible(DialogVideoInfo.xml)">$INFO[Window(movieinformation).Property(Aura.Blur.InfoImage)]</value>
+        <value condition="Control.IsVisible(7975) + !String.IsEmpty(Control.GetLabel(7975))">$INFO[Control.GetLabel(7975)]</value>
+    </variable>
+
     <variable name="Global_Background_Image">
         <value condition="Skin.HasSetting(NoFanart)">$VAR[Global_Background_Image_NoFanart]</value>
-        <value condition="!String.IsEmpty(Window(home).Property(ImageFilterFIVE)) + Skin.HasSetting(EnableBlur) + [!Skin.HasSetting(OnlyBlurInfo) | [Skin.HasSetting(OnlyBlurInfo) + [Window.IsVisible(DialogVideoInfo.xml) | Window.IsVisible(DialogMusicInfo.xml) | Window.IsVisible(DialogAddonInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogVideoInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogInfo.xml)]]] + !Control.HasFocus(9602)">$INFO[Window(home).Property(ImageFilterFIVE)]</value>
+        <value condition="Skin.HasSetting(EnableBlur) + Skin.HasSetting(SkinInfo.Blur) + Skin.HasSetting(SkinInfo.Service.Library) + System.AddonIsEnabled(script.skin.info.service) + !String.IsEmpty(Window(Home).Property(SkinInfo.Aura.BlurredImage)) + !String.IsEmpty(Control.GetLabel(7978)) + String.IsEqual(Window(Home).Property(SkinInfo.Aura.BlurredImage.Original),Control.GetLabel(7978)) + [!Skin.HasSetting(OnlyBlurInfo) | [Skin.HasSetting(OnlyBlurInfo) + [Window.IsVisible(DialogVideoInfo.xml) | Window.IsVisible(DialogMusicInfo.xml) | Window.IsVisible(DialogAddonInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogVideoInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogInfo.xml)]]] + !Control.HasFocus(9602)">$INFO[Window(Home).Property(SkinInfo.Aura.BlurredImage)]</value>
         <value>$VAR[Global_Background_Image_Var]</value>
     </variable>
 
@@ -163,23 +193,8 @@
         <value condition="Window.IsVisible(script-script.extendedinfo-DialogVideoInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogInfo.xml)">null.png</value>
         <value condition="Window.IsVisible(script-script.extendedinfo-VideoList.xml) + !String.IsEmpty(ListItem.Property(Fanart_Image))">$INFO[ListItem.Property(Fanart_Image)]</value>
 
-        <!-- Next Aired -->
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(200) | Control.HasFocus(8200)] + !String.IsEmpty(Container(200).ListItem.Property(Fanart))">$INFO[Container(200).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(201) | Control.HasFocus(8201)] + !String.IsEmpty(Container(201).ListItem.Property(Fanart))">$INFO[Container(201).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(202) | Control.HasFocus(8202)] + !String.IsEmpty(Container(202).ListItem.Property(Fanart))">$INFO[Container(202).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(203) | Control.HasFocus(8203)] + !String.IsEmpty(Container(203).ListItem.Property(Fanart))">$INFO[Container(203).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(204) | Control.HasFocus(8204)] + !String.IsEmpty(Container(204).ListItem.Property(Fanart))">$INFO[Container(204).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(205) | Control.HasFocus(8205)] + !String.IsEmpty(Container(205).ListItem.Property(Fanart))">$INFO[Container(205).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(206) | Control.HasFocus(8206)] + !String.IsEmpty(Container(206).ListItem.Property(Fanart))">$INFO[Container(206).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(207) | Control.HasFocus(8207)] + !String.IsEmpty(Container(207).ListItem.Property(Fanart))">$INFO[Container(207).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(208) | Control.HasFocus(8208)] + !String.IsEmpty(Container(208).ListItem.Property(Fanart))">$INFO[Container(208).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(209) | Control.HasFocus(8209)] + !String.IsEmpty(Container(209).ListItem.Property(Fanart))">$INFO[Container(209).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(210) | Control.HasFocus(8210)] + !String.IsEmpty(Container(210).ListItem.Property(Fanart))">$INFO[Container(210).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(211) | Control.HasFocus(8211)] + !String.IsEmpty(Container(211).ListItem.Property(Fanart))">$INFO[Container(211).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(212) | Control.HasFocus(8212)] + !String.IsEmpty(Container(212).ListItem.Property(Fanart))">$INFO[Container(212).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(213) | Control.HasFocus(8213)] + !String.IsEmpty(Container(213).ListItem.Property(Fanart))">$INFO[Container(213).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(214) | Control.HasFocus(8214)] + !String.IsEmpty(Container(214).ListItem.Property(Fanart))">$INFO[Container(214).ListItem.Property(Fanart)]</value>
-        <value condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + [Control.HasFocus(215) | Control.HasFocus(8215)] + !String.IsEmpty(Container(215).ListItem.Property(Fanart))">$INFO[Container(215).ListItem.Property(Fanart)]</value>
+        <!-- Official seven-day airing calendar; absent artwork uses native fallbacks below. -->
+        <value condition="Window.IsVisible(Custom_1140_AiringCalendar.xml) + !String.IsEmpty(Container(50).ListItem.Art(fanart))">$INFO[Container(50).ListItem.Art(fanart)]</value>
 
         <!-- Weather -->
         <value condition="[Window.IsVisible(weather) | [Window.IsVisible(Home) + String.IsEqual(Container(300).ListItem.Property(widget),Weather)]] + System.HasAddon(resource.images.weatherfanart.multi)">$INFO[Window(Weather).Property(Current.FanartCode),resource://resource.images.weatherfanart.multi/,/]</value>     
@@ -188,35 +203,19 @@
         <value condition="Skin.HasSetting(SkinHelper.EnableAnimatedPosters) + !String.IsEmpty(ListItem.Art(animatedfanart))">$INFO[ListItem.Art(animatedfanart)]</value>
         <value condition="Skin.HasSetting(SkinHelper.EnableAnimatedPosters) + !String.IsEmpty(Container.ListItem.Art(animatedfanart)) + Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)">$INFO[Container.ListItem.Art(animatedfanart)]</value>
 
-        <!-- Artwork Helper Extra Fanart -->
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,set) | String.IsEqual(ListItem.DBTYPE,musicvideo) | String.IsEqual(ListItem.DBTYPE,tvshow)] + !String.IsEmpty(ListItem.DBID)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(ListItem.DBTYPE,season) | String.IsEqual(ListItem.DBTYPE,episode)] + !String.IsEmpty(ListItem.DBID)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=tvshow.fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + String.IsEqual(ListItem.DBTYPE,artist)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(ListItem.DBTYPE,album) | String.IsEqual(ListItem.DBTYPE,song)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=artist.fanart</value>
-
-        <!-- Artwork Helper Extra Fanart Homescreen -->
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + Window.IsVisible(DialogVideoInfo.xml) + [String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,set) | String.IsEqual(ListItem.DBTYPE,musicvideo) |  String.IsEqual(ListItem.DBTYPE,tvshow)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + Window.IsVisible(DialogVideoInfo.xml) + [String.IsEqual(ListItem.DBTYPE,season) | String.IsEqual(ListItem.DBTYPE,episode)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=tvshow.fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + Window.IsVisible(DialogMusicInfo.xml) + String.IsEqual(ListItem.DBTYPE,artist)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + Window.IsVisible(DialogMusicInfo.xml) + [String.IsEqual(ListItem.DBTYPE,album) | String.IsEqual(ListItem.DBTYPE,song)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[ListItem.DBID]&amp;&amp;arttype=artist.fanart</value>
-
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(Container.ListItem.DBTYPE,movie) | String.IsEqual(Container.ListItem.DBTYPE,set) | String.IsEqual(Container.ListItem.DBTYPE,musicvideo) | String.IsEqual(Container.ListItem.DBTYPE,tvshow)] + !String.IsEmpty(Container.ListItem.DBID)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[Container.ListItem.DBID]&amp;&amp;containerid=&amp;&amp;arttype=fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(Container.ListItem.DBTYPE,season) | String.IsEqual(Container.ListItem.DBTYPE,episode)] + !String.IsEmpty(Container.ListItem.DBID)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[Container.ListItem.DBID]&amp;&amp;containerid=&amp;&amp;arttype=tvshow.fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(Container.ListItem.DBTYPE,season) | String.IsEqual(Container.ListItem.DBTYPE,episode)] + String.IsEmpty(Container.ListItem.DBID)">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[Container.ListItem.Label]&amp;&amp;containerid=&amp;&amp;arttype=tvshow.fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(Container.ListItem.DBTYPE,album) | String.IsEqual(Container.ListItem.DBTYPE,song)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[Container.ListItem.DBID]&amp;&amp;containerid=&amp;&amp;arttype=artist.fanart</value>
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart) + !String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + System.HasAddon(script.artwork.helper) + [String.IsEqual(Container.ListItem.DBTYPE,artist)]">plugin://script.artwork.helper/multiimage/listitem/?refresh=$INFO[Container.ListItem.DBID]&amp;&amp;containerid=&amp;&amp;arttype=fanart</value>
-
-        <!-- Skin Helper Extra Fanart -->
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.ExtraFanArt)) + Skin.HasSetting(SkinHelper.EnableExtraFanart) + [!Window.IsVisible(Home) | [Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)]]">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.ExtraFanArt)]</value>
-
-        <!-- Fanart -->
+        <!-- Native selected-item fanart replaces the unavailable helper-owned folder.
+             A library-wide SkinInfo slideshow is not per-item extra fanart and must
+             not displace Aura's selected artwork or its existing folder/playlist backgrounds. -->
+        <value condition="$EXP[Aura.ExtraFanartEligible] + Integer.IsGreater(Container(7979).NumItems,0) + !Container(7979).IsUpdating + [!Window.IsVisible(Home) | [Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)]]">$VAR[Aura_ExtraFanartFolder]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(tvshow.fanart))">$INFO[ListItem.Art(tvshow.fanart)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(artist.fanart))">$INFO[ListItem.Art(artist.fanart)]</value>
         <value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
         <value condition="!String.IsEmpty(Container.ListItem.Art(fanart)) + Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)">$INFO[Container.ListItem.Art(fanart)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Fanart_Image))">$INFO[ListItem.Property(Fanart_Image)]</value>
         <value condition="!String.IsEmpty(Container.ListItem.Property(Fanart_Image)) + Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)">$INFO[Container.ListItem.Property(Fanart_Image)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Fanart))">$INFO[ListItem.Property(Fanart)]</value>
         <value condition="!String.IsEmpty(Container.ListItem.Property(Fanart)) + Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)">$INFO[Container.ListItem.Property(Fanart)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.Fanart)) + [!Window.IsVisible(Home) | [Window.IsVisible(Home) + !Control.HasFocus(300) + !Control.HasFocus(302)]]">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.Fanart)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Fanart))">$INFO[Window(Home).Property(SkinInfo.Online.Fanart)]</value>
 
         <!-- Pictures -->
         <value condition="Window.IsVisible(MyPics.xml) + !String.IsEmpty(ListItem.FileNameAndPath)">$INFO[ListItem.FileNameAndPath]</value>

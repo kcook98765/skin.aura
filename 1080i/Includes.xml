@@ -11,7 +11,6 @@
     <include file="Includes_Items.xml" />
     <include file="Includes_Images.xml" />
     <include file="Includes_Labels.xml" />
-    <include file="Includes_NextAired.xml" />
     <include file="Includes_Object.xml" />
     <include file="Includes_OSD.xml" />
     <include file="Includes_Statusbar.xml" />
@@ -23,6 +22,7 @@
     <include file="Includes_View.xml" />
     <include file="Includes_View_List.xml" />
     <include file="Includes_View_Posters.xml" />
+    <include file="Includes_PVR_Omega.xml" />
 
     <include file="script-skinshortcuts-includes.xml"/>
 
@@ -32,20 +32,16 @@
     <include condition="!Skin.HasSetting(MouseMode) + !Skin.HasSetting(DisableCategoriesWidgetLabel)" file="Constants_Home_NoMouse_BigSubmenu.xml" />
 
     <variable name="ColorHighlight">
-        <value condition="[Skin.HasSetting(CycleColors) | Skin.HasSetting(MatchColors)] + !String.IsEqual(Window(home).Property(SEVEN_daemon_set),None) + !String.IsEmpty(Window(home).Property(ImageColorSEVEN)) + !String.IsEqual(Window(home).Property(ImageColorSEVEN),ffffffff) + !String.IsEqual(Window(home).Property(ImageColorSEVEN),ff000000)">$INFO[Window(home).Property(ImageColorSEVEN)]</value>
         <value condition="!String.IsEmpty(Skin.String(focuscolor.name))">$INFO[Skin.String(focuscolor.name)]</value>
         <value>Highlight</value>
     </variable>
     <variable name="ColorHighlight2">
-        <value condition="[Skin.HasSetting(CycleColors) | Skin.HasSetting(MatchColors)] + !String.IsEqual(Window(home).Property(SEVEN_daemon_set),None) + !String.IsEmpty(Window(home).Property(ImageCColorSEVEN)) + !String.IsEqual(Window(home).Property(ImageCColorSEVEN),ffffffff) + !String.IsEqual(Window(home).Property(ImageCColorSEVEN),ff000000)">$INFO[Window(home).Property(ImageCColorSEVEN)]</value>
         <value condition="!String.IsEmpty(Skin.String(gradientcolor.name))">$INFO[Skin.String(gradientcolor.name)]</value>
         <value>GradientHighlight</value>
     </variable>
 
     <variable name="ColorOverlay">
         <value condition="Skin.HasSetting(DisableOverlayColor)">FFffffff</value>
-        <value condition="Skin.HasSetting(MatchOverlayColors) + !String.IsEqual(Window(home).Property(SEVEN_daemon_set),None) + !String.IsEmpty(Window(home).Property(ImageColorSEVEN)) + !String.IsEqual(Window(home).Property(ImageColorSEVEN),ffffffff) + !String.IsEqual(Window(home).Property(ImageColorSEVEN),ff000000)">$INFO[Window(home).Property(ImageColorSEVEN)]</value>
-        <value condition="Skin.HasSetting(MatchOverlayColors)">$VAR[ColorHighlight]</value>
         <value condition="!String.IsEmpty(Skin.String(overlaycolor.name))">$INFO[Skin.String(overlaycolor.name)]</value>
         <value>Overlay</value>
     </variable>
@@ -55,5 +51,21 @@
         <top>0</top>
         <width>1920</width>
         <height>1080</height>
+    </include>
+
+    <!-- Library monitoring is local. Online work requires explicit opt-in. Never
+         set broad SkinInfo.Service, which would enable both provider groups. -->
+    <include name="Aura_Services_OnLoad">
+        <onload>Skin.Reset(SkinInfo.Service)</onload>
+        <onload>Skin.SetBool(SkinInfo.Service.Library)</onload>
+        <onload condition="Skin.HasSetting(Aura.OnlineEnrichment)">Skin.SetBool(SkinInfo.Service.Online)</onload>
+        <onload condition="!Skin.HasSetting(Aura.OnlineEnrichment)">Skin.Reset(SkinInfo.Service.Online)</onload>
+        <onload condition="Skin.HasSetting(Aura.OnlineEnrichment)">Skin.SetBool(TMDbHelper.Service)</onload>
+        <onload condition="!Skin.HasSetting(Aura.OnlineEnrichment)">Skin.Reset(TMDbHelper.Service)</onload>
+        <onload>SetProperty(SkinInfo.BlurSourceVar,Aura_BlurImage,Home)</onload>
+        <onload>SetProperty(SkinInfo.BlurPrefix,Aura,Home)</onload>
+        <onload condition="String.IsEmpty(Skin.String(SkinInfo.BlurRadius)) + !String.IsEmpty(Skin.String(colorbox_blursize))">Skin.SetString(SkinInfo.BlurRadius,$INFO[Skin.String(colorbox_blursize)])</onload>
+        <onload condition="Skin.HasSetting(EnableBlur)">Skin.SetBool(SkinInfo.Blur)</onload>
+        <onload condition="!Skin.HasSetting(EnableBlur)">Skin.Reset(SkinInfo.Blur)</onload>
     </include>
 </includes>

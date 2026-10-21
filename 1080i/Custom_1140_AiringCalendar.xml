@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="1140">
+    <defaultcontrol always="true">9000</defaultcontrol>
+    <menucontrol>300</menucontrol>
+    <onload>SetProperty(Aura.Calendar.Day,week)</onload>
+    <onunload>ClearProperty(Aura.Calendar.Day)</onunload>
+    <controls>
+        <include>Global_Background</include>
+
+        <!-- Embuary Info 2.0.8: week is today plus six days, while 0..6
+             are Monday..Sunday within that same rolling seven-day range.
+             Only the selected route is requested. No legacy controller. -->
+        <control type="list" id="9000">
+            <left>70</left>
+            <top>145</top>
+            <width>1780</width>
+            <height>66</height>
+            <orientation>horizontal</orientation>
+            <onleft>9000</onleft>
+            <onright>9000</onright>
+            <onup>300</onup>
+            <ondown condition="System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Container(50).NumItems,0) + !Container(50).IsUpdating">50</ondown>
+            <ondown condition="!System.AddonIsEnabled(script.embuary.info) | !Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating">9000</ondown>
+            <itemlayout width="222.5" height="66">
+                <control type="image">
+                    <right>4</right>
+                    <texture border="5" colordiffuse="main_fg_12">common/box.png</texture>
+                </control>
+                <control type="image">
+                    <top>60</top>
+                    <height>6</height>
+                    <right>4</right>
+                    <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(day),Window.Property(Aura.Calendar.Day))</visible>
+                </control>
+                <control type="label">
+                    <left>12</left>
+                    <right>16</right>
+                    <height>66</height>
+                    <align>center</align>
+                    <font>font_statusbar</font>
+                    <textcolor>main_fg_100</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="222.5" height="66">
+                <control type="image">
+                    <right>4</right>
+                    <texture border="5" colordiffuse="$VAR[ColorHighlight]">common/box.png</texture>
+                    <visible>Control.HasFocus(9000)</visible>
+                </control>
+                <control type="image">
+                    <top>60</top>
+                    <height>6</height>
+                    <right>4</right>
+                    <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(day),Window.Property(Aura.Calendar.Day))</visible>
+                </control>
+                <control type="label">
+                    <left>12</left>
+                    <right>16</right>
+                    <height>66</height>
+                    <align>center</align>
+                    <font>font_statusbar</font>
+                    <textcolor>$VAR[AiringCalendar_DayTextColor]</textcolor>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </focusedlayout>
+            <content>
+                <item><label>$LOCALIZE[31921]</label><property name="day">week</property><onclick>SetProperty(Aura.Calendar.Day,week)</onclick></item>
+                <item><label>$LOCALIZE[11]</label><property name="day">0</property><onclick>SetProperty(Aura.Calendar.Day,0)</onclick></item>
+                <item><label>$LOCALIZE[12]</label><property name="day">1</property><onclick>SetProperty(Aura.Calendar.Day,1)</onclick></item>
+                <item><label>$LOCALIZE[13]</label><property name="day">2</property><onclick>SetProperty(Aura.Calendar.Day,2)</onclick></item>
+                <item><label>$LOCALIZE[14]</label><property name="day">3</property><onclick>SetProperty(Aura.Calendar.Day,3)</onclick></item>
+                <item><label>$LOCALIZE[15]</label><property name="day">4</property><onclick>SetProperty(Aura.Calendar.Day,4)</onclick></item>
+                <item><label>$LOCALIZE[16]</label><property name="day">5</property><onclick>SetProperty(Aura.Calendar.Day,5)</onclick></item>
+                <item><label>$LOCALIZE[17]</label><property name="day">6</property><onclick>SetProperty(Aura.Calendar.Day,6)</onclick></item>
+            </content>
+        </control>
+
+        <control type="label">
+            <left>70</left>
+            <top>220</top>
+            <width>1780</width>
+            <height>44</height>
+            <font>font_statusbar</font>
+            <textcolor>main_fg_70</textcolor>
+            <label>$LOCALIZE[31927]</label>
+        </control>
+
+        <control type="list" id="50">
+            <left>70</left>
+            <top>280</top>
+            <width>1100</width>
+            <height>600</height>
+            <orientation>vertical</orientation>
+            <scrolltime>200</scrolltime>
+            <pagecontrol>60</pagecontrol>
+            <onup>9000</onup>
+            <ondown>9000</ondown>
+            <onleft>9000</onleft>
+            <onright>60</onright>
+            <onback>9000</onback>
+            <!-- Provider items are non-playable /info/tv/tmdb/<id> URLs.
+                 Select runs that route, never PlayMedia on a future episode.
+                 Kodi Info uses the provider's native episode InfoTag/plot. -->
+            <onclick condition="System.AddonIsEnabled(script.embuary.info) + String.StartsWith(Container(50).ListItem.FileNameAndPath,plugin://script.embuary.info/)">RunPlugin($ESCINFO[Container(50).ListItem.FileNameAndPath])</onclick>
+            <!-- Keep rejected/missing paths from falling back to the directory
+                 provider's default selection action. Native Info is unchanged. -->
+            <onclick>noop</onclick>
+            <itemlayout width="1100" height="120">
+                <control type="image">
+                    <height>116</height>
+                    <texture border="5" colordiffuse="main_fg_12">common/box.png</texture>
+                </control>
+                <control type="image">
+                    <left>10</left>
+                    <top>10</top>
+                    <width>170</width>
+                    <height>96</height>
+                    <aspectratio>scale</aspectratio>
+                    <texture background="true" fallback="DefaultTVShows.png">$INFO[ListItem.Art(thumb)]</texture>
+                </control>
+                <control type="label">
+                    <left>200</left>
+                    <right>20</right>
+                    <top>14</top>
+                    <height>44</height>
+                    <font>font_small</font>
+                    <textcolor>main_fg_100</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>200</left>
+                    <right>20</right>
+                    <top>64</top>
+                    <height>36</height>
+                    <font>font_statusbar</font>
+                    <textcolor>main_fg_70</textcolor>
+                    <label>$INFO[ListItem.Property(AirDay)]$INFO[ListItem.Premiered, • ,]$INFO[ListItem.Property(AirTime), • ,]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="1100" height="120">
+                <control type="image">
+                    <height>116</height>
+                    <texture border="5" colordiffuse="$VAR[ColorHighlight]">common/box.png</texture>
+                    <visible>Control.HasFocus(50)</visible>
+                </control>
+                <control type="image">
+                    <left>10</left>
+                    <top>10</top>
+                    <width>170</width>
+                    <height>96</height>
+                    <aspectratio>scale</aspectratio>
+                    <texture background="true" fallback="DefaultTVShows.png">$INFO[ListItem.Art(thumb)]</texture>
+                </control>
+                <control type="label">
+                    <left>200</left>
+                    <right>20</right>
+                    <top>14</top>
+                    <height>44</height>
+                    <font>font_small</font>
+                    <textcolor>$VAR[AiringCalendar_EpisodeTextColor]</textcolor>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>200</left>
+                    <right>20</right>
+                    <top>64</top>
+                    <height>36</height>
+                    <font>font_statusbar</font>
+                    <textcolor>$VAR[AiringCalendar_EpisodeDetailColor]</textcolor>
+                    <label>$INFO[ListItem.Property(AirDay)]$INFO[ListItem.Premiered, • ,]$INFO[ListItem.Property(AirTime), • ,]</label>
+                </control>
+            </focusedlayout>
+            <content browse="never">$VAR[AiringCalendar_Content]</content>
+            <visible>System.AddonIsEnabled(script.embuary.info)</visible>
+        </control>
+
+        <control type="scrollbar" id="60">
+            <left>1180</left>
+            <top>280</top>
+            <height>600</height>
+            <width>12</width>
+            <orientation>vertical</orientation>
+            <onleft>50</onleft>
+            <onright>9000</onright>
+            <onup>9000</onup>
+            <ondown>9000</ondown>
+            <onback>9000</onback>
+            <texturesliderbackground colordiffuse="main_fg_12" border="5">common/box.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="main_fg_30" border="5">common/box.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="$VAR[ColorHighlight]" border="5">common/box.png</texturesliderbarfocus>
+            <visible>System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Container(50).NumItems,0)</visible>
+        </control>
+
+        <control type="group">
+            <left>1230</left>
+            <top>280</top>
+            <width>620</width>
+            <visible>System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Container(50).NumItems,0) + !Container(50).IsUpdating</visible>
+            <control type="image">
+                <height>349</height>
+                <aspectratio>keep</aspectratio>
+                <texture background="true" fallback="DefaultTVShows.png">$INFO[Container(50).ListItem.Art(thumb)]</texture>
+            </control>
+            <control type="textbox">
+                <top>370</top>
+                <height>230</height>
+                <font>font_small</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>$INFO[Container(50).ListItem.Plot]</label>
+                <autoscroll time="3000" delay="8000" repeat="8000">!Control.HasFocus(300)</autoscroll>
+            </control>
+        </control>
+
+        <control type="textbox">
+            <left>100</left>
+            <top>390</top>
+            <width>1000</width>
+            <height>180</height>
+            <font>font_small</font>
+            <textcolor>main_fg_70</textcolor>
+            <align>center</align>
+            <label>$LOCALIZE[31922]</label>
+            <visible>System.AddonIsEnabled(script.embuary.info) + !Container(50).IsUpdating + !Integer.IsGreater(Container(50).NumItems,0)</visible>
+        </control>
+        <control type="label">
+            <left>70</left>
+            <top>390</top>
+            <width>1780</width>
+            <height>66</height>
+            <font>font_small</font>
+            <textcolor>main_fg_70</textcolor>
+            <align>center</align>
+            <label>$LOCALIZE[31928]</label>
+            <visible>!System.AddonIsEnabled(script.embuary.info)</visible>
+        </control>
+        <control type="label">
+            <left>70</left>
+            <top>390</top>
+            <width>1100</width>
+            <height>66</height>
+            <font>font_small</font>
+            <textcolor>main_fg_70</textcolor>
+            <align>center</align>
+            <label>$LOCALIZE[31929]</label>
+            <visible>System.AddonIsEnabled(script.embuary.info) + Container(50).IsUpdating</visible>
+        </control>
+        <control type="label">
+            <left>70</left>
+            <top>930</top>
+            <width>1780</width>
+            <height>44</height>
+            <font>font_statusbar</font>
+            <textcolor>main_fg_70</textcolor>
+            <label>$LOCALIZE[31926]</label>
+            <visible>System.AddonIsEnabled(script.embuary.info)</visible>
+        </control>
+
+        <include>Topbar</include>
+    </controls>
+</window>

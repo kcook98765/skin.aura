@@ -522,6 +522,10 @@
                     <label>368</label>
                     <include>Dialog_Standard_Right_Buttons</include>
                 </control>
+                <!-- Native secondary action, including Omega's Browse library. -->
+                <control type="button" id="8">
+                    <include>Dialog_Standard_Right_Buttons</include>
+                </control>
                 <control type="button" id="7">
                     <visible>!Control.IsVisible(3)</visible>
                     <label>222</label>

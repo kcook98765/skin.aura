@@ -1,25 +1,17 @@
 <addon id="skin.aura" name="Aura" provider-name="kcook98765" version="2.0.23">
     <requires>
-        <import addon="xbmc.gui" version="5.15.0" />
-        <import addon="script.skinshortcuts" version="0.4.0"/>
+        <import addon="xbmc.gui" version="5.17.0" />
+        <import addon="script.skinshortcuts" version="2.0.3"/>
         <import addon="script.globalsearch" version="9.0.5"/>
         <import addon="script.image.resource.select" version="0.0.5"/>
         <import addon="resource.images.weathericons.white" version="0.0.6"/>
         <import addon="resource.images.moviegenreicons.transparent" version="0.0.6" />
-        <import addon="script.skin.helper.colorpicker" version="1.0.11"/>
-        <import addon="script.embuary.info" version="0.0.1"/>
-        <import addon="script.embuary.helper" version="1.2.14"/>
-        <import addon="plugin.video.themoviedb.helper" version="0.0.1"/>
+        <import addon="script.embuary.info" version="2.0.8"/>
+        <import addon="script.embuary.helper" version="2.0.8"/>
+        <import addon="plugin.video.themoviedb.helper" version="5.4.16"/>
         <import addon="resource.images.studios.white" version="0.0.25"/>
-        <import addon="script.module.cherrypy" version="12.0.2"/>
-        <import addon="script.module.musicbrainz" version="0.7.0"/>
-        <import addon="script.module.thetvdb" version="1.0.29"/>
-        <import addon="script.module.metadatautils" version="1.0.38"/>
-        <import addon="script.skin.helper.service" version="1.1.33"/>
-        <import addon="script.skin.helper.widgets" version="1.0.42"/>
-        <import addon="script.skin.helper.skinbackup" version="1.0.19"/>
-        <import addon="script.skin.helper.backgrounds" version="1.0.33"/>
-        <import addon="script.tv.show.next.aired" version="8.0.1"/>
+        <import addon="script.skin.info.service" version="2.0.0"/>
+        <import addon="script.xbmcbackup" version="1.7.3"/>
     </requires>
     <extension debugging="false" defaultthemename="Textures.xbt" effectslowdown="1" point="xbmc.gui.skin">
         <res aspect="16:9" default="true" folder="1080i" height="1080" width="1920" />

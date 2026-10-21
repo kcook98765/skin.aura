@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <variable name="AiringCalendar_Content">
+        <value condition="System.AddonIsEnabled(script.embuary.info)">plugin://script.embuary.info/nextaired/$INFO[Window.Property(Aura.Calendar.Day)]</value>
+        <value />
+    </variable>
     <!-- ====== -->
     <!-- Common -->
     <!-- ====== -->
@@ -152,7 +156,7 @@
                     </control>
                     
                     <include condition="![Window.IsVisible(script-globalsearch.xml) | Window.IsVisible(Home)]">Topbar_Menu</include>
-                    <include condition="[Window.IsVisible(MyVideoNav.xml) | Window.IsVisible(MyMusicNav.xml)] + Skin.HasSetting(AlphabetStrip) + System.HasAddon(script.skin.helper.service)">Object_AlphabetStrip</include>
+                    <include condition="[Window.IsVisible(MyVideoNav.xml) | Window.IsVisible(MyMusicNav.xml)] + Skin.HasSetting(AlphabetStrip) + System.AddonIsEnabled(script.embuary.helper)">Object_AlphabetStrip</include>
 
                     <!-- Right Info -->
                     <control type="grouplist">
@@ -822,7 +826,7 @@
             <include condition="[Window.IsVisible(MyGames.xml) | Window.IsVisible(MyPVRChannels.xml) | Window.IsVisible(MyPVRGuide.xml) | Window.IsVisible(MyPVRRecordings.xml) | Window.IsVisible(MyPVRTimers.xml) | Window.IsVisible(MyPVRSearch.xml) | Window.IsVisible(AddonBrowser.xml) | Window.IsVisible(MyPrograms.xml) | Window.IsVisible(MyPics.xml) | Window.IsVisible(MyMusicNav.xml) | Window.IsVisible(MyVideoNav.xml)] + !Window.IsVisible(script-globalsearch-main.xml)">Items_View</include>
             <include condition="Window.IsVisible(MyPlaylist.xml) + !Window.IsVisible(script-globalsearch-main.xml)">Items_Playlist</include>
             <include condition="[Window.IsVisible(SettingsSystemInfo.xml) | Window.IsVisible(Settings.xml) | Window.IsVisible(SettingsCategory.xml) | Window.IsVisible(SkinSettings.xml) | Window.IsVisible(SettingsProfile.xml)] + !Window.IsVisible(script-globalsearch-main.xml)">Items_Settings</include>
-            <include condition="[Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)] + !Window.IsVisible(script-globalsearch-main.xml)">Items_NextAired</include>
+            <include condition="Window.IsVisible(Custom_1140_AiringCalendar.xml) + !Window.IsVisible(script-globalsearch-main.xml)">Items_AiringCalendar</include>
             <include condition="Window.IsVisible(script-globalsearch-main.xml)">Items_GlobalSearch</include>
             <include condition="Window.IsVisible(weather)">Items_Weather</include>
         </control>
@@ -865,20 +869,20 @@
             <movement>5</movement>
             <centerleft>50%</centerleft>
             <orientation>horizontal</orientation>
-            <onup condition="Skin.HasSetting(EnablePressingUp) + !Window.IsVisible(MyPVRGuide.xml)">9602</onup>
+            <onup condition="Skin.HasSetting(EnablePressingUp) + !Window.IsVisible(MyPVRGuide.xml) + !Window.IsVisible(Custom_1140_AiringCalendar.xml)">9602</onup>
             <ondown condition="Window.IsVisible(SettingsCategory.xml)">3</ondown>
             <ondown condition="Window.IsVisible(SettingsProfile.xml)">4</ondown>
             <ondown condition="Window.IsVisible(SettingsSystemInfo.xml)">95</ondown>
             <ondown condition="Window.IsVisible(SkinSettings.xml)">9000</ondown>
-            <ondown condition="Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)">9500</ondown>
-            <ondown condition="!Window.IsVisible(MyPVRGuide.xml)">50</ondown>
+            <ondown condition="Window.IsVisible(Custom_1140_AiringCalendar.xml)">9000</ondown>
+            <ondown condition="!Window.IsVisible(MyPVRGuide.xml) + !Window.IsVisible(Custom_1140_AiringCalendar.xml)">50</ondown>
 
             <onup condition="!Skin.HasSetting(EnablePressingUp) + Window.IsVisible(SettingsCategory.xml)">3</onup>
             <onup condition="!Skin.HasSetting(EnablePressingUp) + Window.IsVisible(SettingsProfile.xml)">4</onup>
             <onup condition="!Skin.HasSetting(EnablePressingUp) + Window.IsVisible(SettingsSystemInfo.xml)">95</onup>
             <onup condition="!Skin.HasSetting(EnablePressingUp) + Window.IsVisible(SkinSettings.xml)">9000</onup>
-            <onup condition="!Skin.HasSetting(EnablePressingUp) + [Window.IsVisible(script-NextAired-TVGuide.xml) | Window.IsVisible(script-NextAired-TVGuide2.xml)]">9500</onup>
-            <onup condition="!Window.IsVisible(MyPVRGuide.xml)">50</onup>
+            <onup condition="Window.IsVisible(Custom_1140_AiringCalendar.xml)">9000</onup>
+            <onup condition="!Window.IsVisible(MyPVRGuide.xml) + !Window.IsVisible(Custom_1140_AiringCalendar.xml)">50</onup>
 
             <!-- Special Conditions for Scroll Around from Menu on PVR Guide -->
             <include condition="Window.IsVisible(MyPVRGuide.xml)">View_PVRGuide_Movement</include>

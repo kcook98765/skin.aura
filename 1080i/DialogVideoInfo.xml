@@ -2,23 +2,36 @@
 <!-- Foundation -->
 <window id="2003">
     <defaultcontrol always="true">9570</defaultcontrol>
+    <include content="Object_Aura_InfoBlur_OnLoad">
+        <param name="window" value="movieinformation" />
+    </include>
 
-<!-- 
-
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)]">Action(close)</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(movies) + Skin.String(ListItem.IMDBNumber)">RunScript(script.extendedinfo,info=extendedinfo,dbid=$INFO[ListItem.DBID],imdb_id=$INFO[ListItem.IMDBNumber],name=$INFO[ListItem.Title])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(movies) + !Skin.String(ListItem.IMDBNumber)">RunScript(script.extendedinfo,info=extendedinfo,dbid=$INFO[ListItem.DBID],name=$INFO[ListItem.Title])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(tvshows) + Skin.String(ListItem.IMDBNumber) + Skin.String(ListItem.TVShowTitle)">RunScript(script.extendedinfo,info=extendedtvinfo,dbid=$INFO[ListItem.DBID],tvdb_id=$INFO[ListItem.IMDBNumber],name=$INFO[ListItem.TVShowTitle])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(tvshows) + !Skin.String(ListItem.IMDBNumber) + Skin.String(ListItem.TVShowTitle)">RunScript(script.extendedinfo,info=extendedtvinfo,dbid=$INFO[ListItem.DBID],name=$INFO[ListItem.TVShowTitle])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(tvshows) + Skin.String(ListItem.IMDBNumber) + !Skin.String(ListItem.TVShowTitle)">RunScript(script.extendedinfo,info=extendedtvinfo,dbid=$INFO[ListItem.DBID],tvdb_id=$INFO[ListItem.IMDBNumber],name=$INFO[ListItem.Title])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(tvshows) + !Skin.String(ListItem.IMDBNumber) + !Skin.String(ListItem.TVShowTitle)">RunScript(script.extendedinfo,info=extendedtvinfo,dbid=$INFO[ListItem.DBID],name=$INFO[ListItem.Title])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(seasons)">RunScript(script.extendedinfo,info=seasoninfo,tvshow=$INFO[ListItem.TVShowTitle],dbid=$INFO[ListItem.DBID],season=$INFO[ListItem.Season])</onload>
-    <onload condition="Skin.HasSetting(ForceExtendedInfo) + System.HasAddon(script.extendedinfo) + Container.Content(episodes)">RunScript(script.extendedinfo,info=extendedepisodeinfo,tvshow=$INFO[ListItem.TVShowTitle],dbid=$INFO[ListItem.DBID],episode=$INFO[ListItem.Episode],season=$INFO[ListItem.Season])</onload>
--->
+    <!-- Snapshot the native subject before a cast/Similar row takes focus. Never
+         pass an episode/season DBID as a tvshow DBID or an episode TMDb ID as a show. -->
+    <onload>SetProperty(Aura.Info.DBID,$INFO[ListItem.DBID])</onload>
+    <onload>SetProperty(Aura.Info.DBType,$INFO[ListItem.DBType])</onload>
+    <onload>SetProperty(Aura.Info.TVShowDBID,$INFO[ListItem.TVShowDBID])</onload>
+    <onload>SetProperty(Aura.Info.TMDB,$INFO[ListItem.UniqueID(tmdb)])</onload>
+    <onload>SetProperty(Aura.Info.IMDB,$INFO[ListItem.UniqueID(imdb)])</onload>
+    <onload condition="String.IsEmpty(ListItem.UniqueID(imdb)) + String.StartsWith(ListItem.IMDBNumber,tt)">SetProperty(Aura.Info.IMDB,$INFO[ListItem.IMDBNumber])</onload>
+    <onload>SetProperty(Aura.Info.ShowTMDB,$INFO[ListItem.UniqueID(tvshow.tmdb)])</onload>
+    <onload>SetProperty(Aura.Info.ShowIMDB,$INFO[ListItem.UniqueID(tvshow.imdb)])</onload>
+    <onload>SetProperty(Aura.Info.Season,$INFO[ListItem.Season])</onload>
+    <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
+    <onunload>ClearProperty(Aura.Info.DBID)</onunload>
+    <onunload>ClearProperty(Aura.Info.DBType)</onunload>
+    <onunload>ClearProperty(Aura.Info.TVShowDBID)</onunload>
+    <onunload>ClearProperty(Aura.Info.TMDB)</onunload>
+    <onunload>ClearProperty(Aura.Info.IMDB)</onunload>
+    <onunload>ClearProperty(Aura.Info.ShowTMDB)</onunload>
+    <onunload>ClearProperty(Aura.Info.ShowIMDB)</onunload>
+    <onunload>ClearProperty(Aura.Info.Season)</onunload>
+    <onunload>ClearProperty(Aura.Info.Episode)</onunload>
 
     <onload>ClearProperty(TrailerPlaying,Home)</onload>
     <onunload>ClearProperty(TrailerPlaying,Home)</onunload>
     <controls>
+        <include>Object_Aura_BlurSource</include>
 
 
         <control type="list" id="300">
@@ -75,7 +88,7 @@
                         <right>view_pad</right>
                         <control type="button" id="9570">
                             <include>Defs_Hidden_Button</include>
-                            <onfocus condition="!Skin.HasSetting(ForceExtendedInfo)">SetFocus(300,0)</onfocus>
+                            <onfocus>SetFocus(300,0)</onfocus>
                             <onup>SetFocus(300,0)</onup>
                             <ondown>SetFocus(300,0)</ondown>
                         </control>
@@ -270,10 +283,10 @@
                         <top>-15</top>
                         <visible>!Skin.HasSetting(VideoInfo.CastList)</visible>
                         <visible>!String.IsEqual(ListItem.DBType,musicvideo)</visible>
-                        <visible>Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating</visible>
+                        <visible>Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating | Integer.IsGreater(Container(9550).NumItems,0) | Container(9550).IsUpdating</visible>
                         <!-- Info Label -->
                         <control type="grouplist">
-                            <visible>!String.IsEmpty(ListItem.DBID) | Integer.IsEqual(Container(9550).NumItems,0)</visible>
+                            <visible>Integer.IsGreater(Container(50).NumItems,0)</visible>
                             <top>20</top>
                             <height>42</height>
                             <left>0</left>
@@ -334,8 +347,6 @@
                             </control>
                             <control type="list" id="50">
                                 <include>Animation_FadeInOut</include>
-                                <visible>!Container(9550).IsUpdating</visible>
-                                <visible>!String.IsEmpty(ListItem.DBID) | Integer.IsEqual(Container(9550).NumItems,0)</visible>
                                 <visible>Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating</visible>
                                 <onup>9570</onup>
                                 <ondown>9501</ondown>
@@ -350,42 +361,26 @@
                             <include content="Dialog_VideoInfo_BusyIndicator">
                                 <param name="id" value="50" />
                             </include>
-                            <include content="Object_VideoInfo_CastList" condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBTYPE,movie) + System.HasAddon(script.skin.helper.service)">
+                            <control type="label" description="Offline actor browser hint">
+                                <top>0</top>
+                                <left>0</left>
+                                <right>0</right>
+                                <height>20</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <align>left</align>
+                                <scroll>true</scroll>
+                                <label>$LOCALIZE[31907]</label>
+                                <visible>Control.IsVisible(9550) + Integer.IsEqual(Container(50).NumItems,0) + !Container(50).IsUpdating + [Integer.IsGreater(Window.Property(Aura.Info.DBID),0) | Skin.HasSetting(Aura.OnlineEnrichment)] + Integer.IsGreater(Container(9550).NumItems,0) + !Container(9550).IsUpdating + !$EXP[Aura.ActorOnline]</visible>
+                            </control>
+                            <include content="Object_VideoInfo_CastList">
                                 <param name="onup" value="9570" />
                                 <param name="id" value="9550" />
                                 <param name="ondown" value="9501" />
                                 <param name="label" value="$LOCALIZE[206]" />
-                                <param name="content" value="plugin://script.skin.helper.service/?action=getcast&amp;movie=$INFO[ListItem.Title]&amp;castaction=extendedinfo" />
-                                <param name="infolabel" value="true" />
-                                <param name="pad" value="0" />
-                                <param name="top" value="0" />
-                            </include>
-                            <include content="Object_VideoInfo_CastList" condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBTYPE,tvshow) + System.HasAddon(script.skin.helper.service)">
-                                <param name="onup" value="9570" />
-                                <param name="id" value="9550" />
-                                <param name="ondown" value="9501" />
-                                <param name="label" value="$LOCALIZE[206]" />
-                                <param name="content" value="plugin://script.skin.helper.service/?action=getcast&amp;tvshow=$INFO[ListItem.Title]&amp;castaction=extendedinfo" />
-                                <param name="infolabel" value="true" />
-                                <param name="pad" value="0" />
-                                <param name="top" value="0" />
-                            </include>
-                            <include content="Object_VideoInfo_CastList" condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBTYPE,season) + System.HasAddon(script.skin.helper.service)">
-                                <param name="onup" value="9570" />
-                                <param name="id" value="9550" />
-                                <param name="ondown" value="9501" />
-                                <param name="label" value="$LOCALIZE[206]" />
-                                <param name="content" value="plugin://script.skin.helper.service/?action=getcast&amp;tvshow=$INFO[ListItem.TvShowTitle]&amp;castaction=extendedinfo" />
-                                <param name="infolabel" value="true" />
-                                <param name="pad" value="0" />
-                                <param name="top" value="0" />
-                            </include>
-                            <include content="Object_VideoInfo_CastList" condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBTYPE,episode) + System.HasAddon(script.skin.helper.service)">
-                                <param name="onup" value="9570" />
-                                <param name="id" value="9550" />
-                                <param name="ondown" value="9501" />
-                                <param name="label" value="$LOCALIZE[206]" />
-                                <param name="content" value="plugin://script.skin.helper.service/?action=getcast&amp;episode=$INFO[ListItem.Label]&amp;castaction=extendedinfo" />
+                                <param name="content" value="$VAR[Aura_InfoCast]" />
+                                <param name="visible" value="Integer.IsEqual(Container(50).NumItems,0) + !Container(50).IsUpdating + [Integer.IsGreater(Window.Property(Aura.Info.DBID),0) | Skin.HasSetting(Aura.OnlineEnrichment)]" />
+                                <param name="actoronclick" value="true" />
                                 <param name="infolabel" value="true" />
                                 <param name="pad" value="0" />
                                 <param name="top" value="0" />
@@ -399,11 +394,9 @@
                         <param name="id" value="9501" />
                         <param name="ondown" value="9502" />
                         <param name="label" value="$INFO[ListItem.Director,$LOCALIZE[31016] ,]" />
-                        <!-- <param name="content" value="plugin://script.extendedinfo?info=personmovies&amp;&amp;person=$INFO[ListItem.Director]" /> -->
                         <param name="infolabel" value="false" />
                         <param name="include_onclick" value="true" />
                         <param name="onclick" value="noop" />
-                        <!-- <param name="onclick" value="RunScript(script.extendedinfo,info=extendedinfo,name=$INFO[ListItem.Label],imdb_id=$INFO[ListItem.IMDBNumber])" /> -->
                         <param name="visible" value="!Skin.HasSetting(VideoInfo.DirectorMovies)" />
                     </include>
 
@@ -427,11 +420,9 @@
                         <param name="id" value="9502" />
                         <param name="ondown" value="9503" />
                         <param name="label" value="$INFO[ListItem.Title,$LOCALIZE[31350],]" />
-                        <param name="content" value="plugin://script.skin.helper.widgets/?action=similar&amp;mediatype=movies&amp;imdbid=$INFO[ListItem.IMDBNumber]" />
+                        <param name="content" value="$VAR[Aura_InfoSimilarMovies]" />
                         <param name="infolabel" value="false" />
-                        <param name="include_onclick" value="true" />
-                        <param name="onclick" value="noop" />
-                        <!-- <param name="onclick" value="RunScript(script.extendedinfo,info=extendedinfo,name=$INFO[ListItem.Label],imdb_id=$INFO[ListItem.IMDBNumber])" /> -->
+                        <param name="include_onclick" value="false" />
                         <param name="visible" value="!Skin.HasSetting(VideoInfo.SimilarMovies)" />
                     </include>
 
@@ -441,11 +432,9 @@
                         <param name="id" value="9502" />
                         <param name="ondown" value="9503" />
                         <param name="label" value="$INFO[ListItem.Title,$LOCALIZE[31350],]" />
-                        <param name="content" value="plugin://script.skin.helper.widgets/?action=similar&amp;mediatype=tvshows&amp;imdbid=$INFO[ListItem.IMDBNumber]" />
+                        <param name="content" value="$VAR[Aura_InfoSimilarTV]" />
                         <param name="infolabel" value="false" />
-                        <param name="include_onclick" value="true" />
-                        <param name="onclick" value="noop" />
-                        <!-- <param name="onclick" value="RunScript(script.extendedinfo,info=extendedtvinfo,name=$INFO[ListItem.Label])" /> -->
+                        <param name="include_onclick" value="false" />
                         <param name="visible" value="!Skin.HasSetting(VideoInfo.SimilarTvShows)" />
                     </include>
 
@@ -459,7 +448,6 @@
                         <param name="infolabel" value="false" />
                         <param name="include_onclick" value="true" />
                         <param name="onclick" value="noop" />
-                        <param name="onclick" value="RunScript(script.extendedinfo,info=extendedinfo,name=$INFO[ListItem.Label],imdb_id=$INFO[ListItem.IMDBNumber])" />
                         <param name="visible" value="!Skin.HasSetting(VideoInfo.StudioMovies)" />
                     </include>
 -->
@@ -469,8 +457,10 @@
                         <param name="id" value="9504" />
                         <param name="ondown" value="9505" />
                         <param name="label" value="$LOCALIZE[31365]" />
-                        <param name="content" value="$VAR[Defs_VideoInfo_Images]" />
-                        <param name="content2" value="$VAR[Defs_VideoInfo_Images2]" />
+                        <!-- Native local image folders below replace the unavailable
+                             artwork-helper image catalogue; no hidden helper call. -->
+                        <param name="content" value="$VAR[Defs_VideoInfo_Images2]" />
+                        <param name="content2" value="" />
                         <param name="content3" value="$VAR[Defs_VideoInfo_Images3]" />
                         <param name="infolabel" value="false" />
                         <param name="itemwidth" value="606.66" />
@@ -603,7 +593,8 @@
                             </include>
                             <include content="Object_VideoInfo_InfoSection">
                                 <param name="label" value="$LOCALIZE[31289]" />
-                                <param name="label2" value="Window(Home).Property(SkinHelper.ListItem.Awards)" />
+                                <param name="label2" value="Window(Home).Property(SkinInfo.Online.Awards)" />
+                                <param name="visible" value="$EXP[Aura.ItemOnline]" />
                             </include>
                         </control>
                     </control>
@@ -834,11 +825,10 @@
         <control type="button" id="9005">
             <label>$LOCALIZE[29915]</label>
             <include>Defs_Hidden_Button</include>
-            <onclick condition="String.IsEqual(ListItem.DbType,movie)">noop</onclick>
-            <!-- <onclick condition="String.IsEqual(ListItem.DbType,movie)">RunScript(script.extendedinfo,info=extendedinfo,name=$INFO[ListItem.Title],imdb_id=$INFO[ListItem.IMDBNumber])</onclick> -->
-            <onclick condition="String.IsEqual(ListItem.DbType,tvshow) | String.IsEqual(ListItem.DbType,episode)">noop</onclick>
-            <!-- <onclick condition="String.IsEqual(ListItem.DbType,tvshow) | String.IsEqual(ListItem.DbType,episode)">RunScript(script.extendedinfo,info=extendedtvinfo,name=$INFO[ListItem.TvShowTitle])</onclick> -->
-            <visible>System.hasAddon(script.extendedinfo) + [String.IsEqual(ListItem.DbType,movie) | String.IsEqual(ListItem.DbType,tvshow) | String.IsEqual(ListItem.DbType,episode)]</visible>
+            <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + String.IsEqual(Window.Property(Aura.Info.DBType),movie)">RunScript(script.embuary.info,call=movie,dbid=$INFO[Window.Property(Aura.Info.DBID)])</onclick>
+            <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + String.IsEqual(Window.Property(Aura.Info.DBType),tvshow)">RunScript(script.embuary.info,call=tv,dbid=$INFO[Window.Property(Aura.Info.DBID)])</onclick>
+            <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + Integer.IsGreater(Window.Property(Aura.Info.TVShowDBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),episode) | String.IsEqual(Window.Property(Aura.Info.DBType),season)]">RunScript(script.embuary.info,call=tv,dbid=$INFO[Window.Property(Aura.Info.TVShowDBID)])</onclick>
+            <visible>Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + [Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow)] | [Integer.IsGreater(Window.Property(Aura.Info.TVShowDBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),episode) | String.IsEqual(Window.Property(Aura.Info.DBType),season)]]]</visible>
             <onclick>SetFocus(300)</onclick>
         </control>
 
@@ -858,34 +848,18 @@
 
         <control type="button" id="9001">
             <label>$LOCALIZE[31389]</label>
-            <!-- If ADownloader installed but not ABeef then use AD otherwise prefer AB -->
-            <!-- AD has been depreciated but some still use it -->
-
-            <onclick condition="String.IsEqual(ListItem.DBType,tvshow) + System.HasAddon(script.artwork.downloader) + !System.HasAddon(script.artwork.beef)">RunScript(script.artwork.downloader, mode=gui, mediatype=tvshow, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,movie) + System.HasAddon(script.artwork.downloader) + !System.HasAddon(script.artwork.beef)">RunScript(script.artwork.downloader, mode=gui, mediatype=movie, dbid=$INFO[ListItem.DBID])</onclick>
-
-            <onclick condition="String.IsEqual(ListItem.DBType,episode) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=episode, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,tvshow) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=tvshow, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,movie) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=movie, dbid=$INFO[ListItem.DBID])</onclick>
+            <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0)">RunScript(script.skin.info.service,action=review_artwork,dbtype=$INFO[Window.Property(Aura.Info.DBType)],dbid=$INFO[Window.Property(Aura.Info.DBID)])</onclick>
             <description>Get Artwork</description>
             <include>Defs_Hidden_Button</include>
-            <visible>[String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + [system.hasaddon(script.artwork.downloader) | system.hasaddon(script.artwork.beef)]</visible>
+            <visible>Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),episode) | String.IsEqual(Window.Property(Aura.Info.DBType),musicvideo)]</visible>
         </control>
 
         <control type="button" id="9011">
             <label>$LOCALIZE[31388]</label>
-            <!-- If ADownloader installed but not ABeef then use AD otherwise prefer AB -->
-            <!-- AD has been depreciated but some still use it -->
-
-            <onclick condition="String.IsEqual(ListItem.DBType,tvshow) + System.HasAddon(script.artwork.downloader) + !System.HasAddon(script.artwork.beef)">RunScript(script.artwork.downloader, mediatype=tvshow, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,movie) + System.HasAddon(script.artwork.downloader) + !System.HasAddon(script.artwork.beef)">RunScript(script.artwork.downloader, mediatype=movie, dbid=$INFO[ListItem.DBID])</onclick>
-
-            <onclick condition="String.IsEqual(ListItem.DBType,episode) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=tvshow, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,tvshow) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=tvshow, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,movie) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=movie, dbid=$INFO[ListItem.DBID])</onclick>
+            <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0)">RunScript(script.skin.info.service,action=download_artwork,dbtype=$INFO[Window.Property(Aura.Info.DBType)],dbid=$INFO[Window.Property(Aura.Info.DBID)])</onclick>
             <description>Get Artwork</description>
             <include>Defs_Hidden_Button</include>
-            <visible>[String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + [system.hasaddon(script.artwork.downloader) | system.hasaddon(script.artwork.beef)]</visible>
+            <visible>Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),episode) | String.IsEqual(Window.Property(Aura.Info.DBType),musicvideo)]</visible>
         </control>
 
         <control type="button" id ="6">
@@ -984,8 +958,8 @@
                         <width>458</width>
                         <label>$LOCALIZE[31178]</label>
                         <onclick>SetFocus(9950)</onclick>
-                        <onclick>noop</onclick>
-                        <!-- <onclick>RunScript(script.extendedinfo,info=extendedactorinfo,name=$INFO[Container(50).ListItem.Label])</onclick> -->
+                        <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + !String.IsEmpty(Container(50).ListItem.Label)">RunScript(script.embuary.info,call=person,query=$ESCINFO[Container(50).ListItem.Label,'&quot;,&quot;'])</onclick>
+                        <visible>Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + !String.IsEmpty(Container(50).ListItem.Label)</visible>
                         <include>Defs_Context_Button</include>
                     </control>
                 </control>

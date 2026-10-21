@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+    <!-- PVR-only layouts, registered once in Includes.xml.
+         Kodi 21.3: PVRBase reserves 10 (show mode), 11 (groups), 28 (group
+         button), 29/30 (headings); GUIMediaWindow reserves 12 (item count).
+         Both windows use view 50; 60 is its scrollbar. Skin furniture uses
+         9300..9312; the info dialog separately uses 9000 and 9400/9401.
+         Source: xbmc/xbmc 21.3-Omega, GUIWindowPVRBase.h/.cpp,
+         GUIWindowPVRGuide.cpp, GUIWindowPVRChannels.cpp and PVRBuiltins.cpp. -->
+
+    <!-- Use the window's ListItem: GUIWindowPVRGuide::GetCurrentListItem returns
+         the selected EVENT. Container(50).ListItem returns the CHANNEL instead
+         (GUIEPGGridContainer::GetListItem), which would show its airing-now data
+         even while browsing a future programme. Channels use their native item. -->
+    <variable name="PVR_Omega_SummaryArt">
+        <value condition="!String.IsEmpty(ListItem.EpgEventIcon)">$INFO[ListItem.EpgEventIcon]</value>
+        <value>$INFO[ListItem.Icon]</value>
+    </variable>
+    <variable name="PVR_Omega_SummaryTitle">
+        <value condition="!String.IsEmpty(ListItem.EpgEventTitle)">$INFO[ListItem.EpgEventTitle]</value>
+        <value condition="!String.IsEmpty(ListItem.ChannelName)">$INFO[ListItem.ChannelName]</value>
+        <value>$LOCALIZE[19055]</value>
+    </variable>
+    <variable name="PVR_Omega_DialogTitle">
+        <value condition="!String.IsEmpty(ListItem.EpgEventTitle)">$INFO[ListItem.EpgEventTitle]</value>
+        <value condition="!String.IsEmpty(ListItem.Title)">$INFO[ListItem.Title]</value>
+        <value condition="!String.IsEmpty(ListItem.Label)">$INFO[ListItem.Label]</value>
+        <value>$LOCALIZE[19055]</value>
+    </variable>
+
+    <include name="PVR_Omega_Background">
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="main_bg_100">common/white.png</texture>
+        </control>
+        <control type="label" id="29"><visible>false</visible></control>
+        <control type="label" id="30"><visible>false</visible></control>
+    </include>
+
+    <include name="PVR_Omega_Button">
+        <height>56</height>
+        <font>font_tiny</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <textoffsetx>8</textoffsetx>
+        <textcolor>main_fg_100</textcolor>
+        <focusedcolor>Selected</focusedcolor>
+        <disabledcolor>main_fg_30</disabledcolor>
+        <texturefocus border="8" colordiffuse="$VAR[ColorHighlight]">common/box.png</texturefocus>
+        <texturenofocus border="8" colordiffuse="main_fg_12">common/box.png</texturenofocus>
+    </include>
+
+    <include name="PVR_Omega_Header">
+        <param name="guide" default="false" />
+        <param name="title" default="$LOCALIZE[19019]" />
+        <param name="switchlabel" default="$LOCALIZE[19032]" />
+        <definition>
+            <control type="label">
+                <left>48</left>
+                <top>20</top>
+                <width>164</width>
+                <height>56</height>
+                <font>font_medium_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>$PARAM[title]</label>
+            </control>
+            <control type="grouplist" id="9300">
+                <left>228</left>
+                <top>20</top>
+                <width>1400</width>
+                <height>56</height>
+                <orientation>horizontal</orientation>
+                <itemgap>8</itemgap>
+                <defaultcontrol>28</defaultcontrol>
+                <onleft>9300</onleft>
+                <onright>9300</onright>
+                <onup>50</onup>
+                <ondown>50</ondown>
+                <!-- Core fills this label and opens its own group chooser. -->
+                <control type="button" id="28">
+                    <width>330</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19141</label>
+                </control>
+                <control type="button" id="9301">
+                    <width>140</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>$PARAM[switchlabel]</label>
+                    <onclick condition="$PARAM[guide] + !Window.IsActive(RadioGuide)">ActivateWindow(TVChannels)</onclick>
+                    <onclick condition="$PARAM[guide] + Window.IsActive(RadioGuide)">ActivateWindow(RadioChannels)</onclick>
+                    <onclick condition="!$PARAM[guide] + !Window.IsActive(RadioChannels)">ActivateWindow(TVGuide)</onclick>
+                    <onclick condition="!$PARAM[guide] + Window.IsActive(RadioChannels)">ActivateWindow(RadioGuide)</onclick>
+                </control>
+                <control type="button" id="9302">
+                    <width>150</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19163</label>
+                    <onclick condition="!Window.IsActive(RadioGuide) + !Window.IsActive(RadioChannels)">ActivateWindow(TVRecordings)</onclick>
+                    <onclick condition="Window.IsActive(RadioGuide) | Window.IsActive(RadioChannels)">ActivateWindow(RadioRecordings)</onclick>
+                </control>
+                <control type="button" id="9303">
+                    <width>110</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19040</label>
+                    <onclick condition="!Window.IsActive(RadioGuide) + !Window.IsActive(RadioChannels)">ActivateWindow(TVTimers)</onclick>
+                    <onclick condition="Window.IsActive(RadioGuide) | Window.IsActive(RadioChannels)">ActivateWindow(RadioTimers)</onclick>
+                </control>
+                <control type="button" id="9304">
+                    <width>150</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19138</label>
+                    <onclick condition="!Window.IsActive(RadioGuide) + !Window.IsActive(RadioChannels)">ActivateWindow(TVTimerRules)</onclick>
+                    <onclick condition="Window.IsActive(RadioGuide) | Window.IsActive(RadioChannels)">ActivateWindow(RadioTimerRules)</onclick>
+                </control>
+                <control type="button" id="9305">
+                    <width>110</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>137</label>
+                    <onclick condition="!Window.IsActive(RadioGuide) + !Window.IsActive(RadioChannels)">ActivateWindow(TVSearch)</onclick>
+                    <onclick condition="Window.IsActive(RadioGuide) | Window.IsActive(RadioChannels)">ActivateWindow(RadioSearch)</onclick>
+                </control>
+                <control type="button" id="9306">
+                    <width>90</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19030</label>
+                    <visible>$PARAM[guide]</visible>
+                    <onclick>PVR.EpgGridControl(CurrentProgramme)</onclick>
+                    <onclick>SetFocus(50)</onclick>
+                </control>
+                <control type="button" id="9307">
+                    <width>150</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>31931</label>
+                    <visible>$PARAM[guide]</visible>
+                    <onclick>PVR.EpgGridControl(SelectDate)</onclick>
+                    <onclick>SetFocus(50)</onclick>
+                </control>
+                <control type="button" id="9308">
+                    <width>90</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>31930</label>
+                    <onclick>Action(Back)</onclick>
+                </control>
+            </control>
+            <control type="label">
+                <left>1652</left>
+                <top>20</top>
+                <width>220</width>
+                <height>56</height>
+                <font>font_medium</font>
+                <textcolor>main_fg_100</textcolor>
+                <align>right</align>
+                <label>$INFO[System.Time]</label>
+            </control>
+            <control type="label">
+                <left>1440</left>
+                <top>78</top>
+                <width>432</width>
+                <height>22</height>
+                <font>font_statusbar</font>
+                <textcolor>main_fg_100</textcolor>
+                <align>right</align>
+                <label>$INFO[System.Date]</label>
+            </control>
+        </definition>
+    </include>
+
+    <include name="PVR_Omega_GridChannel">
+        <param name="focused" default="false" />
+        <definition>
+            <control type="image">
+                <left>0</left>
+                <top>2</top>
+                <width>316</width>
+                <height>68</height>
+                <texture colordiffuse="main_fg_12">common/white.png</texture>
+            </control>
+            <control type="image">
+                <left>0</left>
+                <top>2</top>
+                <width>4</width>
+                <height>68</height>
+                <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                <visible>$PARAM[focused] | ListItem.IsPlaying</visible>
+            </control>
+            <control type="label">
+                <left>8</left>
+                <width>54</width>
+                <height>72</height>
+                <font>font_tiny_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <selectedcolor>main_fg_100</selectedcolor>
+                <align>center</align>
+                <label>$INFO[ListItem.ChannelNumberLabel]</label>
+            </control>
+            <control type="image">
+                <left>68</left>
+                <top>8</top>
+                <width>64</width>
+                <height>56</height>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="DefaultTVShows.png" background="true">$INFO[ListItem.Icon]</texture>
+            </control>
+            <control type="label">
+                <left>144</left>
+                <width>160</width>
+                <height>72</height>
+                <font>font_tiny_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <selectedcolor>main_fg_100</selectedcolor>
+                <label fallback="19019">$INFO[ListItem.ChannelName]</label>
+                <scroll>$PARAM[focused]</scroll>
+            </control>
+        </definition>
+    </include>
+
+    <include name="PVR_Omega_GridProgramme">
+        <param name="focused" default="false" />
+        <param name="textcolor" default="main_fg_100" />
+        <definition>
+            <!-- GUIListGroup::EnlargeWidth resizes layout-local IDs 1..14 only.
+                 These are not window control IDs. 1 also hides too-short titles.
+                 Keep both legacy settings inverted, as in SkinSettings.xml. -->
+            <control type="image" id="2">
+                <left>0</left>
+                <right>4</right>
+                <top>2</top>
+                <height>68</height>
+                <texture colordiffuse="main_fg_12">common/white.png</texture>
+                <visible>Skin.HasSetting(PVRGuideGenreColors)</visible>
+            </control>
+            <control type="image" id="5">
+                <left>0</left>
+                <right>4</right>
+                <top>2</top>
+                <height>68</height>
+                <texture colordiffuse="BBffffff" fallback="pvrgenre/0.png">pvrgenre/$INFO[ListItem.Property(GenreType)].png</texture>
+                <visible>!Skin.HasSetting(PVRGuideGenreColors)</visible>
+            </control>
+            <control type="image" id="4">
+                <left>0</left>
+                <right>4</right>
+                <top>2</top>
+                <height>68</height>
+                <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                <visible>$PARAM[focused]</visible>
+            </control>
+            <control type="label" id="1">
+                <left>12</left>
+                <right>12</right>
+                <top>5</top>
+                <height>34</height>
+                <font>font_small_bold</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <!-- GUIListLabel uses selectedcolor for selected/playing items,
+                     not focusedcolor. Never inherit the highlight-colour default. -->
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label fallback="19055">$INFO[ListItem.Label]</label>
+                <scroll>$PARAM[focused]</scroll>
+            </control>
+            <control type="image">
+                <left>12</left>
+                <top>44</top>
+                <width>20</width>
+                <height>20</height>
+                <texture>indicator/record.png</texture>
+                <visible>ListItem.IsRecording</visible>
+            </control>
+            <control type="image">
+                <left>12</left>
+                <top>44</top>
+                <width>20</width>
+                <height>20</height>
+                <texture>indicator/timer.png</texture>
+                <visible>ListItem.HasTimer + !ListItem.IsRecording</visible>
+            </control>
+            <control type="label" id="3">
+                <left>40</left>
+                <right>12</right>
+                <top>42</top>
+                <height>26</height>
+                <font>font_statusbar</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label>$INFO[ListItem.StartTime]$INFO[ListItem.EndTime, - ,]$INFO[ListItem.Genre,  /  ,]</label>
+                <visible>!Skin.HasSetting(PVRGuideGenreName)</visible>
+            </control>
+            <control type="label" id="6">
+                <left>40</left>
+                <right>12</right>
+                <top>42</top>
+                <height>26</height>
+                <font>font_statusbar</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label>$INFO[ListItem.StartTime]$INFO[ListItem.EndTime, - ,]</label>
+                <visible>Skin.HasSetting(PVRGuideGenreName)</visible>
+            </control>
+        </definition>
+    </include>
+
+    <include name="PVR_Omega_Guide">
+        <control type="epggrid" id="50">
+            <left>48</left>
+            <top>104</top>
+            <width>1792</width>
+            <height>800</height>
+            <!-- Kodi calls horizontal TIME / vertical CHANNELS 'vertical'. -->
+            <orientation>vertical</orientation>
+            <viewtype label="19298">list</viewtype>
+            <pagecontrol>60</pagecontrol>
+            <scrolltime tween="quadratic" easing="out">250</scrolltime>
+            <timeblocks>36</timeblocks>
+            <rulerunit>6</rulerunit>
+            <onleft>9300</onleft>
+            <onright>60</onright>
+            <onup>9300</onup>
+            <ondown>9310</ondown>
+            <!-- Aura's existing texture shades elapsed time up to the native NOW
+                 boundary. Low alpha is essential: Kodi draws this over the text. -->
+            <progresstexture border="5" colordiffuse="main_fg_12">pvr/progressline-full.png</progresstexture>
+            <rulerdatelayout width="1792" height="38">
+                <control type="label">
+                    <left>0</left>
+                    <width>1792</width>
+                    <height>38</height>
+                    <font>font_small_bold</font>
+                    <textcolor>main_fg_100</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </rulerdatelayout>
+            <rulerlayout width="240" height="42">
+                <control type="image" id="2">
+                    <left>0</left>
+                    <top>0</top>
+                    <right>0</right>
+                    <height>42</height>
+                    <texture colordiffuse="main_fg_12">common/white.png</texture>
+                </control>
+                <control type="label" id="1">
+                    <left>12</left>
+                    <right>0</right>
+                    <height>42</height>
+                    <font>font_small</font>
+                    <textcolor>main_fg_100</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </rulerlayout>
+            <channellayout width="320" height="72">
+                <include>PVR_Omega_GridChannel</include>
+            </channellayout>
+            <focusedchannellayout width="320" height="72">
+                <include content="PVR_Omega_GridChannel">
+                    <param name="focused" value="true" />
+                </include>
+            </focusedchannellayout>
+            <itemlayout width="60" height="72">
+                <include>PVR_Omega_GridProgramme</include>
+            </itemlayout>
+            <focusedlayout width="60" height="72">
+                <include content="PVR_Omega_GridProgramme">
+                    <param name="focused" value="true" />
+                    <param name="textcolor" value="Selected" />
+                </include>
+            </focusedlayout>
+        </control>
+        <include content="PVR_Omega_Scrollbar">
+            <param name="top" value="184" />
+            <param name="height" value="720" />
+        </include>
+    </include>
+
+    <include name="PVR_Omega_ChannelRow">
+        <param name="textcolor" default="main_fg_100" />
+        <definition>
+            <control type="label">
+                <left>8</left>
+                <top>0</top>
+                <width>64</width>
+                <height>84</height>
+                <font>font_small_bold</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <align>center</align>
+                <label>$INFO[ListItem.ChannelNumberLabel]</label>
+            </control>
+            <control type="image">
+                <left>88</left>
+                <top>10</top>
+                <width>72</width>
+                <height>64</height>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="DefaultTVShows.png" background="true">$INFO[ListItem.Icon]</texture>
+            </control>
+            <control type="label">
+                <left>184</left>
+                <width>280</width>
+                <height>84</height>
+                <font>font_small_bold</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label fallback="19019">$INFO[ListItem.ChannelName]</label>
+            </control>
+            <control type="label">
+                <left>492</left>
+                <top>8</top>
+                <width>604</width>
+                <height>36</height>
+                <font>font_small_bold</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label fallback="19055">$INFO[ListItem.EpgEventTitle]</label>
+            </control>
+            <control type="label">
+                <left>492</left>
+                <top>46</top>
+                <width>604</width>
+                <height>28</height>
+                <font>font_tiny</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label>$INFO[ListItem.StartTime]$INFO[ListItem.EndTime, - ,]$INFO[ListItem.Genre,  /  ,]</label>
+            </control>
+            <control type="label">
+                <left>1140</left>
+                <top>8</top>
+                <width>590</width>
+                <height>36</height>
+                <font>font_small</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label fallback="19055">$INFO[ListItem.NextTitle]</label>
+            </control>
+            <control type="label">
+                <left>1140</left>
+                <top>46</top>
+                <width>590</width>
+                <height>28</height>
+                <font>font_tiny</font>
+                <textcolor>$PARAM[textcolor]</textcolor>
+                <selectedcolor>$PARAM[textcolor]</selectedcolor>
+                <label>$INFO[ListItem.NextStartTime]$INFO[ListItem.NextEndTime, - ,]</label>
+            </control>
+            <control type="image">
+                <left>1752</left>
+                <top>28</top>
+                <width>24</width>
+                <height>24</height>
+                <texture>indicator/record.png</texture>
+                <visible>ListItem.IsRecording</visible>
+            </control>
+            <control type="image">
+                <left>1752</left>
+                <top>28</top>
+                <width>24</width>
+                <height>24</height>
+                <texture>indicator/timer.png</texture>
+                <visible>ListItem.HasTimer + !ListItem.IsRecording</visible>
+            </control>
+        </definition>
+    </include>
+
+    <include name="PVR_Omega_Channels">
+        <control type="group">
+            <left>48</left>
+            <top>104</top>
+            <control type="label">
+                <left>184</left>
+                <width>280</width>
+                <height>40</height>
+                <font>font_tiny_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>19019</label>
+            </control>
+            <control type="label">
+                <left>492</left>
+                <width>604</width>
+                <height>40</height>
+                <font>font_tiny_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>19030</label>
+            </control>
+            <control type="label">
+                <left>1140</left>
+                <width>590</width>
+                <height>40</height>
+                <font>font_tiny_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>19031</label>
+            </control>
+        </control>
+        <control type="list" id="50">
+            <left>48</left>
+            <top>148</top>
+            <width>1792</width>
+            <height>756</height>
+            <viewtype label="535">list</viewtype>
+            <pagecontrol>60</pagecontrol>
+            <scrolltime tween="quadratic" easing="out">250</scrolltime>
+            <onleft>9300</onleft>
+            <onright>60</onright>
+            <onup>9300</onup>
+            <ondown>9310</ondown>
+            <itemlayout width="1792" height="84" infoupdate="5000">
+                <control type="image">
+                    <left>0</left>
+                    <top>2</top>
+                    <width>1792</width>
+                    <height>80</height>
+                    <texture colordiffuse="main_fg_12">common/white.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left>
+                    <top>2</top>
+                    <width>4</width>
+                    <height>80</height>
+                    <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                    <visible>ListItem.IsPlaying</visible>
+                </control>
+                <include>PVR_Omega_ChannelRow</include>
+            </itemlayout>
+            <focusedlayout width="1792" height="84" infoupdate="5000">
+                <control type="image">
+                    <left>0</left>
+                    <top>2</top>
+                    <width>1792</width>
+                    <height>80</height>
+                    <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                </control>
+                <include content="PVR_Omega_ChannelRow">
+                    <param name="textcolor" value="Selected" />
+                </include>
+            </focusedlayout>
+        </control>
+        <include content="PVR_Omega_Scrollbar">
+            <param name="top" value="148" />
+            <param name="height" value="756" />
+        </include>
+    </include>
+
+    <include name="PVR_Omega_Scrollbar">
+        <definition>
+            <control type="scrollbar" id="60">
+                <left>1852</left>
+                <top>$PARAM[top]</top>
+                <width>20</width>
+                <height>$PARAM[height]</height>
+                <orientation>vertical</orientation>
+                <onleft>50</onleft>
+                <onright>50</onright>
+                <onup>9300</onup>
+                <ondown>9310</ondown>
+                <texturesliderbackground colordiffuse="main_fg_12">common/white.png</texturesliderbackground>
+                <texturesliderbar colordiffuse="main_fg_30">common/white.png</texturesliderbar>
+                <texturesliderbarfocus colordiffuse="$VAR[ColorHighlight]">common/white.png</texturesliderbarfocus>
+            </control>
+        </definition>
+    </include>
+
+    <include name="PVR_Omega_Summary">
+        <control type="group">
+            <left>48</left>
+            <top>920</top>
+            <width>1824</width>
+            <height>144</height>
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>1824</width>
+                <height>2</height>
+                <texture colordiffuse="main_fg_30">common/white.png</texture>
+            </control>
+            <control type="image">
+                <left>0</left>
+                <top>12</top>
+                <width>128</width>
+                <height>128</height>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="DefaultTVShows.png" background="true">$VAR[PVR_Omega_SummaryArt]</texture>
+            </control>
+            <control type="label">
+                <left>152</left>
+                <top>8</top>
+                <width>1240</width>
+                <height>42</height>
+                <font>font_medium_bold</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>$VAR[PVR_Omega_SummaryTitle]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>152</left>
+                <top>50</top>
+                <width>1240</width>
+                <height>30</height>
+                <font>font_tiny</font>
+                <textcolor>main_fg_100</textcolor>
+                <label>$INFO[ListItem.ChannelNumberLabel,,  ]$INFO[ListItem.ChannelName]$INFO[ListItem.StartDate,  /  ,]$INFO[ListItem.StartTime,  /  ,]$INFO[ListItem.EndTime, - ,]$INFO[ListItem.Genre,  /  ,]</label>
+            </control>
+            <control type="textbox">
+                <left>152</left>
+                <top>84</top>
+                <width>1240</width>
+                <height>60</height>
+                <font>font_tiny</font>
+                <textcolor>main_fg_100</textcolor>
+                <label fallback="19055">$INFO[ListItem.Plot]</label>
+                <pagecontrol>0</pagecontrol>
+                <autoscroll>false</autoscroll>
+            </control>
+            <control type="grouplist" id="9310">
+                <left>1432</left>
+                <top>44</top>
+                <width>392</width>
+                <height>56</height>
+                <orientation>horizontal</orientation>
+                <itemgap>12</itemgap>
+                <onleft>50</onleft>
+                <onright>50</onright>
+                <onup>50</onup>
+                <ondown>9300</ondown>
+                <control type="button" id="9311">
+                    <width>150</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>19033</label>
+                    <enable>Integer.IsGreater(Container(50).NumItems,0)</enable>
+                    <onclick>SetFocus(50)</onclick>
+                    <onclick>Action(Info)</onclick>
+                </control>
+                <control type="button" id="9312">
+                    <width>230</width>
+                    <include>PVR_Omega_Button</include>
+                    <label>31932</label>
+                    <enable>Integer.IsGreater(Container(50).NumItems,0)</enable>
+                    <onclick>SetFocus(50)</onclick>
+                    <onclick>Action(ContextMenu)</onclick>
+                </control>
+            </control>
+        </control>
+    </include>
+
+    <include name="PVR_Omega_ChannelNumberInput">
+        <control type="label">
+            <left>720</left>
+            <top>350</top>
+            <width>480</width>
+            <height>220</height>
+            <font>font_musicvis_bigger</font>
+            <align>center</align>
+            <textcolor>Selected</textcolor>
+            <shadowcolor>main_bg_100</shadowcolor>
+            <label>$INFO[PVR.ChannelNumberInput]</label>
+            <visible>!String.IsEmpty(PVR.ChannelNumberInput)</visible>
+        </control>
+    </include>
+
+    <include name="PVR_Omega_DialogButton">
+        <width>180</width>
+        <height>70</height>
+        <font>font_tiny</font>
+        <align>center</align>
+        <textoffsetx>8</textoffsetx>
+        <textcolor>dialog_fg_100</textcolor>
+        <focusedcolor>Selected</focusedcolor>
+        <texturefocus border="8" colordiffuse="$VAR[ColorHighlight]">common/box.png</texturefocus>
+        <texturenofocus border="8" colordiffuse="dialog_fg_12">common/box.png</texturenofocus>
+    </include>
+</includes>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">50</defaultcontrol>
+    <!-- Kodi 21.3-Omega shares this file between managevideoversions and managevideoextras.
+         Core supplies heading 2, list 50, enabled states and empty-list focus.
+         Labels and per-window button visibility are skin-owned; Back/Escape stays native. -->
+    <controls>
+        <include>Global_Overlay</include>
+
+        <control type="group">
+            <include>Dialog_Standard_Group</include>
+
+            <control type="label" id="2">
+                <include>Dialog_Standard_Header</include>
+            </control>
+
+            <control type="list" id="50">
+                <include>Dialog_Standard_List_Left</include>
+                <onup>50</onup>
+                <ondown>50</ondown>
+                <onleft>9000</onleft>
+                <onright condition="Control.IsVisible(61)">61</onright>
+                <onright condition="!Control.IsVisible(61)">9000</onright>
+                <pagecontrol>61</pagecontrol>
+                <scrolltime>200</scrolltime>
+                <itemlayout height="69" width="700">
+                    <control type="label">
+                        <left>30</left>
+                        <right>84</right>
+                        <height>66</height>
+                        <font>font_small_bold</font>
+                        <info>ListItem.Label</info>
+                    </control>
+                    <control type="image">
+                        <right>30</right>
+                        <centertop>50%</centertop>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="$VAR[ColorHighlight]">osd/minicheck.png</texture>
+                        <visible>ListItem.IsSelected</visible>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="69" width="700">
+                    <control type="group">
+                        <height>66</height>
+                        <animation effect="fade" start="100" end="50" condition="!Control.HasFocus(50)">Conditional</animation>
+                        <control type="image">
+                            <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
+                        </control>
+                        <control type="image">
+                            <texture colordiffuse="$VAR[ColorHighlight2]">common/gradient-diffuse-horizontal.png</texture>
+                        </control>
+                    </control>
+                    <control type="label">
+                        <left>30</left>
+                        <right>84</right>
+                        <height>66</height>
+                        <font>font_small_bold</font>
+                        <textcolor>Selected</textcolor>
+                        <selectedcolor>Selected</selectedcolor>
+                        <info>ListItem.Label</info>
+                        <scroll>true</scroll>
+                    </control>
+                    <control type="image">
+                        <right>30</right>
+                        <centertop>50%</centertop>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="Selected">osd/minicheck.png</texture>
+                        <visible>ListItem.IsSelected</visible>
+                    </control>
+                </focusedlayout>
+            </control>
+
+            <control type="scrollbar" id="61">
+                <left>700</left>
+                <top>120</top>
+                <width>20</width>
+                <height>690</height>
+                <onleft>50</onleft>
+                <onright>9000</onright>
+                <texturesliderbackground colordiffuse="dialog_fg_12">common/white.png</texturesliderbackground>
+                <texturesliderbar colordiffuse="dialog_fg_30">common/white.png</texturesliderbar>
+            </control>
+
+            <control type="grouplist" id="9000">
+                <include>Dialog_Standard_Right_Grouplist</include>
+                <height>690</height>
+                <onup>9000</onup>
+                <ondown>9000</ondown>
+                <onleft condition="Control.IsVisible(61)">61</onleft>
+                <onleft condition="!Control.IsVisible(61) + Integer.IsGreater(Container(50).NumItems,0)">50</onleft>
+                <onright condition="Integer.IsGreater(Container(50).NumItems,0)">50</onright>
+                <control type="button" id="21">
+                    <description>Play</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[208]</label>
+                </control>
+                <control type="button" id="22">
+                    <description>Add version</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[40014]</label>
+                    <visible>Window.IsVisible(managevideoversions)</visible>
+                </control>
+                <control type="button" id="23">
+                    <description>Add extra</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[40015]</label>
+                    <visible>Window.IsVisible(managevideoextras)</visible>
+                </control>
+                <control type="button" id="27">
+                    <description>Choose art</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[13511]</label>
+                </control>
+                <control type="button" id="24">
+                    <description>Rename version</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[40004]</label>
+                    <visible>Window.IsVisible(managevideoversions)</visible>
+                </control>
+                <control type="button" id="28">
+                    <description>Rename extra</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[118]</label>
+                    <visible>Window.IsVisible(managevideoextras)</visible>
+                </control>
+                <control type="button" id="26">
+                    <description>Remove</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[15015]</label>
+                </control>
+                <control type="button" id="25">
+                    <description>Set default version</description>
+                    <include>Dialog_Standard_Right_Buttons</include>
+                    <label>$LOCALIZE[40023]</label>
+                    <visible>Window.IsVisible(managevideoversions)</visible>
+                </control>
+            </control>
+
+            <control type="label">
+                <left>30</left>
+                <right>30</right>
+                <top>830</top>
+                <height>40</height>
+                <font>font_tiny</font>
+                <label>$INFO[Container(50).ListItem.FileNameAndPath]</label>
+                <scroll>true</scroll>
+            </control>
+        </control>
+    </controls>
+</window>

@@ -232,14 +232,6 @@
  
  
  
-            <!-- CinemaVision -->
-            <item>
-                 <label>$LOCALIZE[31315]</label>
-                 <icon>special://skin/extras/icons/cinemavision.png</icon>
-                 <onclick>Dialog.Close(MovieInformation)</onclick>
-                 <onclick>RunScript(script.cinemavision,experience)</onclick>
-                 <visible>System.HasAddon(script.cinemavision) + [String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)]</visible>
-            </item> 
             <!-- Trailer -->
             <item>
                 <label>$INFO[Control.GetLabel(11)]</label>
@@ -310,7 +302,7 @@
                 <onclick>Select</onclick>
                 <onclick>SetFocus(300)</onclick>
                 <visible>Control.IsEnabled(9001)</visible>
-                <visible>!Skin.HasSetting(global.kioskmode) + system.hasaddon(script.artwork.beef)</visible>
+                <visible>!Skin.HasSetting(global.kioskmode) + System.AddonIsEnabled(script.skin.info.service) + Skin.HasSetting(Aura.OnlineEnrichment)</visible>
             </item>
 
             <!-- Art Downloader All -->
@@ -322,7 +314,7 @@
                 <onclick>Select</onclick>
                 <onclick>SetFocus(300)</onclick>
                 <visible>Control.IsEnabled(9011)</visible>
-                <visible>!Skin.HasSetting(global.kioskmode) + system.hasaddon(script.artwork.beef)</visible>
+                <visible>!Skin.HasSetting(global.kioskmode) + System.AddonIsEnabled(script.skin.info.service) + Skin.HasSetting(Aura.OnlineEnrichment)</visible>
             </item>
 
             <!-- Refresh -->
@@ -392,13 +384,6 @@
 
     <include name="Items_ExtendedInfo">
         <content>
-            <!-- Trakt -->
-            <item>
-                <label>$INFO[Control.GetLabel(9009)]</label>
-                <icon>special://skin/extras/icons/addtile.png</icon>
-                <onclick>SendClick(9009)</onclick>
-                <visible>Control.IsEnabled(9009)</visible>
-            </item>
             <!-- Manage -->
             <item>
                 <label>$INFO[Control.GetLabel(445)]</label>
@@ -645,11 +630,12 @@
                 <label>13350</label>
                 <onclick condition="!String.IsEqual(Playlist.Length(music),0) + String.IsEqual(Playlist.Length(video),0)">ActivateWindow(musicplaylist)</onclick>
                 <onclick condition="!String.IsEqual(Playlist.Length(video),0) + String.IsEqual(Playlist.Length(music),0)">ActivateWindow(videoplaylist)</onclick>
-                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.1.Label,$LOCALIZE[31395])</onclick>
-                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.1.BuiltIn,ActivateWindow(musicplaylist))</onclick>
-                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.2.Label,$LOCALIZE[31396])</onclick>
-                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.2.BuiltIn,ActivateWindow(videoplaylist))</onclick>
-                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">RunScript(script.toolbox,info=selectdialog,header=$LOCALIZE[524])</onclick>
+                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.1.Label,$LOCALIZE[31395],home)</onclick>
+                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.1.BuiltIn,ActivateWindow(musicplaylist),home)</onclick>
+                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.2.Label,$LOCALIZE[31396],home)</onclick>
+                <onclick condition="!String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">SetProperty(Dialog.2.BuiltIn,ActivateWindow(videoplaylist),home)</onclick>
+                <onclick condition="System.AddonIsEnabled(script.skin.info.service) + !String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">RunScript(script.skin.info.service,dialog=select,items=properties,heading=$LOCALIZE[524])</onclick>
+                <onclick condition="!System.AddonIsEnabled(script.skin.info.service) + !String.IsEqual(Playlist.Length(music),0) + !String.IsEqual(Playlist.Length(video),0)">ActivateWindow(musicplaylist)</onclick>
                 <visible>!String.IsEqual(Playlist.Length(music),0) | !String.IsEqual(Playlist.Length(video),0)</visible> 
             </item>
             <!-- Fullscreen -->
@@ -689,12 +675,17 @@
         </content>
     </include>
 
-    <include name="Items_NextAired">
+    <include name="Items_AiringCalendar">
         <content>
+            <item>
+                <icon>special://skin/extras/icons/tvguide.png</icon>
+                <label>$LOCALIZE[31920]</label>
+                <onclick>SetFocus(9000)</onclick>
+            </item>
             <item>
                 <icon>special://skin/extras/icons/settings.png</icon>
                 <label>$LOCALIZE[10140]</label>
-                <onclick>Addon.OpenSettings(script.tv.show.next.aired)</onclick>
+                <onclick condition="System.AddonIsEnabled(script.embuary.info)">Addon.OpenSettings(script.embuary.info)</onclick>
                 <visible>!Skin.HasSetting(global.kioskmode)</visible>
             </item>
         </content>

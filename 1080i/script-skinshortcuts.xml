@@ -3,6 +3,7 @@
     <defaultcontrol always="true">313</defaultcontrol>
     <onload condition="!Skin.HasSetting(WidgetsInit)">AlarmClock(Clickit,Action(Close),00:01,silent)</onload>
     <onunload condition="!Skin.HasSetting(WidgetsInit)">Skin.ToggleSetting(WidgetsInit)</onunload>
+    <onunload>Skin.Reset(Aura.Shortcuts.Input)</onunload>
     <controls>
         <include>Global_Overlay</include>
 
@@ -475,7 +476,13 @@
                     <texturenofocus colordiffuse="dialog_fg_30">special://skin/extras/icons/write.png</texturenofocus>
                     <label>$LOCALIZE[118]</label>
                     <textcolor>dialog_fg_30</textcolor>
-                    <onclick>RunScript(script.skin.helper.service,action=setskinshortcutsproperty,header=$ADDON[script.skinshortcuts 32025],property=$INFO[Window.Property(widgetName)])</onclick>
+                    <!-- Skin Info 2.0.0 dialog=input substitutes {value} before
+                         splitting callback builtins on |. Native input plus
+                         ESCINFO preserves commas, pipes, quotes and backslashes.
+                         Empty/cancelled input never reaches SendClick(404). -->
+                    <onclick>Skin.Reset(Aura.Shortcuts.Input)</onclick>
+                    <onclick>Skin.SetString(Aura.Shortcuts.Input)</onclick>
+                    <onclick>SetFocus(9410)</onclick>
                     <onback condition="!String.IsEmpty(Window.Property(SetWidgets))">AlarmClock(reopen,RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu),00:00,silent)</onback>
                 </control>
                 <control type="button" id="9403" description="Aspect">
@@ -503,7 +510,9 @@
                     <texturenofocus colordiffuse="dialog_fg_30">special://skin/extras/icons/sort2.png</texturenofocus>
                     <label>$LOCALIZE[31237]</label>
                     <textcolor>dialog_fg_30</textcolor>
-                    <onclick>RunScript(script.skin.helper.service,action=setskinshortcutsproperty,header=$LOCALIZE[31235],property=$INFO[Window.Property(WidgetSort)])</onclick>
+                    <onclick>Skin.Reset(Aura.Shortcuts.Input)</onclick>
+                    <onclick>Skin.SetString(Aura.Shortcuts.Input)</onclick>
+                    <onclick>SetFocus(9411)</onclick>
                     <onback condition="!String.IsEmpty(Window.Property(SetWidgets))">AlarmClock(reopen,RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu),00:00,silent)</onback>
                 </control>
                 <control type="button" id="9405" description="Direction">
@@ -526,6 +535,29 @@
 
         </control>
 
+        <!-- Kodi snapshots action conditions before running that action list.
+             Commit on a separate focus event AFTER the blocking keyboard closes.
+             Skin Shortcuts consumes/clears customProperty and customValue itself. -->
+        <control type="button" id="9410">
+            <visible allowhiddenfocus="true">false</visible>
+            <width>1</width>
+            <height>1</height>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SetProperty(customProperty,$INFO[Window.Property(widgetName)])</onfocus>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SetProperty(customValue,$ESCINFO[Skin.String(Aura.Shortcuts.Input)])</onfocus>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SendClick(404)</onfocus>
+            <onfocus>Skin.Reset(Aura.Shortcuts.Input)</onfocus>
+            <onfocus>SetFocus(9402)</onfocus>
+        </control>
+        <control type="button" id="9411">
+            <visible allowhiddenfocus="true">false</visible>
+            <width>1</width>
+            <height>1</height>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SetProperty(customProperty,$INFO[Window.Property(WidgetSort)])</onfocus>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SetProperty(customValue,$ESCINFO[Skin.String(Aura.Shortcuts.Input)])</onfocus>
+            <onfocus condition="!String.IsEmpty(Skin.String(Aura.Shortcuts.Input))">SendClick(404)</onfocus>
+            <onfocus>Skin.Reset(Aura.Shortcuts.Input)</onfocus>
+            <onfocus>SetFocus(9404)</onfocus>
+        </control>
         <control type="button" id="404"><visible allowhiddenfocus="true">false</visible><width>1</width><height>1</height></control>
     </controls>
 </window>

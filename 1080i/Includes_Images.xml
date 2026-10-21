@@ -8,7 +8,9 @@
     </variable>
 
     <variable name="Image_ArtistFanartVis">
-        <value condition="!Skin.HasSetting(ArtistSlideShow.Disabled) + !String.IsEmpty(Window(Home).Property(SkinHelper.Player.Art.ExtraFanArt))">$INFO[Window(Home).Property(SkinHelper.Player.Art.ExtraFanArt)]</value>
+        <value condition="!Skin.HasSetting(ArtistSlideShow.Disabled) + !String.IsEmpty(Player.Art(artist.fanart))">$INFO[Player.Art(artist.fanart)]</value>
+        <value condition="!Skin.HasSetting(ArtistSlideShow.Disabled) + !String.IsEmpty(Player.Art(fanart))">$INFO[Player.Art(fanart)]</value>
+        <value condition="Skin.HasSetting(Aura.OnlineEnrichment) + !Skin.HasSetting(ArtistSlideShow.Disabled) + Player.HasAudio + !String.IsEmpty(MusicPlayer.Artist) + String.IsEqual(MusicPlayer.Artist,Window(Home).Property(SkinInfo.Player.Online.Music.Artist.Name)) + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Music.Artist.FanArt))">$INFO[Window(Home).Property(SkinInfo.Player.Online.Music.Artist.FanArt)]</value>
         <value condition="System.HasAddon(script.artistslideshow) + !Skin.HasSetting(ArtistSlideShow.Disabled) + !String.IsEmpty(Window(Visualisation).Property(ArtistSlideshow.Image))">$INFO[Window(Visualisation).Property(ArtistSlideshow.Image)]</value>
         <value condition="[!System.HasAddon(script.artistslideshow) | Skin.HasSetting(ArtistSlideShow.Disabled)] + Skin.HasSetting(musicvis.fanartfallback) + !String.IsEmpty(Player.Art(fanart))">$INFO[Player.Art(fanart)]</value>
         <value>common/null.png</value>
@@ -50,13 +52,20 @@
     <variable name="Image_ClearLogo">
         <value condition="!String.IsEmpty(ListItem.Art(tvshow.clearlogo))">$INFO[ListItem.Art(tvshow.clearlogo)]</value>
         <value condition="!String.IsEmpty(ListItem.Art(clearlogo))">$INFO[ListItem.Art(clearlogo)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.ClearLogo))">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.ClearLogo)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(artist.clearlogo))">$INFO[ListItem.Art(artist.clearlogo)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(Window(Home).Property(SkinInfo.Movie.Art(clearlogo)))">$INFO[Window(Home).Property(SkinInfo.Movie.Art(clearlogo))]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(Window(Home).Property(SkinInfo.TVShow.Art(clearlogo)))">$INFO[Window(Home).Property(SkinInfo.TVShow.Art(clearlogo))]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,set) + !String.IsEmpty(Window(Home).Property(SkinInfo.Set.Art(clearlogo)))">$INFO[Window(Home).Property(SkinInfo.Set.Art(clearlogo))]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Clearlogo)]</value>
     </variable>
 
     <variable name="Image_DiscArt">
         <value condition="!String.IsEmpty(ListItem.Art(discart))">$INFO[ListItem.Art(discart)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.DiscArt))">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.DiscArt)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(album.discart))">$INFO[ListItem.Art(album.discart)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,album)">$INFO[Window(Home).Property(SkinInfo.Album.Art(discart))]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,movie)">$INFO[Window(Home).Property(SkinInfo.Movie.Art(discart))]</value>
     </variable>
+    <expression name="Aura.MusicDiscArt">[String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)] + [!String.IsEmpty(ListItem.Art(discart)) | !String.IsEmpty(ListItem.Art(album.discart)) | [$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,album) + !String.IsEmpty(Window(Home).Property(SkinInfo.Album.Art(discart)))]]</expression>
 
     <variable name="Image_Watched">
         <value condition="System.Setting(hidewatched)">special://skin/extras/icons/watched-hide.png</value>
@@ -68,7 +77,7 @@
     </variable>
 
     <variable name="Image_GenreIcons_Path">
-        <value condition="System.HasAddon(resource.images.moviegenreicons.horizon)">resource://resource.images.moviegenreicons.horizon/</value>
+        <!-- Keep the official transparent genre artwork as the appearance fallback. -->
         <value condition="System.HasAddon(resource.images.moviegenreicons.transparent)">resource://resource.images.moviegenreicons.transparent/</value>
     </variable>
 
@@ -144,9 +153,12 @@
         <value condition="Container.Content(seasons) + !String.IsEmpty(ListItem.Icon)">$INFO[ListItem.Icon]</value>
         <value condition="!String.IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
         <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.Poster))">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.Poster)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.AlbumThumb))">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.AlbumThumb)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.ArtistThumb))">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.ArtistThumb)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(album.thumb))">$INFO[ListItem.Art(album.thumb)]</value>
+        <value condition="!String.IsEmpty(ListItem.Art(artist.thumb))">$INFO[ListItem.Art(artist.thumb)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(Window(Home).Property(SkinInfo.Movie.Art(poster)))">$INFO[Window(Home).Property(SkinInfo.Movie.Art(poster))]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,album) + !String.IsEmpty(Window(Home).Property(SkinInfo.Album.Art(thumb)))">$INFO[Window(Home).Property(SkinInfo.Album.Art(thumb))]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + String.IsEqual(ListItem.DBType,artist) + !String.IsEmpty(Window(Home).Property(SkinInfo.Artist.Art(thumb)))">$INFO[Window(Home).Property(SkinInfo.Artist.Art(thumb))]</value>
+        <value condition="$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Poster))">$INFO[Window(Home).Property(SkinInfo.Online.Poster)]</value>
         <value condition="!String.IsEmpty(ListItem.Icon)">$INFO[ListItem.Icon]</value>
         <value condition="Skin.HasSetting(CycleColors)">special://skin/extras/colorspin/</value>
     </variable>

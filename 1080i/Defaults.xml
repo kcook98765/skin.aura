@@ -54,6 +54,26 @@
         <pulseonselect>false</pulseonselect>
     </default>
 
+    <default type="colorbutton">
+        <align>center</align>
+        <aligny>center</aligny>
+        <font>font_small</font>
+        <textoffsetx>30</textoffsetx>
+        <textcolor>dialog_fg_70</textcolor>
+        <focusedcolor>Selected</focusedcolor>
+        <disabledcolor>dialog_fg_30</disabledcolor>
+        <selectedcolor>$VAR[ColorHighlight]</selectedcolor>
+        <texturefocus colordiffuse="dialog_bg_12">common/white.png</texturefocus>
+        <texturenofocus/>
+        <pulseonselect>false</pulseonselect>
+        <colorwidth>32</colorwidth>
+        <colorheight>32</colorheight>
+        <colorposx>0</colorposx>
+        <colorposy>0</colorposy>
+        <texturecolormask>common/white.png</texturecolormask>
+        <texturecolordisabledmask colordiffuse="dialog_fg_30">common/white.png</texturecolordisabledmask>
+    </default>
+
     <default type="togglebutton">
         <align>center</align>
         <aligny>center</aligny>

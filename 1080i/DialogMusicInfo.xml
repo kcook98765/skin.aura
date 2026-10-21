@@ -2,7 +2,11 @@
 <!-- Foundation -->
 <window id="2001">
     <defaultcontrol always="true">300</defaultcontrol>
+    <include content="Object_Aura_InfoBlur_OnLoad">
+        <param name="window" value="musicinformation" />
+    </include>
     <controls>
+        <include>Object_Aura_BlurSource</include>
         
         <control type="list" id="300">
             <top>30</top>
@@ -184,8 +188,8 @@
                             <width>360</width>
                             <height>360</height>
                             <aspectratio>keep</aspectratio>
-                            <texture background="true">$INFO[Window(Home).Property(SkinHelper.ListItem.Art.Discart)]</texture>
-                            <visible>!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.Discart)) + [String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</visible>
+                            <texture background="true">$VAR[Image_DiscArt]</texture>
+                            <visible>$EXP[Aura.MusicDiscArt]</visible>
                         </control>
                         <control type="image">
                             <top>60</top>
@@ -194,7 +198,7 @@
                             <height>360</height>
                             <aspectratio>keep</aspectratio>
                             <texture background="true">$VAR[Image_ClearLogo]</texture>
-                            <visible>String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Art.Discart)) | ![String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</visible>
+                            <visible>!$EXP[Aura.MusicDiscArt]</visible>
                         </control>
                     </control>
                 </control>
@@ -275,26 +279,17 @@
 
         <control type="button" id="9001">
             <label>$LOCALIZE[31389]</label>
-            <!-- If ADownloader installed but not ABeef then use AD otherwise prefer AB -->
-            <!-- AD has been depreciated but some still use it -->
-
-            <onclick condition="String.IsEqual(ListItem.DBType,artist) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=artist, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,album) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=album, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,song) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=gui, mediatype=song, dbid=$INFO[ListItem.DBID])</onclick>
+            <onclick condition="System.AddonIsEnabled(script.skin.info.service) + Skin.HasSetting(Aura.OnlineEnrichment) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,artist) | String.IsEqual(ListItem.DBType,album)]">RunScript(script.skin.info.service,action=review_artwork,dbtype=$INFO[ListItem.DBType],dbid=$INFO[ListItem.DBID])</onclick>
             <description>Get Artwork</description>
             <include>Defs_Hidden_Button</include>
-            <visible>[String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song) | String.IsEqual(ListItem.DBType,artist)] + system.hasaddon(script.artwork.beef)</visible>
+            <visible>Skin.HasSetting(Aura.OnlineEnrichment) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,artist)] + System.AddonIsEnabled(script.skin.info.service)</visible>
         </control>
         <control type="button" id="9011">
             <label>$LOCALIZE[31388]</label>
-            <!-- If ADownloader installed but not ABeef then use AD otherwise prefer AB -->
-            <!-- AD has been depreciated but some still use it -->
-            <onclick condition="String.IsEqual(ListItem.DBType,artist) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=artist, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,album) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=album, dbid=$INFO[ListItem.DBID])</onclick>
-            <onclick condition="String.IsEqual(ListItem.DBType,song) + System.HasAddon(script.artwork.beef)">RunScript(script.artwork.beef, mode=auto, mediatype=song, dbid=$INFO[ListItem.DBID])</onclick>
+            <onclick condition="System.AddonIsEnabled(script.skin.info.service) + Skin.HasSetting(Aura.OnlineEnrichment) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,artist) | String.IsEqual(ListItem.DBType,album)]">RunScript(script.skin.info.service,action=download_artwork,dbtype=$INFO[ListItem.DBType],dbid=$INFO[ListItem.DBID])</onclick>
             <description>Get Artwork</description>
             <include>Defs_Hidden_Button</include>
-            <visible>[String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song) | String.IsEqual(ListItem.DBType,artist)] + system.hasaddon(script.artwork.beef)</visible>
+            <visible>Skin.HasSetting(Aura.OnlineEnrichment) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,artist)] + System.AddonIsEnabled(script.skin.info.service)</visible>
         </control>
 
     </controls>

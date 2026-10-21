@@ -3,7 +3,11 @@
 <window id="146">
     <defaultcontrol always="true">300</defaultcontrol>
     <onload>AlarmClock(defaultcontrol,SetFocus(300),00:00,silent)</onload>
+    <include content="Object_Aura_InfoBlur_OnLoad">
+        <param name="window" value="addoninformation" />
+    </include>
     <controls>
+        <include>Object_Aura_BlurSource</include>
         
         <control type="list" id="300">
             <top>30</top>

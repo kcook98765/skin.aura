@@ -91,6 +91,12 @@
                 <include>Dialog_Standard_HintLabel</include>
             </control>
 
+            <control type="colorbutton" id="15">
+                <description>Default ColorButton</description>
+                <colorposx>885</colorposx>
+                <include>Dialog_Standard_ListButton</include>
+            </control>
+
 
             <control type="image">
                 <right>20</right>

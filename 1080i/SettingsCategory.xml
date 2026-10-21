@@ -163,10 +163,22 @@
             <include>Defs_Settings_Button</include>
         </control>
 
+        <control type="sliderex" id="13">
+            <description>Default Slider</description>
+            <include>Defs_Settings_Button</include>
+        </control>
+
         <control type="label" id="14">
             <textoffsetx>view_pad</textoffsetx>
             <font>font_button</font>
             <textcolor>main_fg_30</textcolor>
+            <include>Defs_Settings_Button</include>
+        </control>
+
+        <control type="colorbutton" id="15">
+            <description>Default ColorButton</description>
+            <colorposx>1380</colorposx>
+            <texturecolordisabledmask colordiffuse="main_fg_12">common/white.png</texturecolordisabledmask>
             <include>Defs_Settings_Button</include>
         </control>
 

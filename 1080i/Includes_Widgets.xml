@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <variable name="AiringCalendar_DayTextColor">
+        <value condition="Control.HasFocus(9000)">Selected</value>
+        <value>main_fg_100</value>
+    </variable>
+    <variable name="AiringCalendar_EpisodeTextColor">
+        <value condition="Control.HasFocus(50)">Selected</value>
+        <value>main_fg_100</value>
+    </variable>
+    <variable name="AiringCalendar_EpisodeDetailColor">
+        <value condition="Control.HasFocus(50)">Selected</value>
+        <value>main_fg_70</value>
+    </variable>
     <include name="Widget_Movement">
         <param name="submenu" default="false" />
         <definition>
@@ -29,6 +41,27 @@
     </include>
 
     <include name="Widgets">
+        <!-- Stable, native seeds for the opt-in Similar choices. The provider
+             needs a real source DBID; widget focus must not become its seed.
+             No source means an empty Similar list, not an online lookup. -->
+        <control type="list" id="9986">
+            <left>-2000</left>
+            <width>1</width>
+            <height>1</height>
+            <visible allowhiddenfocus="true">false</visible>
+            <itemlayout width="1" height="1" />
+            <focusedlayout width="1" height="1" />
+            <content sortby="dateadded" sortorder="descending" limit="1" browse="never">videodb://recentlyaddedmovies/</content>
+        </control>
+        <control type="list" id="9987">
+            <left>-2000</left>
+            <width>1</width>
+            <height>1</height>
+            <visible allowhiddenfocus="true">false</visible>
+            <itemlayout width="1" height="1" />
+            <focusedlayout width="1" height="1" />
+            <content sortby="dateadded" sortorder="descending" limit="1" browse="never">videodb://tvshows/titles/</content>
+        </control>
         <control type="list" id="302">
             <onup>430</onup>
             <onback>300</onback>
@@ -364,15 +397,6 @@
                         <label2>$LOCALIZE[31345]</label2>
                         <onclick>activatewindow(eventlog)</onclick>
                         <icon>special://skin/extras/icons/year.png</icon>
-                        <visible>!System.HasAddon(service.libreelec.settings)</visible>
-                    </item>
-                    <item id="19">
-                        <description>LibreElec</description>
-                        <label>$ADDON[service.libreelec.settings 600]</label>
-                        <label2>$ADDON[service.libreelec.settings 32002] • $ADDON[service.libreelec.settings 32101] • $ADDON[service.libreelec.settings 32001][CR]$ADDON[service.libreelec.settings 32100] • $ADDON[service.libreelec.settings 32331]</label2>
-                        <onclick>RunScript(service.libreelec.settings)</onclick>
-                        <icon>special://skin/extras/icons/libreelec.png</icon>
-                        <visible>System.HasAddon(service.libreelec.settings)</visible>
                     </item>
                     <item id="13">
                         <description>Filemanager</description>
@@ -511,9 +535,9 @@
                 <control type="label">
                     <left>-16</left>
                     <textcolor>main_fg_100</textcolor>
-                    <label>$INFO[Container($PARAM[id]).ListItem.Property(similartitle), $LOCALIZE[19160] ,]</label>
+                    <label>$INFO[Container($PARAM[id]).ListItem.Property(BasedOnLabel), ,]</label>
                     <include>Statusbar_Menubar_Items</include>
-                    <visible>!String.IsEmpty(Container($PARAM[id]).ListItem.Property(similartitle))</visible>
+                    <visible>!String.IsEmpty(Container($PARAM[id]).ListItem.Property(BasedOnLabel))</visible>
                 </control>
                 <control type="image">
                     <texture colordiffuse="$VAR[ColorHighlight]">common/white.png</texture>
@@ -562,7 +586,6 @@
         <height>$PARAM[height]</height>
         <preloaditems>2</preloaditems>
         <onfocus>SetProperty(WidgetFocus,1,Home)</onfocus>
-        <onfocus>SetProperty(SkinHelper.WidgetContainer,$PARAM[id],Home)</onfocus>
         <include content="Widget_Movement" condition="Skin.HasSetting(DisableCategoriesWidgetLabel)">
             <param name="id" value="$PARAM[id]" />
             <param name="aspect" value="$PARAM[aspect]" />
@@ -1183,4 +1206,3 @@
         </definition>
     </include>
 </includes>
-

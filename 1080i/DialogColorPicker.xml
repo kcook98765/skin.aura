@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">6</defaultcontrol>
+    <controls>
+        <include>Global_Overlay</include>
+
+        <control type="group">
+            <include content="Dialog_Standard_Group">
+                <param name="width" value="1300" />
+                <param name="height" value="720" />
+            </include>
+
+            <control type="label" id="1">
+                <description>Heading</description>
+                <include>Dialog_Standard_Header</include>
+            </control>
+
+            <control type="panel" id="6">
+                <description>Native color palette</description>
+                <left>30</left>
+                <right>360</right>
+                <top>100</top>
+                <bottom>20</bottom>
+                <onup>6</onup>
+                <ondown>6</ondown>
+                <onleft>7</onleft>
+                <onright>7</onright>
+                <scrolltime>200</scrolltime>
+                <orientation>vertical</orientation>
+                <itemlayout width="150" height="150">
+                    <control type="image">
+                        <left>0</left>
+                        <top>0</top>
+                        <right>10</right>
+                        <bottom>10</bottom>
+                        <texture colordiffuse="dialog_fg_12" border="5">common/colorpick.png</texture>
+                    </control>
+                    <control type="image">
+                        <left>10</left>
+                        <top>10</top>
+                        <right>20</right>
+                        <bottom>20</bottom>
+                        <texture>common/white.png</texture>
+                        <colordiffuse>$INFO[ListItem.Label2]</colordiffuse>
+                    </control>
+                </itemlayout>
+                <focusedlayout width="150" height="150">
+                    <control type="image">
+                        <left>0</left>
+                        <top>0</top>
+                        <right>10</right>
+                        <bottom>10</bottom>
+                        <texture colordiffuse="$VAR[ColorHighlight]" border="5">common/colorpick.png</texture>
+                    </control>
+                    <control type="image">
+                        <left>10</left>
+                        <top>10</top>
+                        <right>20</right>
+                        <bottom>20</bottom>
+                        <texture>common/white.png</texture>
+                        <colordiffuse>$INFO[ListItem.Label2]</colordiffuse>
+                    </control>
+                </focusedlayout>
+            </control>
+
+            <control type="button" id="7">
+                <description>Cancel</description>
+                <right>40</right>
+                <top>100</top>
+                <label>222</label>
+                <onleft>6</onleft>
+                <onright>6</onright>
+                <onup>6</onup>
+                <ondown>6</ondown>
+                <include>Dialog_Standard_Right_Buttons</include>
+            </control>
+        </control>
+    </controls>
+</window>

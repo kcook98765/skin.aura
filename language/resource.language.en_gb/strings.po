@@ -1963,3 +1963,106 @@ msgstr "Show trailers and special features in the preview window"
 msgctxt "#31411"
 msgid "Unavailable"
 msgstr "Unavailable"
+
+#: /1080i/SkinSettings.xml
+msgctxt "#31900"
+msgid "Online metadata enrichment (optional)"
+msgstr "Online metadata enrichment (optional)"
+
+msgctxt "#31901"
+msgid "Enrichment provider settings"
+msgstr "Enrichment provider settings"
+
+msgctxt "#31902"
+msgid "Library metadata works offline. Extra ratings, awards and artwork require provider settings and may be unavailable."
+msgstr "Library metadata works offline. Extra ratings, awards and artwork require provider settings and may be unavailable."
+
+msgctxt "#31903"
+msgid "Use local extra-fanart folders"
+msgstr "Use local extra-fanart folders"
+
+msgctxt "#31904"
+msgid "Scores use stored library ratings first. Optional online scores depend on provider coverage. Rotten Tomatoes displays Tomatometer and audience percentages, not the former critic-average metric."
+msgstr "Scores use stored library ratings first. Optional online scores depend on provider coverage. Rotten Tomatoes displays Tomatometer and audience percentages, not the former critic-average metric."
+
+msgctxt "#31910"
+msgid "Configure Backup destination and enable Add-on Data before backing up; include custom asset folders. Old Skin Helper archives are not supported."
+msgstr "Configure Backup destination and enable Add-on Data before backing up; include custom asset folders. Old Skin Helper archives are not supported."
+
+msgctxt "#31905"
+msgid "Rotten Tomatoes (Tomatometer / audience)"
+msgstr "Rotten Tomatoes (Tomatometer / audience)"
+
+msgctxt "#31906"
+msgid "TVDB (stored library rating)"
+msgstr "TVDB (stored library rating)"
+
+msgctxt "#31907"
+msgid "Offline actor selection opens the library actor browser; choose an actor there."
+msgstr "Offline actor selection opens the library actor browser; choose an actor there."
+
+msgctxt "#31911"
+msgid "Blur radius"
+msgstr "Blur radius"
+
+msgctxt "#31912"
+msgid "Predefined palette only. Saved custom colours remain until changed. Automatic poster-derived colours are unavailable in official-only mode."
+msgstr "Predefined palette only. Saved custom colours remain until changed. Automatic poster-derived colours are unavailable in official-only mode."
+
+msgctxt "#31915"
+msgid "Unavailable in official-only mode"
+msgstr "Unavailable in official-only mode"
+
+#: /1080i/Custom_1140_AiringCalendar.xml
+msgctxt "#31920"
+msgid "Airing calendar"
+msgstr "Airing calendar"
+
+msgctxt "#31921"
+msgid "Seven days"
+msgstr "Seven days"
+
+msgctxt "#31922"
+msgid "No scheduled episodes. Check library shows, provider settings and network access."
+msgstr "No scheduled episodes. Check library shows, provider settings and network access."
+
+msgctxt "#31923"
+msgid "Skin Info Service (library widgets)"
+msgstr "Skin Info Service (library widgets)"
+
+msgctxt "#31924"
+msgid "Similar movies - newest library movie"
+msgstr "Similar movies - newest library movie"
+
+msgctxt "#31925"
+msgid "Similar TV shows - newest library show"
+msgstr "Similar TV shows - newest library show"
+
+msgctxt "#31926"
+msgid "Select an episode for show information"
+msgstr "Select an episode for show information"
+
+msgctxt "#31927"
+msgid "Library schedule - next seven days"
+msgstr "Library schedule - next seven days"
+
+msgctxt "#31928"
+msgid "Schedule unavailable while Embuary Info is disabled."
+msgstr "Schedule unavailable while Embuary Info is disabled."
+
+msgctxt "#31929"
+msgid "Loading schedule..."
+msgstr "Loading schedule..."
+
+#: /1080i/Includes_PVR_Omega.xml
+msgctxt "#31930"
+msgid "Back"
+msgstr "Back"
+
+msgctxt "#31931"
+msgid "Choose date"
+msgstr "Choose date"
+
+msgctxt "#31932"
+msgid "Programme options"
+msgstr "Programme options"

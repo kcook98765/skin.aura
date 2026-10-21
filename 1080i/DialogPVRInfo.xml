@@ -1,124 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window id="2003">
-<onload>RunPlugin(plugin://script.embuary.helper?info=getcast&amp;type=movie&amp;title=$ESCINFO[ListItem.EpgEventTitle])</onload>
-
     <defaultcontrol always="true">9000</defaultcontrol>
     <controls>
         <include>Global_Overlay</include>
         <control type="group">
             <include content="Dialog_Standard_Group">
-                <param name="width" value="1400" />
-                <param name="height" value="650" />
+                <param name="width" value="1600" />
+                <param name="height" value="900" />
             </include>
 
             <control type="label" id="2">
-                <include>Dialog_Standard_Header</include>
-                <label>$INFO[ListItem.EpgEventTitle]$INFO[ListItem.EpisodeName, - ,]</label>
+                <left>48</left>
+                <top>30</top>
+                <width>1504</width>
+                <height>64</height>
+                <font>font_title</font>
+                <textcolor>dialog_fg_100</textcolor>
+                <scroll>true</scroll>
+                <label>$VAR[PVR_Omega_DialogTitle]</label>
             </control>
-            <control type="grouplist">
-                <left>30</left>
-                <top>100</top>
-                <right>60</right>
-                <include>Dialog_Info_Details_Grouplist</include>
-                <!-- start,stop and channel -->
-                <control type="group">
-                    <height>50</height>
-                    <control type="label">
-                        <left>0</left>
-                        <width>160</width>
-                        <align>right</align>
-                        <textcolor>dialog_fg_30</textcolor>
-                        <font>font_small</font>
-                        <label>19126</label>
-                        <aligny>top</aligny>
-                    </control>
-                    <control type="label">
-                        <left>176</left>
-                        <textcolor>dialog_fg_70</textcolor>
-                        <font>font_small</font>
-                        <aligny>top</aligny>
-                        <label fallback="19055">$INFO[ListItem.StartTime] - $INFO[ListItem.EndTime] : $INFO[ListItem.ChannelName]$INFO[ListItem.ChannelNumberLabel, (,)]</label>
-                    </control>
-                </control>
-                <!-- Plot -->
-                <control type="group">
-                    <height>150</height>
-                    <control type="label">
-                        <left>0</left>
-                        <width>160</width>
-                        <align>right</align>
-                        <textcolor>dialog_fg_30</textcolor>
-                        <font>font_small</font>
-                        <label>21821</label>
-                        <aligny>top</aligny>
-                    </control>
-                    <control type="textbox">
-                        <left>176</left>
-                        <textcolor>dialog_fg_70</textcolor>
-                        <font>font_plotbox</font>
-                        <aligny>top</aligny>
-                        <label fallback="19055">$INFO[ListItem.Plot]</label>
-                    </control>
-                </control>
-                <!-- Cast -->
-                <control type="group">
-                    <height>50</height>
-                    <control type="label">
-                        <left>0</left>
-                        <width>160</width>
-                        <align>right</align>
-                        <textcolor>dialog_fg_30</textcolor>
-                        <font>font_small</font>
-                        <label>$LOCALIZE[206]</label>
-                        <aligny>top</aligny>
-                    </control>
-                    <control type="label">
-                        <left>176</left>
-                        <textcolor>dialog_fg_70</textcolor>
-                        <font>font_small</font>
-                        <aligny>top</aligny>
-                        <label fallback="19055">$INFO[ListItem.Cast] -- $INFO[ListItem.Property(Cast.1)]</label>
-                    </control>
-                </control>
-
+            <control type="label">
+                <left>48</left>
+                <top>108</top>
+                <width>1504</width>
+                <height>40</height>
+                <textcolor>dialog_fg_100</textcolor>
+                <label>$INFO[ListItem.Date]$INFO[ListItem.EndTime, - ,]$INFO[ListItem.Duration,  /  ,]$INFO[ListItem.Genre,  /  ,]</label>
             </control>
-            <!-- Buttons -->
+            <control type="image">
+                <left>48</left>
+                <top>180</top>
+                <width>400</width>
+                <height>400</height>
+                <texture colordiffuse="dialog_fg_12" border="16">common/rounded-dialog.png</texture>
+            </control>
+            <control type="image">
+                <left>72</left>
+                <top>204</top>
+                <width>352</width>
+                <height>352</height>
+                <aspectratio>keep</aspectratio>
+                <!-- Kodi's EPG icon already falls back to channel and bundled artwork. -->
+                <texture fallback="DefaultTVShows.png" background="true">$INFO[ListItem.Icon]</texture>
+            </control>
+            <control type="textbox">
+                <left>48</left>
+                <top>604</top>
+                <width>400</width>
+                <height>126</height>
+                <font>font_medium_bold</font>
+                <textcolor>dialog_fg_100</textcolor>
+                <label>$INFO[ListItem.ChannelNumberLabel,,  ]$INFO[ListItem.ChannelName]</label>
+                <autoscroll>false</autoscroll>
+                <pagecontrol>0</pagecontrol>
+            </control>
+            <control type="label">
+                <left>500</left>
+                <top>180</top>
+                <width>1030</width>
+                <height>40</height>
+                <font>font_small_bold</font>
+                <textcolor>dialog_fg_100</textcolor>
+                <label>$INFO[ListItem.EpisodeName]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="textbox" id="9400">
+                <left>500</left>
+                <top>236</top>
+                <width>1030</width>
+                <height>504</height>
+                <font>font_plotbox</font>
+                <textcolor>dialog_fg_100</textcolor>
+                <label fallback="19055">$INFO[ListItem.Plot]</label>
+                <pagecontrol>9401</pagecontrol>
+                <autoscroll>false</autoscroll>
+            </control>
+            <control type="scrollbar" id="9401">
+                <left>1540</left>
+                <top>236</top>
+                <width>12</width>
+                <height>504</height>
+                <orientation>vertical</orientation>
+                <onleft>9000</onleft>
+                <onright>9000</onright>
+                <onup>9000</onup>
+                <ondown>9000</ondown>
+                <texturesliderbackground colordiffuse="dialog_fg_12">common/white.png</texturesliderbackground>
+                <texturesliderbar colordiffuse="dialog_fg_30">common/white.png</texturesliderbar>
+                <texturesliderbarfocus colordiffuse="$VAR[ColorHighlight]">common/white.png</texturesliderbarfocus>
+            </control>
+            <!-- Native handlers: 4 find similar, 5 switch, 6 record/stop/delete,
+                 7 close, 8 play recording, 9 add timer rule, 10 play programme,
+                 11 reminder. The guide dialog gates 6/8/9/10/11 and labels 6;
+                 recording info uses only 4/7/8. Header 2 is skin-owned.
+                 No onclick, window reload or selection reset: closing resumes the grid. -->
             <control type="grouplist" id="9000">
-                <left>30</left>
-                <right>30</right>
+                <left>40</left>
+                <top>790</top>
+                <width>1520</width>
                 <align>center</align>
-                <bottom>20</bottom>
-                <height>60</height>
+                <height>70</height>
                 <orientation>horizontal</orientation>
-                <itemgap>14</itemgap>
-                <control type="button" id="9091">
-                    <label>Local Copy</label>
-                    <include>Dialog_Info_Buttons</include>
-                    <visible>Window.IsActive(PVRGuideInfo) + !String.IsEmpty(Window(Home).Property(Fuzzy.xsp))</visible>
-                    <onclick>RunScript(script.epg_fuzzy_match,$INFO[Window(Home).Property(Fuzzy.context)])</onclick>
-                </control>
+                <itemgap>8</itemgap>
+                <defaultcontrol always="true">7</defaultcontrol>
+                <onleft>9000</onleft>
+                <onright>9000</onright>
+                <onup>9401</onup>
+                <ondown>9401</ondown>
                 <control type="button" id="5">
                     <label>19165</label>
-                    <include>Dialog_Info_Buttons</include>
+                    <include>PVR_Omega_DialogButton</include>
                     <visible>Window.IsActive(PVRGuideInfo)</visible>
                 </control>
-                <control type="button" id="4">
-                    <label>19003</label>
-                    <include>Dialog_Info_Buttons</include>
-                    <visible>Window.IsActive(PVRGuideInfo)</visible>
-                </control>
-                <control type="button" id="6">
-                    <include>Dialog_Info_Buttons</include>
+                <control type="button" id="10">
+                    <label>19190</label>
+                    <include>PVR_Omega_DialogButton</include>
                     <visible>Window.IsActive(PVRGuideInfo)</visible>
                 </control>
                 <control type="button" id="8">
                     <label>19687</label>
-                    <include>Dialog_Info_Buttons</include>
-                    <visible>Window.IsActive(PVRGuideInfo) | Window.IsActive(PVRRecordingInfo)</visible>
+                    <include>PVR_Omega_DialogButton</include>
+                </control>
+                <control type="button" id="6">
+                    <include>PVR_Omega_DialogButton</include>
+                    <visible>Window.IsActive(PVRGuideInfo)</visible>
+                </control>
+                <control type="button" id="9">
+                    <label>19061</label>
+                    <include>PVR_Omega_DialogButton</include>
+                    <visible>Window.IsActive(PVRGuideInfo)</visible>
+                </control>
+                <control type="button" id="11">
+                    <label>826</label>
+                    <include>PVR_Omega_DialogButton</include>
+                    <visible>Window.IsActive(PVRGuideInfo)</visible>
+                </control>
+                <control type="button" id="4">
+                    <label>19003</label>
+                    <include>PVR_Omega_DialogButton</include>
                 </control>
                 <control type="button" id="7">
                     <label>186</label>
-                    <include>Dialog_Info_Buttons</include>
+                    <include>PVR_Omega_DialogButton</include>
                 </control>
             </control>
         </control>

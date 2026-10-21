@@ -334,11 +334,11 @@
         </control>
 
         <control type="button" id ="9009">
-            <description>Add to trakt</description>
+            <description>Legacy Trakt list-manager compatibility stub</description>
             <include>Defs_Hidden_Button</include>
-            <onclick>RunPlugin(plugin://plugin.video.trakt_list_manager/movies/add?title=$INFO[Window.Property(label)])</onclick>
-            <label>Trakt</label>
-            <visible>System.HasAddon(plugin.video.trakt_list_manager)</visible>
+            <label>Trakt: $LOCALIZE[31915]</label>
+            <label2>$LOCALIZE[31915]</label2>
+            <enable>false</enable>
         </control>
 
         <control type="button" id ="445">

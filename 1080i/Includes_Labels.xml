@@ -1,5 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <!-- Library is the baseline. Never enable the broad SkinInfo.Service switch.
+         Positive native IDs suppress the published service's ID-less stale-property case.
+         Player-online 2.0.0 has no per-result identity/clear contract: rapid item changes
+         with valid IDs still need runtime acceptance; these guards are not a provider fix. -->
+    <expression name="Aura.ItemLibrary">Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(ListItem.Title) + String.IsEqual(ListItem.Title,Window(Home).Property(SkinInfo.ListItem.Title))</expression>
+    <expression name="Aura.ItemOnline">Skin.HasSetting(Aura.OnlineEnrichment) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,episode)] + [String.StartsWith(ListItem.UniqueID(imdb),tt) | String.StartsWith(ListItem.IMDBNumber,tt) | Integer.IsGreater(ListItem.UniqueID(tmdb),0)]</expression>
+    <expression name="Aura.PlayerLibrary">Player.HasVideo + Integer.IsGreater(VideoPlayer.DBID,0) + [VideoPlayer.Content(movies) | VideoPlayer.Content(episodes)]</expression>
+    <expression name="Aura.PlayerOnline">Skin.HasSetting(Aura.OnlineEnrichment) + $EXP[Aura.PlayerLibrary] + [String.StartsWith(VideoPlayer.UniqueID(imdb),tt) | String.StartsWith(VideoPlayer.IMDBNumber,tt) | Integer.IsGreater(VideoPlayer.UniqueID(tmdb),0)]</expression>
+    <variable name="Aura_ArtistAlbumCount">
+        <value condition="String.IsEqual(ListItem.DBType,artist) + Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.Artist,Window(Home).Property(SkinInfo.Artist.Artist)) | String.IsEqual(ListItem.Label,Window(Home).Property(SkinInfo.Artist.Artist))]">$INFO[Window(Home).Property(SkinInfo.Artist.Albums.Count)]</value>
+    </variable>
+    <expression name="Aura.ItemIMDB">!String.IsEmpty(ListItem.Rating(imdb)) | [$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.imdb))] | [$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Rating.imdb))]</expression>
+    <expression name="Aura.ItemTMDB">!String.IsEmpty(ListItem.Rating(themoviedb)) | !String.IsEmpty(ListItem.Rating(tmdb)) | [$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tmdb))] | [$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Rating.tmdb))]</expression>
+    <expression name="Aura.ItemTVDB">!String.IsEmpty(ListItem.Rating(tvdb)) | !String.IsEmpty(ListItem.Rating(thetvdb))</expression>
+    <variable name="Aura_ItemIMDB">
+        <value condition="!String.IsEmpty(ListItem.Rating(imdb))">$INFO[ListItem.Rating(imdb)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.imdb))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.imdb)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.imdb)]</value>
+    </variable>
+    <variable name="Aura_ItemIMDBVotes">
+        <value condition="!String.IsEmpty(ListItem.Rating(imdb))">$INFO[ListItem.Votes(imdb), (, $LOCALIZE[205])]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.imdb))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.imdb.Votes), (, $LOCALIZE[205])]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.imdb.Votes), (, $LOCALIZE[205])]</value>
+    </variable>
+    <variable name="Aura_ItemTMDB">
+        <value condition="!String.IsEmpty(ListItem.Rating(themoviedb))">$INFO[ListItem.Rating(themoviedb)]</value>
+        <value condition="!String.IsEmpty(ListItem.Rating(tmdb))">$INFO[ListItem.Rating(tmdb)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tmdb))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.tmdb)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.tmdb)]</value>
+    </variable>
+    <variable name="Aura_ItemTVDB">
+        <value condition="!String.IsEmpty(ListItem.Rating(tvdb))">$INFO[ListItem.Rating(tvdb)]</value>
+        <value>$INFO[ListItem.Rating(thetvdb)]</value>
+    </variable>
+    <!-- Percent sources use the library's verified max->0..100 conversion, then online.
+         Never append '%' to native 0..10 Rating(source), or alias critic average. -->
+    <expression name="Aura.ItemMetacritic">[$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.metacritic.Percent))] | [$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Rating.metacritic.Percent))]</expression>
+    <expression name="Aura.ItemPopcorn">[$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent))] | [$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Rating.popcorn.Percent))]</expression>
+    <expression name="Aura.ItemTomatoes">[$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent))] | [$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Rating.tomatoes.Percent))]</expression>
+    <expression name="Aura.ItemPopcornFresh">[$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent)) + Integer.IsGreater(Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent),59)] | [![$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent))] + $EXP[Aura.ItemOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Online.Rating.popcorn.Percent),59)]</expression>
+    <expression name="Aura.ItemTomatoesFresh">[$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent)) + Integer.IsGreater(Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent),59)] | [![$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent))] + $EXP[Aura.ItemOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Online.Rating.tomatoes.Percent),59)]</expression>
+    <variable name="Aura_ItemMetacritic">
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.metacritic.Percent))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.metacritic.Percent)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.metacritic.Percent)]</value>
+    </variable>
+    <variable name="Aura_ItemPopcorn">
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.popcorn.Percent)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.popcorn.Percent)]</value>
+    </variable>
+    <variable name="Aura_ItemTomatoes">
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent))">$INFO[Window(Home).Property(SkinInfo.ListItem.Rating.tomatoes.Percent)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Rating.tomatoes.Percent)]</value>
+    </variable>
+    <variable name="Aura_ItemTop250">
+        <value condition="Integer.IsGreater(ListItem.Top250,0)">$INFO[ListItem.Top250]</value>
+        <value condition="String.IsEqual(ListItem.DBType,movie) + $EXP[Aura.ItemLibrary]">$INFO[Window(Home).Property(SkinInfo.Movie.Top250)]</value>
+    </variable>
+    <expression name="Aura.ItemTop250">Integer.IsGreater(ListItem.Top250,0) | [String.IsEqual(ListItem.DBType,movie) + $EXP[Aura.ItemLibrary] + Integer.IsGreater(Window(Home).Property(SkinInfo.Movie.Top250),0)]</expression>
+    <expression name="Aura.PlayerIMDB">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.imdb)) | [$EXP[Aura.PlayerOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Rating.imdb))]]</expression>
+    <expression name="Aura.PlayerTMDB">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tmdb)) | [$EXP[Aura.PlayerOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Rating.tmdb))]]</expression>
+    <expression name="Aura.PlayerTVDB">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tvdb)) | !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.thetvdb))]</expression>
+    <variable name="Aura_PlayerIMDB">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.imdb))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.imdb)]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.imdb)]</value>
+    </variable>
+    <variable name="Aura_PlayerIMDBVotes">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.imdb))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.imdb.Votes), (, $LOCALIZE[205])]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.imdb.Votes), (, $LOCALIZE[205])]</value>
+    </variable>
+    <variable name="Aura_PlayerTMDB">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tmdb))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.tmdb)]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.tmdb)]</value>
+    </variable>
+    <variable name="Aura_PlayerTVDB">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tvdb))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.tvdb)]</value>
+        <value condition="$EXP[Aura.PlayerLibrary]">$INFO[Window(Home).Property(SkinInfo.Player.Rating.thetvdb)]</value>
+    </variable>
+    <expression name="Aura.PlayerMetacritic">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.metacritic.Percent)) | [$EXP[Aura.PlayerOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Rating.metacritic.Percent))]]</expression>
+    <expression name="Aura.PlayerPopcorn">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent)) | [$EXP[Aura.PlayerOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Rating.popcorn.Percent))]]</expression>
+    <expression name="Aura.PlayerTomatoes">$EXP[Aura.PlayerLibrary] + [!String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent)) | [$EXP[Aura.PlayerOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Online.Rating.tomatoes.Percent))]]</expression>
+    <expression name="Aura.PlayerPopcornFresh">[$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent)) + Integer.IsGreater(Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent),59)] | [String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent)) + $EXP[Aura.PlayerOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Player.Online.Rating.popcorn.Percent),59)]</expression>
+    <expression name="Aura.PlayerTomatoesFresh">[$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent)) + Integer.IsGreater(Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent),59)] | [String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent)) + $EXP[Aura.PlayerOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Player.Online.Rating.tomatoes.Percent),59)]</expression>
+    <variable name="Aura_PlayerMetacritic">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.metacritic.Percent))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.metacritic.Percent)]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.metacritic.Percent)]</value>
+    </variable>
+    <variable name="Aura_PlayerPopcorn">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.popcorn.Percent)]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.popcorn.Percent)]</value>
+    </variable>
+    <variable name="Aura_PlayerTomatoes">
+        <value condition="$EXP[Aura.PlayerLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent))">$INFO[Window(Home).Property(SkinInfo.Player.Rating.tomatoes.Percent)]</value>
+        <value condition="$EXP[Aura.PlayerOnline]">$INFO[Window(Home).Property(SkinInfo.Player.Online.Rating.tomatoes.Percent)]</value>
+    </variable>
+    <!-- Native player Top250 is local metadata. 2.0.0 does not publish Player.IMDB.Top250. -->
+    <variable name="Aura_PlayerTop250"><value>$INFO[VideoPlayer.Top250]</value></variable>
+
+    <!-- Native cast (control 50) wins. URLs stay tied to the dialog subject. -->
+    <variable name="Aura_InfoCast">
+        <value condition="Integer.IsEqual(Container(50).NumItems,0) + System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + [String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),episode) | String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),set)]">plugin://script.skin.info.service/?action=get_cast&amp;dbtype=$INFO[Window.Property(Aura.Info.DBType)]&amp;dbid=$INFO[Window.Property(Aura.Info.DBID)]</value>
+        <value condition="Integer.IsEqual(Container(50).NumItems,0) + Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + [String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow)] + [Integer.IsGreater(Window.Property(Aura.Info.TMDB),0) | String.StartsWith(Window.Property(Aura.Info.IMDB),tt)]">plugin://script.skin.info.service/?action=get_cast&amp;online=true&amp;dbtype=$INFO[Window.Property(Aura.Info.DBType)]&amp;tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)]&amp;imdb_id=$INFO[Window.Property(Aura.Info.IMDB)]</value>
+        <value condition="Integer.IsEqual(Container(50).NumItems,0) + Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + [String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)] + [Integer.IsGreater(Window.Property(Aura.Info.ShowTMDB),0) | String.StartsWith(Window.Property(Aura.Info.ShowIMDB),tt)] + !String.IsEmpty(Window.Property(Aura.Info.Season)) + [String.IsEqual(Window.Property(Aura.Info.DBType),season) | !String.IsEmpty(Window.Property(Aura.Info.Episode))]">plugin://script.skin.info.service/?action=get_cast&amp;online=true&amp;dbtype=$INFO[Window.Property(Aura.Info.DBType)]&amp;tmdb_id=$INFO[Window.Property(Aura.Info.ShowTMDB)]&amp;imdb_id=$INFO[Window.Property(Aura.Info.ShowIMDB)]&amp;season=$INFO[Window.Property(Aura.Info.Season)]&amp;episode=$INFO[Window.Property(Aura.Info.Episode)]</value>
+    </variable>
+    <variable name="Aura_InfoSimilarMovies">
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(Window.Property(Aura.Info.DBType),movie) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=movie&amp;dbid=$INFO[Window.Property(Aura.Info.DBID)]</value>
+        <value condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(Window.Property(Aura.Info.DBType),movie) + Integer.IsGreater(Window.Property(Aura.Info.TMDB),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=movie&amp;tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)]</value>
+    </variable>
+    <variable name="Aura_InfoSimilarTV">
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=tvshow&amp;dbid=$INFO[Window.Property(Aura.Info.DBID)]</value>
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + [String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)] + Integer.IsGreater(Window.Property(Aura.Info.TVShowDBID),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=tvshow&amp;dbid=$INFO[Window.Property(Aura.Info.TVShowDBID)]</value>
+        <value condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) + Integer.IsGreater(Window.Property(Aura.Info.TMDB),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=tvshow&amp;tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)]</value>
+        <value condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.skin.info.service) + [String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)] + Integer.IsGreater(Window.Property(Aura.Info.ShowTMDB),0)">plugin://script.skin.info.service/?action=similar&amp;dbtype=tvshow&amp;tmdb_id=$INFO[Window.Property(Aura.Info.ShowTMDB)]</value>
+    </variable>
+
     <variable name="Label_OSD_Time">
         <value condition="PVR.IsPlayingTV + !String.IsEmpty(PVR.EpgEventElapsedTime)">$INFO[PVR.EpgEventElapsedTime]</value>
         <value>$INFO[Player.Time]</value>
@@ -37,75 +151,39 @@
     </variable>
 
     <variable name="Label_OverlayColor">
-        <value condition="!String.IsEmpty(Skin.String(overlaycolor.name)) + !Skin.HasSetting(MatchOverlayColors) + !Skin.HasSetting(DisableOverlayColor)">$INFO[Skin.String(overlaycolor.name)]</value>
-        <value condition="String.IsEmpty(Skin.String(overlaycolor.name)) + !Skin.HasSetting(MatchOverlayColors) + !Skin.HasSetting(DisableOverlayColor)">$LOCALIZE[571]</value>
-        <value condition="Skin.HasSetting(MatchOverlayColors) + !Skin.HasSetting(DisableOverlayColor)">$LOCALIZE[31340]</value>
+        <value condition="!String.IsEmpty(Skin.String(overlaycolor.name)) + !Skin.HasSetting(DisableOverlayColor)">$INFO[Skin.String(overlaycolor.name)]</value>
+        <value condition="String.IsEmpty(Skin.String(overlaycolor.name)) + !Skin.HasSetting(DisableOverlayColor)">$LOCALIZE[571]</value>
         <value condition="Skin.HasSetting(DisableOverlayColor)">$LOCALIZE[1223]</value>
     </variable>
 
     <variable name="Label_Info_NextAired_Status">
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Status))">$INFO[Window(Home).Property(SkinHelper.ListItem.Status)]</value>
+        <value condition="!String.IsEmpty(ListItem.Status)">$INFO[ListItem.Status]</value>
+        <value condition="String.IsEqual(ListItem.DBType,tvshow) + Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(Window(Home).Property(SkinInfo.TVShow.Status))">$INFO[Window(Home).Property(SkinInfo.TVShow.Status)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow)">$INFO[Window(Home).Property(SkinInfo.Online.Status)]</value>
     </variable>
 
     <variable name="Label_Info_NextAired_Details">
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.NextEpisode.Label))">$INFO[Window(Home).Property(SkinHelper.ListItem.NextEpisode.Airdate),,   -   ]$INFO[Window(Home).Property(SkinHelper.ListItem.NextEpisode.Label),,  ]$INFO[Window(Home).Property(SkinHelper.ListItem.NextEpisode.Airtime),,  ]$INFO[Window(Home).Property(SkinHelper.ListItem.NextEpisode.Airday)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.LastEpisode.Label))">$INFO[Window(Home).Property(SkinHelper.ListItem.LastEpisode.Airdate),,   -   ]$INFO[Window(Home).Property(SkinHelper.ListItem.LastEpisode.Label),,  ]$INFO[Window(Home).Property(SkinHelper.ListItem.LastEpisode.Airtime),,  ]$INFO[Window(Home).Property(SkinHelper.ListItem.LastEpisode.Airday)]</value>
+        <!-- 2.0.0 supplies dates/titles, not the old broadcaster airtime/day fields. -->
+        <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.NextEpisodeTitle))">$INFO[Window(Home).Property(SkinInfo.Online.NextEpisodeAired),,   -   ]$INFO[Window(Home).Property(SkinInfo.Online.NextEpisodeTitle)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow)">$INFO[Window(Home).Property(SkinInfo.Online.LastEpisodeAired),,   -   ]$INFO[Window(Home).Property(SkinInfo.Online.LastEpisodeTitle)]</value>
     </variable>
 
     <variable name="Label_Info_NextAired_Date">
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.NextEpisode.Airdate))">$INFO[Window(Home).Property(SkinHelper.ListItem.NextEpisode.Airdate)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.LastEpisode.Airdate))">$INFO[Window(Home).Property(SkinHelper.ListItem.LastEpisode.Airdate)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.NextEpisodeAired))">$INFO[Window(Home).Property(SkinInfo.Online.NextEpisodeAired)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow)">$INFO[Window(Home).Property(SkinInfo.Online.LastEpisodeAired)]</value>
     </variable>
 
     <variable name="Label_ExtraFanart">
-        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart)">$LOCALIZE[31014]: $LOCALIZE[16041]</value>
-        <value>$LOCALIZE[31014]: $LOCALIZE[16039]</value>
+        <value condition="Skin.HasSetting(SkinHelper.EnableExtraFanart)">$LOCALIZE[31903]: $LOCALIZE[16041]</value>
+        <value>$LOCALIZE[31903]: $LOCALIZE[16039]</value>
     </variable>
 
     <variable name="Label_Oscars">
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),20 Oscar)">x20</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),19 Oscar)">x19</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),18 Oscar)">x18</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),17 Oscar)">x17</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),16 Oscar)">x16</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),15 Oscar)">x15</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),14 Oscar)">x14</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),13 Oscar)">x13</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),12 Oscar)">x12</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),11 Oscar)">x11</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),10 Oscar)">x10</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),9 Oscar)">x9</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),8 Oscar)">x8</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),7 Oscar)">x7</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),6 Oscar)">x6</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),5 Oscar)">x5</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),4 Oscar)">x4</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),3 Oscar)">x3</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),2 Oscar)">x2</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.ListItem.Awards),1 Oscar)">x1</value>
+        <value condition="$EXP[Aura.ItemOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Online.Awards.Oscar.Wins),0)">$INFO[Window(Home).Property(SkinInfo.Online.Awards.Oscar.Wins),x,]</value>
     </variable>
 
     <variable name="Label_OSD_Oscars">
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),20 Oscar)">x20</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),19 Oscar)">x19</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),18 Oscar)">x18</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),17 Oscar)">x17</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),16 Oscar)">x16</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),15 Oscar)">x15</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),14 Oscar)">x14</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),13 Oscar)">x13</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),12 Oscar)">x12</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),11 Oscar)">x11</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),10 Oscar)">x10</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),9 Oscar)">x9</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),8 Oscar)">x8</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),7 Oscar)">x7</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),6 Oscar)">x6</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),5 Oscar)">x5</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),4 Oscar)">x4</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),3 Oscar)">x3</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),2 Oscar)">x2</value>
-        <value condition="String.Contains(Window(Home).Property(SkinHelper.Player.Awards),1 Oscar)">x1</value>
+        <value condition="$EXP[Aura.PlayerOnline] + Integer.IsGreater(Window(Home).Property(SkinInfo.Player.Online.Awards.Oscar.Wins),0)">$INFO[Window(Home).Property(SkinInfo.Player.Online.Awards.Oscar.Wins),x,]</value>
     </variable>
 
 
@@ -135,7 +213,7 @@
     <variable name="Label_Header_Content">
         <value condition="Container.Scrolling + [String.IsEqual(Container.SortMethod,$LOCALIZE[551]) | String.IsEqual(Container.SortMethod,$LOCALIZE[556]) | String.IsEqual(Container.SortMethod,$LOCALIZE[557]) | String.IsEqual(Container.SortMethod,$LOCALIZE[558])] + !Container.Content(seasons) + [Control.IsEnabled(3) | Control.IsEnabled(4)]">$INFO[ListItem.SortLetter,$LOCALIZE[31392]: ,]</value>
         <value condition="Window.IsVisible(script-script.extendedinfo-VideoList.xml)">$LOCALIZE[31086]</value>
-        <value condition="Window.IsVisible(script-NextAired-TVGuide2.xml) | Window.IsVisible(script-NextAired-TVGuide.xml)">$LOCALIZE[31220]</value>
+        <value condition="Window.IsVisible(Custom_1140_AiringCalendar.xml)">$LOCALIZE[31920]</value>
         <value condition="Window.IsVisible(script-nextup-notification-PostPlayInfo.xml) + Control.HasFocus(201)">$INFO[Control.GetLabel(201)]</value>
         <value condition="Window.IsVisible(script-nextup-notification-PostPlayInfo.xml) + Control.HasFocus(202)">$INFO[Control.GetLabel(202)]</value>
         <value condition="Window.IsVisible(script-nextup-notification-PostPlayInfo.xml)">$LOCALIZE[31221]</value>
@@ -275,7 +353,7 @@
     </variable>
 
     <variable name="Label_SubTitle">
-        <value condition="!String.IsEmpty(ListItem.Property(Artist_Genre)) + Container.Content(artists)">$INFO[Window(Home).Property(SkinHelper.ListItem.AlbumCount),[COLOR=main_fg_100], $LOCALIZE[132][/COLOR]  |  ]$INFO[ListItem.Property(Artist_Genre),[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Property(Artist_YearsActive),  |  [COLOR=main_fg_100],[/COLOR]]</value>
+        <value condition="!String.IsEmpty(ListItem.Property(Artist_Genre)) + Container.Content(artists)">$VAR[Aura_ArtistAlbumCount,[COLOR=main_fg_100], $LOCALIZE[132][/COLOR]  |  ]$INFO[ListItem.Property(Artist_Genre),[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Property(Artist_YearsActive),  |  [COLOR=main_fg_100],[/COLOR]]</value>
         
         <value condition="!String.IsEmpty(ListItem.Artist) + [Container.Content(musicvideos) | Container.Content(albums) | Container.Content(songs) | [Window.IsVisible(MyPlaylist.xml) + String.IsEqual(ListItem.DBType,song)]]">$INFO[ListItem.Artist,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Year,  |  [COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Genre,  |  [COLOR=main_fg_100],[/COLOR]]</value>
 
@@ -296,19 +374,20 @@
         <value condition="Container.Content(seasons)">$INFO[ListItem.Property(TotalEpisodes),[COLOR=main_fg_100], $LOCALIZE[20360][/COLOR]  |  ]$INFO[ListItem.Property(UnWatchedEpisodes),[COLOR=main_fg_100], $LOCALIZE[31215][/COLOR]]$INFO[ListItem.Year,  |  [COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="Container.Content(musicvideos)">$INFO[ListItem.Artist,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.Album,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[Container.Property(Album_Label),[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.Year,[COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="Container.Content(songs) | Container.Content(albums)">$INFO[ListItem.Album,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[Container.Property(Album_Label),[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.Year,[COLOR=main_fg_100],[/COLOR]]</value>
-        <value condition="Container.Content(artists)">$INFO[ListItem.Property(Artist_YearsActive),[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[Window(Home).Property(SkinHelper.ListItem.AlbumCount),[COLOR=main_fg_100], $LOCALIZE[36919][/COLOR]]</value>
+        <value condition="Container.Content(artists)">$INFO[ListItem.Property(Artist_YearsActive),[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Aura_ArtistAlbumCount,[COLOR=main_fg_100], $LOCALIZE[36919][/COLOR]]</value>
         <value condition="Container.Content(addons) | Window.IsVisible(DialogAddonInfo.xml)">$INFO[ListItem.AddonType,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.AddonVersion,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.AddonCreator,  |  [COLOR=main_fg_100],[/COLOR]]</value>
 
     </variable>
 
 
     <variable name="Label_Sets_Count">
-        <value>$INFO[Window(Home).Property(SkinHelper.ListItem.WatchedCount),, $LOCALIZE[20163] ]$INFO[Window(Home).Property(SkinHelper.ListItem.Count),, [LOWERCASE]$LOCALIZE[16102][/LOWERCASE]]</value>
+        <!-- No published aggregate watched-count contract; never alias Count to WatchedCount. -->
+        <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0)">$INFO[Window(Home).Property(SkinInfo.Set.Count),, $LOCALIZE[342]]</value>
     </variable>
 
     <variable name="Label_ShowCase_InfoLine">
         <value condition="Window.IsVisible(script-script.extendedinfo-VideoList.xml)">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Premiered,[COLOR=main_fg_100],[/COLOR]]</value>
-        <value condition="ListItem.IsCollection">$INFO[Window(Home).Property(SkinHelper.ListItem.Year),[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Sets_Count,[COLOR=main_fg_100],[/COLOR]]</value>
+        <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0)">$INFO[Window(Home).Property(SkinInfo.Set.Years.Range),[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Sets_Count,[COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="[Container.Content(seasons) | Container.Content(tvshows)] + [!String.IsEmpty(ListItem.MPAA) | !String.IsEmpty(ListItem.Duration) | !String.IsEmpty(ListItem.Premiered)] + !String.IsEmpty(ListItem.Property(TotalEpisodes))">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Premiered,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.Property(WatchedEpisodes),[COLOR=main_fg_100]$LOCALIZE[16102] , $LOCALIZE[20163] [/COLOR]]$INFO[ListItem.Property(TotalEpisodes),[COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="!String.IsEmpty(ListItem.MPAA) | !String.IsEmpty(ListItem.Duration) | !String.IsEmpty(ListItem.Premiered)">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Premiered,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_EndTime,[COLOR=main_fg_100]$LOCALIZE[31106] ,[/COLOR]]</value>
         <value condition="[String.StartsWith(Container.FolderPath,plugin://plugin.program.advanced.launcher/) | String.StartsWith(Container.FolderPath,plugin://plugin.program.advanced.emulator.launcher/) | String.StartsWith(Container.FolderPath,plugin://plugin.program.advanced.MAME.launcher/)]">$INFO[ListItem.Property(platform),[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Studio,  |  [COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Year,  |  [COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.Property(nplayers),  |  [COLOR=main_fg_100], $LOCALIZE[31308][/COLOR]]$INFO[ListItem.Property(ESRB),  |  [COLOR=main_fg_100],[/COLOR]]</value>
@@ -413,9 +492,10 @@
     </variable>
 
     <variable name="Label_Genre">
-        <value condition="ListItem.IsCollection">$INFO[Window(Home).Property(SkinHelper.ListItem.Genre)]</value>
         <value condition="!String.IsEmpty(ListItem.Genre)">$INFO[ListItem.Genre]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Genre))">$INFO[Window(Home).Property(SkinHelper.ListItem.Genre)]</value>
+        <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(Window(Home).Property(SkinInfo.Set.Genres))">$INFO[Window(Home).Property(SkinInfo.Set.Genres)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Genre))">$INFO[Window(Home).Property(SkinInfo.ListItem.Genre)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Genre))">$INFO[Window(Home).Property(SkinInfo.Online.Genre)]</value>
         <value>Other</value>
     </variable>
 
@@ -423,8 +503,7 @@
         <value condition="Window.IsVisible(script-script.extendedinfo-DialogVideoInfo.xml) | Window.IsVisible(script-script.extendedinfo-DialogInfo.xml)">$INFO[Window.Property(label)]</value>
         <value condition="!String.IsEmpty(ListItem.Title)">$INFO[ListItem.Title]</value>
         <value condition="!String.IsEmpty(ListItem.Label)">$INFO[ListItem.Label]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Title))">$INFO[Window(Home).Property(SkinHelper.ListItem.Title)]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Label))">$INFO[Window(Home).Property(SkinHelper.ListItem.Label)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Title))">$INFO[Window(Home).Property(SkinInfo.ListItem.Title)]</value>
         <value>$LOCALIZE[31380]</value>
     </variable>
 
@@ -433,31 +512,33 @@
         <value condition="Window.IsVisible(script-script.extendedinfo-DialogInfo.xml)">$INFO[Window.Property(biography)]</value>
         <value condition="!String.IsEmpty(ListItem.AddonDescription) | !String.IsEmpty(ListItem.AddonDisclaimer) | !String.IsEmpty(ListItem.AddonNews)">$INFO[ListItem.AddonDisclaimer,[B]$LOCALIZE[24052][/B][CR],[CR][CR]]$INFO[ListItem.AddonDescription,[B]$LOCALIZE[21821][/B][CR],[CR][CR]]$INFO[ListItem.AddonNews,[B]$LOCALIZE[31303][/B][CR],[CR][CR]]</value>
         <value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Tagline,[B],[/B][CR]]$INFO[ListItem.Artist,[B],[/B][CR]]$INFO[ListItem.Plot]</value>
-        <value condition="Window.IsVisible(Home) + [!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.AddonDescription)) | !String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.AddonDisclaimer)) | !String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.AddonNews))]">$INFO[Window(Home).Property(SkinHelper.ListItem.AddonDisclaimer),[B]$LOCALIZE[24052][/B][CR],[CR][CR]]$INFO[Window(Home).Property(SkinHelper.ListItem.AddonDescription),[B]$LOCALIZE[21821][/B][CR],[CR][CR]]$INFO[Window(Home).Property(SkinHelper.ListItem.AddonNews),[B]$LOCALIZE[31303][/B][CR],[CR][CR]]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Plot))">$INFO[Window(Home).Property(SkinHelper.ListItem.Tagline),[B],[/B][CR]]$INFO[Window(Home).Property(SkinHelper.ListItem.Artist),[B],[/B][CR]]$INFO[Window(Home).Property(SkinHelper.ListItem.Plot)]</value>
+        <value condition="Window.IsVisible(Home) + [!String.IsEmpty(Container.ListItem.AddonDescription) | !String.IsEmpty(Container.ListItem.AddonDisclaimer) | !String.IsEmpty(Container.ListItem.AddonNews)]">$INFO[Container.ListItem.AddonDisclaimer,[B]$LOCALIZE[24052][/B][CR],[CR][CR]]$INFO[Container.ListItem.AddonDescription,[B]$LOCALIZE[21821][/B][CR],[CR][CR]]$INFO[Container.ListItem.AddonNews,[B]$LOCALIZE[31303][/B][CR],[CR][CR]]</value>
         <value>$INFO[ListItem.Tagline,[B],[/B][CR]]$INFO[ListItem.Artist,[B],[/B][CR]]$VAR[Label_Plot]</value>
     </variable>
     
     <variable name="Label_Plot">
         <value condition="Control.HasFocus(9501) + !String.IsEmpty(Container(9501).ListItem.Plot)">$INFO[Container(9501).ListItem.Plot]</value>
-        <value condition="ListItem.IsCollection">$INFO[Window(Home).Property(SkinHelper.ListItem.Plots)]</value>
+        <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(Window(Home).Property(SkinInfo.Set.Plots))">$INFO[Window(Home).Property(SkinInfo.Set.Plots)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Artist_Description))">$INFO[ListItem.Property(Artist_Description)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Album_Description))">$INFO[ListItem.Property(Album_Description)]</value>
         <value condition="!String.IsEmpty(ListItem.AddonDescription)">$INFO[ListItem.AddonDescription]</value>
         <value condition="!String.IsEmpty(ListItem.PlotOutline) + Skin.HasSetting(PlotOutline)">$INFO[ListItem.PlotOutline]</value>
         <value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Plot))">$INFO[Window(Home).Property(SkinHelper.ListItem.Plot)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Plot))">$INFO[Window(Home).Property(SkinInfo.ListItem.Plot)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Plot)]</value>
         
     </variable>
 
     <variable name="Label_Tagline">
         <value condition="!String.IsEmpty(ListItem.Tagline)">$INFO[ListItem.Tagline]</value>
-        <value condition="ListItem.IsCollection">$INFO[Window(Home).Property(SkinHelper.ListItem.Plots)]</value>
+        <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(Window(Home).Property(SkinInfo.Set.Plots))">$INFO[Window(Home).Property(SkinInfo.Set.Plots)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Artist_Description))">$INFO[ListItem.Property(Artist_Description)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Album_Description))">$INFO[ListItem.Property(Album_Description)]</value>
         <value condition="!String.IsEmpty(ListItem.AddonDescription)">$INFO[ListItem.AddonDescription]</value>
         <value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
-        <value condition="!String.IsEmpty(Window(Home).Property(SkinHelper.ListItem.Plot))">$INFO[Window(Home).Property(SkinHelper.ListItem.Plot)]</value>
+        <value condition="$EXP[Aura.ItemLibrary] + !String.IsEmpty(Window(Home).Property(SkinInfo.ListItem.Plot))">$INFO[Window(Home).Property(SkinInfo.ListItem.Plot)]</value>
+        <value condition="$EXP[Aura.ItemOnline] + !String.IsEmpty(Window(Home).Property(SkinInfo.Online.Tagline))">$INFO[Window(Home).Property(SkinInfo.Online.Tagline)]</value>
+        <value condition="$EXP[Aura.ItemOnline]">$INFO[Window(Home).Property(SkinInfo.Online.Plot)]</value>
         
     </variable>
 
@@ -480,7 +561,7 @@
         <value condition="Player.Rewinding4x">RW 4x</value>
         <value condition="Player.Rewinding2x">RW 2x</value>
         <value condition="Player.Rewinding">RW</value>
-        <value condition="[Player.Seeking | Player.DisplayAfterSeek] + !String.IsEmpty(Player.SeekOffset)">$LOCALIZE[773]$INFO[Player.SeekOffset, ,]</value>
+        <value condition="[Player.Seeking | Player.HasPerformedSeek(3)] + !String.IsEmpty(Player.SeekOffset)">$LOCALIZE[773]$INFO[Player.SeekOffset, ,]</value>
         <value condition="Player.Seeking + String.IsEmpty(Player.SeekOffset)">$LOCALIZE[773]$INFO[Player.SeekStepSize, ,]</value>
         <value condition="Player.Caching">$LOCALIZE[439] $INFO[Player.CacheLevel,,%]</value>
         <value condition="Player.Paused">$LOCALIZE[112]</value>

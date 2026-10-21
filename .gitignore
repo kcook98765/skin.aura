@@ -2,3 +2,5 @@
 *.xcf
 *~
 Thumbs.db
+.local/
+__pycache__/
