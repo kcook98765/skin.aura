@@ -1,3 +1,20 @@
+## Superseding owner decision: original assets restored
+
+The current owner revision supersedes all earlier cleanup-candidate publication
+and admission proposals, including request 81b45e5e0dfa and ZIP 541a8749...d01fa.
+Original assets/presentation are restored; the cleaned package must not be admitted
+or published. Its immutable evidence and source 88e580b remain retained.
+
+The adapter, skin-alpha policy, exact OpenCode enrollment and owner-reported use
+remain valid infrastructure/evidence within their actual scopes. The restored
+package has unresolved substantive asset rights and five screenshot-checker errors.
+Use a truthful pending private-candidate record, not transferred rights approval
+or forced static acceptance. A release-admission approval request cannot clear
+these nonwaivable requirements. Source restoration is separate from permission
+to redistribute. No native operation or remote publication is authorized.
+
+--- Historical proposals below are superseded ---
+
 # Current owner direction — 2026-11-14 continuation
 
 The owner approved narrow official-Omega dependency admission and a separate

@@ -15,7 +15,7 @@ BASELINE_VERSION = "2.0.23"
 RUNTIME_MANIFEST = "tools/runtime-files.txt"
 RUNTIME_REVIEW_COMMIT = "2402785e7f5e16184955a5bc1f1e92ef666fb7da"
 # The import commit remains the historical runtime anchor. Exact successor
-# additions/removals below record the 2026-11-14 alpha rights cleanup.
+# additions record supplemental notices; the active exclusion set is empty.
 RUNTIME_REVIEW_ADDITIONS = frozenset((
     'THIRD-PARTY-NOTICES.txt',
     'fonts/Apache-2.0.txt',
@@ -23,14 +23,14 @@ RUNTIME_REVIEW_ADDITIONS = frozenset((
     'resources/ICONMONSTR-LICENSE.txt',
     'resources/LEGACY-ASSET-NOTICES.txt',
 ))
-RUNTIME_EXCLUSIONS_SHA256 = "ca7432cd3319b9f5035a57828314e25423894f843264b1f22b43bbb686039fb1"
+RUNTIME_EXCLUSIONS_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 _exclusions = (Path(__file__).resolve().parent / "runtime-exclusions.txt").read_bytes()
 if hashlib.sha256(_exclusions).hexdigest() != RUNTIME_EXCLUSIONS_SHA256:
     raise ValueError("Runtime exclusions differ from the reviewed alpha inventory")
 RUNTIME_REVIEW_REMOVALS = frozenset(_exclusions.decode().splitlines())
 # Membership approval, not content hashes: a new path review must update both
 # this pin and the exact manifest. Never regenerate approval during a build.
-RUNTIME_MANIFEST_SHA256 = "7788af3d8ab7f9832e70afed8374cd156467baf434643ea1045d41b8c22a1e2b"
+RUNTIME_MANIFEST_SHA256 = "0df24ff354c073cdf7a286d0d67f5467c54f6938ddc237d28aa12c28c6612812"
 DIRECTORIES = (
     "1080i", "colors", "extras", "fonts", "language", "media", "resources",
     "shortcuts", "themes",
@@ -75,32 +75,10 @@ FOCUSED_DELTA = frozenset((
     )),
 ))
 
-# Owner-scoped alpha asset/metadata changes; exact membership retained above.
-FOCUSED_DELTA = FOCUSED_DELTA | RUNTIME_REVIEW_REMOVALS | frozenset((
-    '1080i/Custom_1117_EnableViews.xml',
-    '1080i/DialogVideoInfo.xml',
-    '1080i/Font.xml',
-    'README',
-    'THIRD-PARTY-NOTICES.txt',
-    'addon.xml',
-    'changelog.txt',
-    'extras/albumbacks/0.jpg',
-    'extras/albumbacks/1.jpg',
-    'extras/albumbacks/2.jpg',
-    'extras/albumbacks/3.jpg',
-    'extras/albumbacks/4.jpg',
-    'extras/albumbacks/5.jpg',
-    'extras/albumbacks/6.jpg',
-    'extras/albumbacks/7.jpg',
-    'extras/albumbacks/8.jpg',
-    'extras/albumbacks/9.jpg',
-    'fanart.jpg',
-    'fonts/Apache-2.0.txt',
-    'fonts/Roboto-Regular-LineSpacingMod-NOTICE.txt',
-    'icon.png',
-    'resources/ICONMONSTR-LICENSE.txt',
-    'resources/LEGACY-ASSET-NOTICES.txt',
-))
+# Original Omega resources are restored. Only release documentation/notices
+# differ from the pre-cleanup6882909 tree; no asset substitution is authorized.
+RESTORED_OMEGA_COMMIT = "688290914a31d0f595179043062cc57eb85ab8d9"
+RESTORED_DOCUMENTATION = frozenset({"README", "changelog.txt", "THIRD-PARTY-NOTICES.txt"})
 
 
 def git(root, *args):

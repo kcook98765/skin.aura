@@ -1,3 +1,22 @@
+# Current restored-assets validation scope
+
+The owner reversed the cleanup decision. The current source preserves original
+Omega resources from 6882909 with 1,806 payload files (original 1,802 plus 4 notices).
+All runtime XML, manifest, original binary/graphical resources and original font
+notices are restored exactly. Only release documentation differs among original
+runtime paths. Native tests are prohibited. Owner daily-use evidence remains
+owner-reported; exact installed production identity is unverified.
+
+Run focused test_distribution/test_packaging/PackagingRegressions, the source
+checker and explicit Omega Toolkit lane. Expect and retain all five original
+1366x768 screenshot errors and the three known warnings; do not modify screenshots
+or remove the font-license PDF. Candidate feed mechanics can be qualified with
+pending rights/static/release decisions. No new full-suite campaign is required.
+Current exact receipts/results: kodi-development/reports/aura-restored-assets-20261114.
+The earlier cleaned-package results below do not qualify this restored artifact.
+
+--- Historical validation record follows ---
+
 # Current owner continuation
 
 Owner reports more than one week of stable production Omega use with minor

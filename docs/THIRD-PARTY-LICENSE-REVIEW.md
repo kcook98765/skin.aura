@@ -1,38 +1,41 @@
-# Alpha distribution rights disposition — 2026-11-14
+# Restored-assets distribution disposition
 
-This is a bounded review of the successor runtime inventory, not historical Git
-cleanup. Retain original Aura attribution, LICENSE.txt and all ten supplied font
-notices verbatim. See the shipped THIRD-PARTY-NOTICES.txt for current and retained
-historical findings. Independent review precedes any package rights approval.
+The owner requested original resource preservation, not licensing-driven asset
+substitution. All original assets and presentation references are restored from
+688290914a31d0f595179043062cc57eb85ab8d9. All original attribution, supplied font
+notices, metadata and LICENSE.txt remain. Four supplemental notice files remain.
 
-| Material | Current disposition |
-| --- | --- |
-| Aura layout, generic textures/geometry | Retain upstream CC BY-NC-SA 4.0 with jurialmunkey credit, continuation/change notices and noncommercial distribution |
-| Roboto Condensed, Mono, LineSpacingMod, Luckiest Guy | Retain embedded Apache notices; full text additionally in fonts/Apache-2.0.txt; prominent LineSpacingMod file-specific change notice added |
-| Exo 2, Poller One, Fredoka One, Ranchers | Retain OFL binaries, embedded copyrights, RFNs and supplied full notices; no new modification or renaming |
-| SF Distant Galaxy, Nasalization, Geomancy Extra Bold, BOXING, Theboldfont | Exclude five binaries; Font.xml role names now resolve to existing Exo 2, Poller One or Ranchers. Preserve all original license documents including PDF |
-| Knavs language flags | Exclude all 483 PNGs; ten audio/subtitle controls show real language codes. Preserve original embedded text in resources/LEGACY-ASSET-NOTICES.txt |
-| Ten album fallback photographs | Replace at the same paths with original procedural geometry; reproducible source tools/prepare_alpha_artwork.py, project license |
-| Two unused photographic default icons; eleven commercial-art view previews | Exclude; selector uses Aura title art, not a fake view capture |
-| Five inherited screenshots | Exclude both files and metadata references; optional authentic cleared-media captures await native authorization |
-| Matrix title artwork | Replace with simple Aura Omega alpha typography; retain Muhammad Hussein Ammari credit and original history |
-| iconmonstr icons | Retain in application-design context under section 2; full separate terms in resources/ICONMONSTR-LICENSE.txt. No CC relicensing or standalone reusable-icon/library grant |
-| Brand/format symbols | UI identification only; no affiliation, endorsement or blanket trademark license asserted |
+The earlier cleaned-package rights decision does not cover this restored ZIP.
+No font, flag, photograph, icon or artwork has been relicensed or cleared by
+restoration. The root THIRD-PARTY-NOTICES.txt retains the original known findings.
+No broad historical investigation is undertaken in this revision.
 
-Missing exact binary-build ancestry alone does not establish a font prohibition.
-The retained fonts contain express licenses. Generic geometry can rely on the
-upstream project license; unknown photo/film artwork is handled conservatively
-without broad historical investigations. Main interface typography is unchanged.
+Known precise blockers under supplied terms:
 
-Primary references: https://iconmonstr.com/license/ and
-https://creativecommons.org/licenses/by-nc-sa/4.0/ ; embedded font metadata and
-original shipped notices are the evidence for those exact binaries. iconmonstr
-application use and standalone transfer restrictions must be read together.
-This is not legal advice, a trademark grant or a representation that all historic
-copies are cleared. Any concrete adverse ownership/restriction finding remains
-a nonwaivable blocker: replace/exclude it or obtain applicable permission.
+- SF Distant Galaxy prohibits inclusion as part of another product and imposes
+  complete-original-package conditions for free web redistribution. No applicable
+  exception for public skin bundling is established.
+- Nasalization EULA 02-2014 permits free-font sharing within a company/household
+  (§1.4), while §2.5 prohibits distribution except its stated permanent-transfer
+  case. No broader skin redistribution grant for this binary is established.
+- Geomancy's unmodified-only distribution terms, BOXING's limited-use terms and
+  Theboldfont's insufficient explicit redistribution evidence remain unresolved;
+  they are not all declared categorical distribution bans.
+- Knavs flags retain the opensource/non-profitable condition, including its exact
+  embedded notice. Aura's noncommercial source availability does not prove that
+  condition is satisfied. Original photos/previews/media-art permission gaps
+  also remain; the skin project license does not grant third-party image rights.
 
-The explicit 506 exclusions are tools/runtime-exclusions.txt; their hash and
-exact successor inventory are pinned in tools/omega_common.py. No build discovers
-or silently approves replacement files. All excluded material remains in Git
-history, which the owner explicitly required preserving.
+Apache/OFL materials retain their reviewed notice conditions. Contextual
+iconmonstr application-design terms are separate and preserved; there is no
+blanket icon/trademark grant. Original title art/contributor credit is retained.
+
+The repository requires genuine affirmative package-rights verification.
+The initial skin-alpha policy accepts named runtime coverage, not missing rights.
+Owner use, alpha labeling and owner risk acceptance cannot satisfy this gate.
+
+Smallest options that preserve these assets: supply applicable existing grants
+for the exact restricted files and a supported basis for remaining permissions;
+or separately authorize only targeted rights-holder clarification. No contact
+is authorized here. Otherwise retain this as a private unapproved candidate.
+Any future asset-alteration route needs a new owner decision and is not performed.

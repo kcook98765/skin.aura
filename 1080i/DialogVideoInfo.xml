@@ -188,49 +188,39 @@
                                 <label>$LOCALIZE[21447]</label>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.1))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(AudioLanguage.1)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(AudioLanguage.1),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.1))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(AudioLanguage.2)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(AudioLanguage.2),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.2))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(AudioLanguage.3)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(AudioLanguage.3),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.3))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(AudioLanguage.4)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(AudioLanguage.4),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.4))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(AudioLanguage.5)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(AudioLanguage.5),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(AudioLanguage.5))</visible>
                             </control>
                             <control type="group">
@@ -247,49 +237,39 @@
                                 <label>$LOCALIZE[21448]</label>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.1))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(SubtitleLanguage.1)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(SubtitleLanguage.1),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.1))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(SubtitleLanguage.2)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(SubtitleLanguage.2),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.2))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(SubtitleLanguage.3)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(SubtitleLanguage.3),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.3))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(SubtitleLanguage.4)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(SubtitleLanguage.4),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.4))</visible>
                             </control>
-                            <control type="label">
-                                <width>auto</width>
+                            <control type="image">
+                                <width>32</width>
                                 <height>32</height>
-                                <font>font_statusbar</font>
-                                <textcolor>main_fg_100</textcolor>
-                                <aligny>center</aligny>
-                                <label>$INFO[ListItem.Property(SubtitleLanguage.5)]</label>
+                                <aspectratio>keep</aspectratio>
+                                <texture fallback="lang/eng.png">$INFO[ListItem.Property(SubtitleLanguage.5),lang/,.png]</texture>
                                 <visible>!String.IsEmpty(ListItem.Property(SubtitleLanguage.5))</visible>
                             </control>
                         </control>

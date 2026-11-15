@@ -1,10 +1,10 @@
-[B]2.1.0 Alpha — Kodi 21 Omega[/B]
-Preserve existing Omega port and Aura identity; original skin by jurialmunkey.
-Remove restricted lyric fonts and language flags; retain every original notice.
-Use licensed lyric alternatives, language-code labels and original geometric
-album fallback/title art. Omit unverified photos, previews and screenshots.
-Owner reports stable production use; exact cleaned-byte identity is unverified.
-Independent static/package review; incomplete formal coverage remains explicit.
+[B]2.1.0 ALPHA — Kodi 21 Omega, original-assets restoration[/B]
+Restore every original Omega asset and presentation/manifest reference from 6882909.
+Keep original Aura by jurialmunkey and existing Omega development unchanged.
+Retain all original licenses plus supplemental notices. Redistribution rights
+and five original screenshot-checker errors remain unresolved; no release approval.
+Owner reports stable normal production use; installed-byte identity is unverified.
+No native testing, production change or publication is part of this preparation.
 
 [B]2.0.0[/b]
 Initial changes to run on Matrix (V19) Kodi

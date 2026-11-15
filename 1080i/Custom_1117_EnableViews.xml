@@ -25,7 +25,7 @@
                 <height>600</height>
                 <control type="image">
                     <aspectratio scalediffuse="false">scale</aspectratio>
-                    <texture background="true" fallback="special://skin/fanart.jpg" diffuse="diffuse/1117.png">special://skin/fanart.jpg</texture>
+                    <texture background="true" fallback="special://skin/fanart.jpg" diffuse="diffuse/1117.png">$INFO[Window.Property(Image_Preview)]</texture>
                 </control>
                 <control type="image">
                     <aspectratio scalediffuse="false">center</aspectratio>
@@ -50,7 +50,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.MediaInfo)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.MediaInfo)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/mediainfo.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9002" description="Info List">
                     <label>$LOCALIZE[31164]</label>
@@ -58,7 +58,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.InfoList)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.InfoList)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/infolist.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9003" description="Poster Showcase">
                     <label>$LOCALIZE[31040]</label>
@@ -66,7 +66,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.PosterShowcase)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.PosterShowcase)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/postershowcase.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9004" description="Landscape Showcase">
                     <label>$LOCALIZE[31361]</label>
@@ -74,7 +74,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.LandscapeShowcase)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.LandscapeShowcase)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/landscapeshowcase.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9005" description="Square Showcase">
                     <label>$LOCALIZE[31362]</label>
@@ -82,7 +82,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.SquareShowcase)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.SquareShowcase)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/squareshowcase.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9006" description="Poster Wall">
                     <label>$LOCALIZE[31358]</label>
@@ -90,7 +90,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.PosterWall)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.PosterWall)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/posterwall.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9007" description="Landscape Wall">
                     <label>$LOCALIZE[31359]</label>
@@ -98,7 +98,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.LandscapeWall)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.LandscapeWall)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/landscapewall.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9008" description="Banner Wall">
                     <label>$LOCALIZE[31370]</label>
@@ -106,7 +106,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.BannerWall)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.BannerWall)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/bannerwall.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9009" description="Big Posters">
                     <label>$LOCALIZE[31363]</label>
@@ -114,7 +114,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.BigPosters)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.BigPosters)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/bigposter.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9010" description="Lovefilm">
                     <label>$LOCALIZE[31231]</label>
@@ -122,7 +122,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.Lovefilm)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.Lovefilm)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/lovefilm.jpg)</onfocus>
                 </control>
                 <control type="radiobutton" id="9011" description="EpisodeList">
                     <label>$LOCALIZE[31385]</label>
@@ -130,7 +130,7 @@
                     <include>Dialog_Standard_ListButton</include>
                     <onclick>Skin.ToggleSetting(DisableViewMode.EpisodeList)</onclick>
                     <selected>!Skin.HasSetting(DisableViewMode.EpisodeList)</selected>
-
+                    <onfocus>SetProperty(Image_Preview,special://skin/extras/backgrounds/viewmodes/episodelist.jpg)</onfocus>
                 </control>
             </control>
         </control>

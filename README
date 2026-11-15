@@ -1,90 +1,70 @@
-# Aura 2.1.0 — Kodi 21 Omega ALPHA
+# Aura 2.1.0 — Kodi 21 Omega ALPHA, original assets
 
-A continuation by kcook98765 of **Aura by jurialmunkey**:
-https://github.com/jurialmunkey/skin.aura
-Source: https://github.com/kcook98765/skin.aura
+Original Aura by **jurialmunkey**: https://github.com/jurialmunkey/skin.aura
+Omega continuation by kcook98765: https://github.com/kcook98765/skin.aura
+Existing add-on ID: `skin.aura`. Original attribution and LICENSE.txt are retained.
 
-**ALPHA: incomplete formal functional coverage.** This build targets
-Kodi 21 Omega only (GUI API 5.17.0). Existing Omega development, layout, main
-interface typography and add-on ID `skin.aura` are retained. Kodi 19/20 historical
-branches and tags remain in Git; they are not this distribution's supported lanes.
-Kodi 22 is unqualified. A minimum GUI dependency is not an upper-version bound;
-the repository catalog supplies Omega-only routing.
+This candidate restores the original Omega resources from commit
+688290914a31d0f595179043062cc57eb85ab8d9, including fonts, flags, icons, textures,
+backgrounds/photos, screenshots and view previews. Original font selections,
+language flags, preview controls and manifest asset references are restored.
+There are no substitute fonts, language-code labels or generated geometric assets.
+Historical artwork/branding remains unchanged. This is an Omega-only alpha;
+older branch history is preserved but is not a new compatibility claim.
 
-## Repository installation
+**Public distribution is blocked by unresolved original-asset permissions.**
+Read THIRD-PARTY-NOTICES.txt. Apache/OFL materials retain their applicable terms;
+other original fonts, flags and photographs/previews have the previously documented
+restrictions or permission gaps. No asset is relicensed or cleared by this fork,
+alpha labeling, owner use or successful static/package checks. Restoring original
+screenshots also retains five known 1366x768 official-checker errors.
 
-After separately approved publication, use the existing kcook-lab-repo source:
+## Owner-reported use and coverage
+
+The owner reports more than a week of stable normal daily use on an existing
+production Kodi Omega instance. Minor layout adjustments remain. This is genuine
+owner-reported use, not comprehensive scripted acceptance. Exact installed files,
+OS and Kodi patch have not been verified. Matching the pre-cleanup source resources
+does not prove byte identity with that production installation. No native test,
+installation, skin switch, profile reset or new instance is authorized here.
+
+Populated widgets, playback/PVR backend behavior, enrichment, animated lyrics,
+Backup/Restore, profile migration, device and input combinations retain incomplete
+formal coverage. Online enrichment is off by default; dependencies may still use
+the network. Saved widgets using removed Skin Helper providers need manual source
+reselection; do not reset a working profile to force migration. The airing calendar
+is not identical to the former Next Aired guide. Existing Omega work is retained.
+
+## Distribution identity and installation route
+
+If rights and repository admission are legitimately resolved and publication is
+separately authorized, the intended source is:
 https://kcook98765.github.io/kcook-lab-repo/
-Kodi File manager → Add source; then Add-ons → Install from zip file and select
-repository.ai.kodi-0.1.1.zip. Choose Install from repository → kcook-lab-repo →
-Look and feel → Skin → Aura. Aura's `xbmc.gui.skin` extension supplies the native
-skin category; no custom launcher or new repository installer is needed.
-Let Kodi install dependencies from
-the official Kodi Add-on repository; an index audit is not installation proof.
+Use the existing repository.ai.kodi 0.1.1 installer, then Install from repository →
+kcook-lab-repo → Look and feel → Skin → Aura. Kodi resolves official dependencies.
+No new installer, custom launcher or renamed skin identity is needed. Catalog
+selection targets Omega; a GUI API minimum is not an upper-version bound.
 
-**Identity conflict:** Kodi identifies this skin as `skin.aura`, the same ID as
-other Aura forks. Installing it can replace/update an existing Aura and reuse its
-settings. A higher version from another enabled repository may win an update.
-Check origin, installed version and per-add-on update settings before installing;
-back up the stopped profile. No side-by-side installation or automatic migration
-is promised. Do not change an existing working profile just to try this alpha.
+Other Aura forks share `skin.aura`. Installation can replace another Aura and reuse
+its settings; a higher version from another enabled repository can win an update.
+A sideloaded 2.1.0 candidate is not promised an automatic same-version update.
+Review origin/version/update settings and preserve profile recovery state before
+any separately authorized installation. Do not modify production for this release.
 
-## Alpha changes and limits
-
-Five restricted/unclear lyric fonts use licensed bundled alternatives. Language
-flags become language-code labels. Photographic album fallbacks become simple
-original geometric artwork. Optional unverified photo/view previews and inherited
-screenshots are omitted; title art now identifies Omega alpha. Title/fallback art
-is not a screenshot. Main appearance and functional Omega work remain retained.
-
-Populated-library widgets, playback/PVR backend behavior, enrichment, animated
-lyrics, Backup/Restore and migration acceptance remain incomplete. Online metadata
-enrichment is off by default. Dependencies may still use the network. Existing
-widgets using removed Skin Helper providers need manual source reselection;
-saved shortcuts are not automatically translated. Do not reset a profile to
-force migration. The airing calendar is not identical to the old Next Aired guide.
-
-## Owner-reported production experience
-
-The owner reports using their customized Omega 2.1.0 development candidate on
-an existing production Kodi Omega instance for more than one week, stable in
-normal daily use. Minor layout adjustments remain. This is genuine owner-reported
-general use, not formal scripted or scenario-by-scenario acceptance. The installed
-file inventory and exact Kodi patch/platform have not been verified against this
-cleaned distribution package. The excluded/replaced assets therefore have no new
-native acceptance claim. Release preparation performs no new native test.
-
-## Testing and recovery
-
-For any future separately requested testing, use a disposable profile and
-synthetic local media. This release campaign performs no installation, skin
-switch, profile reset or new native test. Keep Estuary installed. Roll back through Settings →
-Interface → Skin → Estuary; switching skins does not restore settings or data.
-Native installation and skin switching have not been performed for this candidate.
-The Backup add-on needs a configured destination, Add-on Data and custom assets,
-and a verified restore. Installing Backup alone creates no backup. Old Skin Helper
-backup archives are unsupported. Keep profiles, backups and settings out of Git.
-
-Source guides: docs/TESTING.md, docs/PACKAGING.md, docs/PUBLICATION.md and
-docs/THIRD-PARTY-LICENSE-REVIEW.md. These development files are intentionally
-excluded from the installable ZIP; the root notices and all font licenses ship.
+For future separately requested recovery, keep Estuary installed. Switching skins
+alone does not restore add-on data/settings. The Backup add-on requires configured
+storage and a verified restore; installing it creates no backup. Old Skin Helper
+backup archives are unsupported. No recovery operation is performed here.
 
 ## Attribution and licensing
 
-Original Aura: jurialmunkey. Omega continuation and distribution changes:
-kcook98765. Original Matrix title artwork contributor: Muhammad Hussein Ammari
-(2022); historical artwork remains credited in retained Git history.
+Aura remains CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/
+The original LICENSE.txt wording remains verbatim. Fonts and other assets retain
+separate terms and notices; the project license does not replace those terms.
+Original Matrix title-art contributor Muhammad Hussein Ammari remains credited.
+iconmonstr / Alexander Kahlkopf terms are supplied separately in resources/.
+No standalone icon redistribution, trademark rights or endorsement is granted.
 
-Aura's project license remains **CC BY-NC-SA 4.0 International**:
-https://creativecommons.org/licenses/by-nc-sa/4.0/
-LICENSE.txt is preserved verbatim, including its historical "Unported" wording.
-This is noncommercial redistribution under the existing license, not an official
-Kodi repository submission or a claim that Aura has an OSI open-source license.
-Retain attribution, identify changes and preserve the applicable separate terms.
-
-Read THIRD-PARTY-NOTICES.txt. Fonts retain Apache/OFL notices. iconmonstr icons
-remain within the skin's application design under their separate terms
-(resources/ICONMONSTR-LICENSE.txt); no standalone icon redistribution or blanket
-trademark rights are granted. Service/format symbols do not imply endorsement.
-No owner exception or alpha label can supply missing redistribution permission.
-The cleaned alpha inventory does not clear excluded assets in historical Git refs.
+Development guides remain in the source docs/ directory, excluded from the ZIP.
+Runtime notices and all original font licenses are included. The superseded cleaned
+candidate, original Git history and all prior validation evidence remain retained.

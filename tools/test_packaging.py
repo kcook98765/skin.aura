@@ -256,7 +256,7 @@ class ReviewedInventoryRegressions(unittest.TestCase):
         self.assertTrue(reviewed.isdisjoint(RUNTIME_REVIEW_ADDITIONS))
         self.assertEqual(set(source.files) - reviewed, RUNTIME_REVIEW_ADDITIONS)
         self.assertEqual(reviewed - set(source.files), RUNTIME_REVIEW_REMOVALS)
-        self.assertEqual(len(source.files), 1300)
+        self.assertEqual(len(source.files), 1806)
         self.assertEqual(set(source.files), (source.original_files - REMOVED_RUNTIME) | ADDED_RUNTIME)
         self.assertEqual(parse_runtime_manifest((ROOT / RUNTIME_MANIFEST).read_bytes()), source.files)
         self.assertEqual(source.runtime_manifest["sha256"], RUNTIME_MANIFEST_SHA256)
