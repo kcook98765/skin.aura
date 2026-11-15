@@ -1,90 +1,93 @@
-# Aura Omega 2.1.0 — DEVELOPMENT CANDIDATE
+# Aura for Kodi Omega (21.x)
 
-This is a personal continuation of Aura, updated primarily to keep using the
-skin on **Kodi 21.3 Omega**. Its implementation and visual appearance are retained.
-Original project: [jurialmunkey/skin.aura](https://github.com/jurialmunkey/skin.aura).
-This fork: [kcook98765/skin.aura](https://github.com/kcook98765/skin.aura).
-The add-on identity remains `skin.aura`.
+**Aura 2.1.0 ALPHA — usable work in progress, unofficial continuation.**
 
-**2.1.0 is a development candidate, not an officially validated release.** The
-target skin GUI API is **5.17.0**. Static checks are not proof of complete Kodi
-functionality; populated-library widgets, playback, full PVR behavior and
-Backup/Restore acceptance remain incomplete. This notice/documentation update
-does not add skin features, replace assets or establish new runtime acceptance.
-See [test status and retained checker findings](docs/TESTING.md).
+This project brings [jurialmunkey's original Aura skin](https://github.com/jurialmunkey/skin.aura) to **Kodi 21 Omega**. The aim is to preserve Aura's familiar appearance and workflow while adapting outdated integrations and Kodi interfaces to current Omega add-ons and APIs.
 
-**Known third-party redistribution restrictions remain unresolved.** Read
-[THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt), included with the skin package.
-Attribution and disclosure do not grant missing permissions. Publishing source
-and distributing a ZIP both redistribute assets; personal use and candidate
-status do not clear those restrictions. No broad asset reconstruction or
-replacement is part of this continuation's current preparation scope.
+The skin is in regular use and is generally usable, but **it is not finished**. Some layouts need further work, existing configurations may need attention, and formal end-to-end testing is incomplete. Kodi 21.3 is the development target; compatibility with Kodi 19, 20 or 22 is not claimed for this Omega release.
 
-## Branch policy
+- **Skin source and issues:** [kcook98765/skin.aura](https://github.com/kcook98765/skin.aura)
+- **Recommended installation:** [kcook-lab-repo](https://github.com/kcook98765/kcook-lab-repo)
+- **Direct ZIP:** [Aura 2.1.0 ALPHA](https://github.com/kcook98765/kcook-lab-repo/releases/tag/aura-omega-2.1.0-alpha)
 
-The layout is prepared locally, not yet published:
+## Install Aura
 
-| Branch | Purpose |
+### Option 1 — Install from kcook-lab-repo (recommended)
+
+The repository currently publishes Aura 2.1.0 for its **Omega** catalog. If you already have the `kcook-lab-repo` repository installed, skip to step 4.
+
+1. In Kodi, open **Settings → File manager → Add source**.
+2. Enter `https://kcook98765.github.io/kcook-lab-repo/` and name the source `kcook-lab-repo`.
+3. Go to **Settings → Add-ons → Install from zip file**, choose the new `kcook-lab-repo` source and install **`repository.ai.kodi-0.1.1.zip`**. If Kodi asks, enable **Unknown sources** under **Settings → System → Add-ons** and acknowledge the warning.
+4. Open **Install from repository → kcook-lab-repo → Look and feel → Skin → Aura** and select **Install**.
+5. Allow Kodi to resolve the declared dependencies from the official Kodi add-on repository. Once installed, switch to Aura through **Settings → Interface → Skin** if Kodi has not already prompted you.
+
+The repository's display name is **kcook-lab-repo**, but its installer/add-on ID remains `repository.ai.kodi`. You do **not** need a newer installer to see this Aura release. The repository is the preferred option for receiving subsequent published updates through Kodi.
+
+### Option 2 — Download the skin ZIP directly
+
+1. Download **[skin.aura-2.1.0.zip](https://github.com/kcook98765/kcook-lab-repo/releases/download/aura-omega-2.1.0-alpha/skin.aura-2.1.0.zip)** from the [2.1.0 ALPHA release](https://github.com/kcook98765/kcook-lab-repo/releases/tag/aura-omega-2.1.0-alpha).
+2. Make the downloaded ZIP accessible to Kodi, then select **Settings → Add-ons → Install from zip file** and choose it. Enable **Unknown sources** if prompted.
+3. Allow Kodi to resolve dependencies from the official Kodi add-on repository; if an installation reports missing dependencies, check the list below rather than installing obsolete legacy helper ZIPs.
+4. Select Aura from **Settings → Interface → Skin**.
+
+A direct ZIP install is a manual installation method; use the repository method for normal update management. The download is a packaged skin, **not** GitHub's automatically generated *Source code (zip)* archive.
+
+**Release package SHA-256:** `7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0`
+
+## What is retained and what changed
+
+| Area | Omega continuation |
 | --- | --- |
-| `main` | Omega 2.1.0 development candidate |
-| `matrix` | Exact historical commit `203aba5117f185a34fef773134d3cf955cbf2c7a` |
-| `master` | Existing historical branch, unchanged |
-| `Nexus` | Existing Nexus branch, unchanged, including its capitalization |
+| Appearance | The original Aura look, artwork, typography, horizontal home menu, rounded styling and general navigation approach are retained. |
+| Home and widgets | Customisable home menus, multiple widgets and Skin Shortcuts-based editing remain central features. Older widgets using removed providers may require manual source reselection. |
+| Library and information | Movie, TV and music views remain; current Kodi information/dialog conventions and supported add-ons replace several outdated integrations. |
+| Search and metadata | Global Search, Embuary information/helper, TMDb Helper and Skin Info Service provide supported integration paths. Optional online metadata enrichment is **off by default**, so third-party ratings, artwork and awards may not always appear. |
+| Settings and controls | Kodi Omega-compatible dialogs, colour selection, favourites, video management and seek-display paths replace older API behavior. The available palette is not identical to legacy automatic artwork-derived colouring. |
+| PVR / EPG | PVR/EPG interfaces and event actions have been adapted around current Kodi behavior. Live TV, guide, recordings and backend-specific flows are **not yet comprehensively tested**. |
+| Upcoming TV | A library-oriented airing calendar takes the place of old Next Aired-related behavior; it is **not** a feature-for-feature copy of the previous guide. |
+| Backup | Uses Kodi's **Backup** add-on in place of historical Skin Helper backup integration. Backup must be configured; old Skin Helper archives are not automatically compatible. |
 
-Historical tags remain unchanged. No history rewrite, old-version support
-guarantee or automatic Kodi update is implied. See the bounded
-[publication proposal](docs/PUBLICATION.md).
+This is primarily a **compatibility restoration**, not a redesign. Additional features may be developed later, but they should not be assumed available in this alpha.
 
-## Dependencies and migration
+## Add-ons used by Aura on Omega
 
-Use the official Kodi Add-on repository for the declared dependencies and their
-transitive requirements. Let Kodi resolve versions appropriate to Omega; do not
-follow the former manual GitHub ZIP chain or beta-repository setup. An offline
-index audit checks declarations, not actual installation or availability.
+The authoritative requirement list is in [`addon.xml`](addon.xml). The following dependencies are declared for 2.1.0; Kodi normally handles installation and their additional dependencies:
 
-Online metadata enrichment is optional and **off by default**. Stored library
-metadata is the baseline; extra ratings, awards and artwork depend on provider
-coverage and may be unavailable. This guide requires no credentials or account
-setup. Enrichment being off does not make every installed dependency network-free.
+| Add-on / resource | Role |
+| --- | --- |
+| **Skin Shortcuts** (`script.skinshortcuts`) | Custom home menus and widgets |
+| **Global Search** (`script.globalsearch`) | Search interface |
+| **Image Resource Select** (`script.image.resource.select`) | Image-resource selection |
+| **Embuary Info** (`script.embuary.info`) | Information views and related functions |
+| **Embuary Helper** (`script.embuary.helper`) | Skin helper functionality |
+| **TheMovieDb Helper** (`plugin.video.themoviedb.helper`) | Supported metadata and discovery integration |
+| **Skin Info Service** (`script.skin.info.service`) | Skin information services |
+| **Backup** (`script.xbmcbackup`) | Optional user-initiated backup/restore workflow; declared as an install dependency |
+| **White Weather Icons** (`resource.images.weathericons.white`) | Weather icons |
+| **Transparent Movie Genre Icons** (`resource.images.moviegenreicons.transparent`) | Genre icons |
+| **White Studio Icons** (`resource.images.studios.white`) | Studio logos |
 
-Existing widgets pointing at removed Skin Helper providers need **manual source
-reselection** in the menu/widget editor. Saved shortcuts are not automatically
-translated. Review affected widgets individually; do not reset a working profile
-to force migration. The airing calendar is not a replacement with identical
-behaviour for the old Next Aired guide.
+Kodi provides the required `xbmc.gui` interface (minimum declared version **5.17.0**). Although Backup is included in the declared dependencies, **running backups is optional and requires configuration**. Other add-on features may use network services when invoked even with optional enrichment turned off.
 
-## Bounded testing and recovery
+**For users moving from older Aura:** do not follow the old manual Skin Helper or CherryPy installation instructions. Saved widgets targeting discontinued providers will not automatically migrate; open the Aura menu/widget editor and reselect those sources as needed. Existing settings are not guaranteed to migrate cleanly.
 
-Test only in a disposable Kodi profile with synthetic data and a recoverable
-configuration. Before switching skins, keep **Estuary** available; use
-**Settings → Interface → Skin → Estuary** to roll back. Switching skins does not
-restore changed widgets, add-on data or other settings.
+## Known limitations and feedback
 
-The Backup add-on (`script.xbmcbackup`) must be configured before use: select a
-destination, enable **Add-on Data**, include custom asset folders and verify a
-restore in the disposable profile. Installing Backup alone creates no backup.
-Old Skin Helper backup archives are not supported. Keep backups and saved
-settings out of the source tree and public reports.
+- **WIP / ALPHA:** minor layouts and functionality still require refinement. Populated-library widgets, playback/OSD variants, PVR/EPG, recordings, games and some migration scenarios lack complete formal acceptance.
+- **Existing Aura installations:** the ID is still `skin.aura`. This version is **not** a separate side-by-side skin; changing sources may affect the existing Aura install, update behavior and saved settings.
+- **Recovery:** keep Kodi's default **Estuary** skin available. Return through **Settings → Interface → Skin → Estuary** if you encounter a problem. Switching skins does not undo changed widgets or other settings.
+- **Backups:** configure Backup with a destination, **Add-on Data** and any custom asset folders, and test recovery before relying on it. Installing Backup by itself does not create a backup.
+- **Screenshots:** bundled screenshots are inherited from the older skin and are not up-to-date Omega captures. They also do not meet the official Kodi repository's required screenshot dimensions; this is an **unofficial repository release**, not an official Kodi skin repository submission.
 
-- [Development and Git policy](docs/DEVELOPMENT.md)
-- [Packaging and current builder limits](docs/PACKAGING.md)
-- [Static checks and future runtime acceptance](docs/TESTING.md)
+Report reproducible problems via [GitHub Issues](https://github.com/kcook98765/skin.aura/issues). Include the Kodi version, platform, what you were doing and the expected/actual result. Please remove private information from logs or screenshots.
 
-These development links refer to the source checkout; `docs/` is deliberately
-excluded from the installable skin ZIP. The root third-party notice and existing
-license files are included. The five legacy screenshots remain 1366x768 and
-fail official repository dimensions; no images were replaced to mask that finding.
+For detailed development/testing limitations, see [Compatibility](docs/COMPATIBILITY.md) and [Testing](docs/TESTING.md). Those documents include historical preparation-stage results and may not reflect the later distribution publication.
 
-## Attribution and licensing
+## Original credits and licensing
 
-Aura's project license is **Creative Commons Attribution-NonCommercial-ShareAlike
-4.0 International (CC BY-NC-SA 4.0)**:
-https://creativecommons.org/licenses/by-nc-sa/4.0/ . Retain attribution to the
-original project and this fork and identify changes. The existing `LICENSE.txt`
-is retained verbatim, including its historical “Unported” wording.
+**Original Aura skin:** [jurialmunkey](https://github.com/jurialmunkey/skin.aura), with credit to the original contributors. This is an **unofficial**, independently maintained continuation by **kcook98765**, not a release by the original developer.
 
-Icon images from **iconmonstr.com** have separate terms:
-https://iconmonstr.com/license/ . Fonts and other third-party assets retain
-their own notices and terms; Aura's license does not relicense them. The
-third-party review is a list of findings and unresolved questions, not legal
-clearance.
+The project retains its Creative Commons Attribution-NonCommercial-ShareAlike 4.0 notices and original [license](LICENSE.txt). Separate fonts, icons, photographs, flags and other third-party materials have their own conditions. **Known redistribution permission questions remain unresolved**, including some inherited fonts and artwork; publication and attribution do not resolve them. See [Third-Party Notices](THIRD-PARTY-NOTICES.txt) and the [license review](docs/THIRD-PARTY-LICENSE-REVIEW.md).
+
+The current packaged alpha is tied to its published release asset; subsequent changes to this source README do not modify that frozen ZIP.
