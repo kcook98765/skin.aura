@@ -1,17 +1,17 @@
-# Aura 2.1.0 — Kodi 21 Omega alpha preparation
+# Aura 2.1.0 — Kodi 21 Omega ALPHA
 
 A continuation by kcook98765 of **Aura by jurialmunkey**:
 https://github.com/jurialmunkey/skin.aura
 Source: https://github.com/kcook98765/skin.aura
 
-**Alpha candidate, not yet published or natively accepted.** This build targets
+**ALPHA: incomplete formal functional coverage.** This build targets
 Kodi 21 Omega only (GUI API 5.17.0). Existing Omega development, layout, main
 interface typography and add-on ID `skin.aura` are retained. Kodi 19/20 historical
 branches and tags remain in Git; they are not this distribution's supported lanes.
 Kodi 22 is unqualified. A minimum GUI dependency is not an upper-version bound;
 the repository catalog supplies Omega-only routing.
 
-## Proposed repository installation
+## Repository installation
 
 After separately approved publication, use the existing kcook-lab-repo source:
 https://kcook98765.github.io/kcook-lab-repo/
@@ -19,7 +19,7 @@ Kodi File manager → Add source; then Add-ons → Install from zip file and sel
 repository.ai.kodi-0.1.1.zip. Choose Install from repository → kcook-lab-repo →
 Look and feel → Skin → Aura. Aura's `xbmc.gui.skin` extension supplies the native
 skin category; no custom launcher or new repository installer is needed.
-This candidate is not yet available there. Let Kodi install dependencies from
+Let Kodi install dependencies from
 the official Kodi Add-on repository; an index audit is not installation proof.
 
 **Identity conflict:** Kodi identifies this skin as `skin.aura`, the same ID as

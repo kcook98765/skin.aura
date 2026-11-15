@@ -2,7 +2,7 @@ Aura Omega 2.1.0 ALPHA — current distribution scope, 2026-11-14
 
 Read the final "ALPHA DISTRIBUTION SUCCESSOR" section for the CURRENT payload.
 The inherited findings below are retained history, not claims that excluded
-binaries remain in the new package. Independent exact-package approval pending.
+binaries remain in the new package. Notices supply no release authorization.
 
 --- Preserved historical notice follows ---
 
@@ -129,4 +129,4 @@ notice preservation. This successor changes the following current payload:
 Removed materials remain in Git history. This review applies only to the new
 alpha inventory, not historical branches/tags, old source archives or old ZIPs.
 Owner risk acceptance cannot clear a concrete missing redistribution permission.
-Independent exact-package review and release approval are still pending.
+Independent exact-package review and separate owner admission are required.
