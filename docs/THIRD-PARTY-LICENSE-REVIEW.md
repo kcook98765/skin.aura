@@ -1,40 +1,38 @@
-# Third-party licensing: bounded continuation policy
+# Alpha distribution rights disposition — 2026-11-14
 
-The shipped [THIRD-PARTY-NOTICES.txt](../THIRD-PARTY-NOTICES.txt) is the concise
-attribution and known-limitations summary. Existing full license files,
-copyright notices and font metadata remain unchanged. The summary supplements
-them; it neither replaces their terms nor grants permission.
+This is a bounded review of the successor runtime inventory, not historical Git
+cleanup. Retain original Aura attribution, LICENSE.txt and all ten supplied font
+notices verbatim. See the shipped THIRD-PARTY-NOTICES.txt for current and retained
+historical findings. Independent review precedes any package rights approval.
 
-## Known position
+| Material | Current disposition |
+| --- | --- |
+| Aura layout, generic textures/geometry | Retain upstream CC BY-NC-SA 4.0 with jurialmunkey credit, continuation/change notices and noncommercial distribution |
+| Roboto Condensed, Mono, LineSpacingMod, Luckiest Guy | Retain embedded Apache notices; full text additionally in fonts/Apache-2.0.txt; prominent LineSpacingMod file-specific change notice added |
+| Exo 2, Poller One, Fredoka One, Ranchers | Retain OFL binaries, embedded copyrights, RFNs and supplied full notices; no new modification or renaming |
+| SF Distant Galaxy, Nasalization, Geomancy Extra Bold, BOXING, Theboldfont | Exclude five binaries; Font.xml role names now resolve to existing Exo 2, Poller One or Ranchers. Preserve all original license documents including PDF |
+| Knavs language flags | Exclude all 483 PNGs; ten audio/subtitle controls show real language codes. Preserve original embedded text in resources/LEGACY-ASSET-NOTICES.txt |
+| Ten album fallback photographs | Replace at the same paths with original procedural geometry; reproducible source tools/prepare_alpha_artwork.py, project license |
+| Two unused photographic default icons; eleven commercial-art view previews | Exclude; selector uses Aura title art, not a fake view capture |
+| Five inherited screenshots | Exclude both files and metadata references; optional authentic cleared-media captures await native authorization |
+| Matrix title artwork | Replace with simple Aura Omega alpha typography; retain Muhammad Hussein Ammari credit and original history |
+| iconmonstr icons | Retain in application-design context under section 2; full separate terms in resources/ICONMONSTR-LICENSE.txt. No CC relicensing or standalone reusable-icon/library grant |
+| Brand/format symbols | UI identification only; no affiliation, endorsement or blanket trademark license asserted |
 
-- Aura's project license remains CC BY-NC-SA 4.0; third-party assets retain
-  their own terms and are not automatically relicensed under that notice.
-- The supplied Apache/OFL font notices must continue to reach recipients.
-  Roboto LineSpacingMod's modifier/source is documented in the shipped notice;
-  exact-build and modification-notice questions are not declared fully resolved.
-- SF Distant Galaxy's product-bundling restriction and Nasalization's public
-  sharing restriction remain specific unresolved obstacles to source/ZIP
-  redistribution under the supplied terms.
-- Geomancy's unmodified/no-renaming condition, BOXING's limited-use conditions
-  and The Bold Font's unclear redistribution grant remain disclosed.
-- iconmonstr permits application-design use but has redistribution restrictions;
-  applicable source/downstream permission and asset mapping remain unresolved.
-- Language flags contain a separate non-profitable/opensource condition. Some
-  inherited photographs, previews and other artwork lack established provenance.
-  Trademark rights are separate from copyright and project licensing.
+Missing exact binary-build ancestry alone does not establish a font prohibition.
+The retained fonts contain express licenses. Generic geometry can rely on the
+upstream project license; unknown photo/film artwork is handled conservatively
+without broad historical investigations. Main interface typography is unchanged.
 
-## Current scope
+Primary references: https://iconmonstr.com/license/ and
+https://creativecommons.org/licenses/by-nc-sa/4.0/ ; embedded font metadata and
+original shipped notices are the evidence for those exact binaries. iconmonstr
+application use and standalone transfer restrictions must be read together.
+This is not legal advice, a trademark grant or a representation that all historic
+copies are cleared. Any concrete adverse ownership/restriction finding remains
+a nonwaivable blocker: replace/exclude it or obtain applicable permission.
 
-This is a personal continuation for Kodi 21.3, not a comprehensive historical
-rights-reconstruction project. No fonts, icons, flags, artwork or original
-notices are removed, renamed or replaced by this documentation update.
-No further broad asset investigations are scheduled under the current scope.
-
-These boundaries do not erase restrictions or certify compliance. Public source
-and ZIP distribution still require applicable permission. Any specific asset
-change or rights-resolution work needs a separate decision. Deleting a file at
-a future branch tip would not remove it from retained Git history.
-
-See [Publication](PUBLICATION.md) for the separation between development-source
-publication and installable-release requirements. No source push or release
-is authorized by these documents.
+The explicit 506 exclusions are tools/runtime-exclusions.txt; their hash and
+exact successor inventory are pinned in tools/omega_common.py. No build discovers
+or silently approves replacement files. All excluded material remains in Git
+history, which the owner explicitly required preserving.

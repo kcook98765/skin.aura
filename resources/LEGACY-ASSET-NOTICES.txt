@@ -1,0 +1,15 @@
+Historical asset notices
+
+The five restricted/unclear lyric fonts, language flags, optional photographic
+default icons, view previews and inherited screenshots are excluded from this
+alpha. Original license documents remain verbatim in fonts/lyrics for historical
+notice preservation and do not license replacement fonts. Retained Git history
+is not rewritten. Do not redistribute excluded legacy assets on the strength
+of this alpha package review.
+
+Original flag metadata (verbatim text):
+
+comment: Free for opensource non-profitable projects. For anything else contact herbert@knavs.net
+date:create: 2015-06-17T14:34:28+02:00
+date:modify: 2015-06-17T14:38:41+02:00
+Software: Adobe ImageReady

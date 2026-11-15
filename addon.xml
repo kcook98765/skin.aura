@@ -17,9 +17,9 @@
         <res aspect="16:9" default="true" folder="1080i" height="1080" width="1920" />
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Minimalistic. Customisable. Multiple Widgets.</summary>
+        <summary lang="en_GB">Omega-only alpha. Minimalistic. Customisable. Multiple Widgets.</summary>
         <summary lang="de_DE">Minimalistisch. Anpassbar. Mehrere Widgets.</summary>
-        <description lang="en_GB">Aura is highly customisable skin with multiple widgets and a horizontal home menu. Aura combines the minimalism and rounded edges of Arctic Zephyr with the sleek customisability of Horizon. Whilst the best Aura experience is had with a remote, Aura has been designed to accomodate mouse and touch users where possible.</description>
+        <description lang="en_GB">Kodi 21 Omega alpha continuation by kcook98765; original Aura by jurialmunkey. Incomplete runtime coverage: see README. Keeps add-on ID skin.aura and may update/replace another Aura installation. Aura is highly customisable skin with multiple widgets and a horizontal home menu. Aura combines the minimalism and rounded edges of Arctic Zephyr with the sleek customisability of Horizon. Whilst the best Aura experience is had with a remote, Aura has been designed to accomodate mouse and touch users where possible.</description>
         <description lang="de_DE">Aura ist ein sehr anpassbarer Skin mit mehreren Widgets und einem horizontalen Home-Menü. Aura kombiniert den Minimalismus und die abgerundeten Kanten von Arctic Zephyr mit der eleganten Anpassungsfähigkeit von Horizon. Während das beste Aura-Erlebnis mit einer Fernbedienung geboten wird, wurde Aura so konzipiert, dass es auch Maus- und Touch-Benutzern nach Möglichkeit entgegenkommt.</description>
         <platform>all</platform>
         <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>
@@ -28,11 +28,11 @@
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
-            <screenshot>resources/screenshot-01.jpg</screenshot>
-            <screenshot>resources/screenshot-02.jpg</screenshot>
-            <screenshot>resources/screenshot-03.jpg</screenshot>
-            <screenshot>resources/screenshot-04.jpg</screenshot>
-            <screenshot>resources/screenshot-05.jpg</screenshot>
+
+
+
+
+
         </assets>
     </extension>
 </addon>

@@ -63,9 +63,11 @@ def build(source, output):
             stream.write(data)
         path.chmod(0o644)
         files[name] = {"sha256": sha256(data), "size": len(data), "mode": "0644"}
-    label = "omega-baseline-local" if source.baseline else "omega-official-local"
-    archive = output / ("skin.aura-" + version + "-" + label + ".zip")
-    entries = {directory + "/": b"" for directory in directories}
+    suffix = "-omega-baseline-local" if source.baseline else ""
+    archive = output / ("skin.aura-" + version + suffix + ".zip")
+    # Production admission requires regular file entries only. Keep genuine
+    # historical baseline output stable; Kodi creates parent directories.
+    entries = {directory + "/": b"" for directory in directories} if source.baseline else {}
     entries.update({"skin.aura/" + name: data for name, data in payload.items()})
     with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as tree:
         for name in sorted(entries):

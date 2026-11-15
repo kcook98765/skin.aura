@@ -1,56 +1,77 @@
-# Bounded Omega source-publication proposal
+# Current owner direction — 2026-11-14 continuation
 
-Aura 2.1.0 is a personal Kodi 21.3 continuation and a **development candidate**,
-not an officially validated release. Keep its implementation and appearance.
-This proposal authorizes no commit, push, repository-setting change or release.
+The owner approved narrow official-Omega dependency admission and a separate
+opt-in initial-release skin-alpha policy. General production use for more than
+a week is genuine owner-reported evidence; installed byte identity is unverified,
+and the cleaned distribution has not inherited exact native acceptance. Minor
+layout adjustments and formal outstanding coverage must be explicit.
 
-## Preserve the repository layout
+No native installation, switching, profile reset, disposable-instance creation
+or new smoke campaign is authorized or required solely for this release. The
+older proposed native plan below is superseded. Use independent static/package,
+rights and distribution-delta review plus attributed owner report under the new
+skin policy; do not misuse provider-specific exceptions. Source/package decisions
+and eventual complete production-site publication each need separate approval.
+Implementation/review evidence: kodi-development/reports/aura-alpha-admission-20261114.
 
-| Ref | Intended state |
-| --- | --- |
-| `matrix` | Exact commit `203aba5117f185a34fef773134d3cf955cbf2c7a` |
-| `main` | Existing Omega lineage plus reviewed documentation/notice packaging changes |
-| `master` | Unchanged at `203aba5117f185a34fef773134d3cf955cbf2c7a` |
-| `Nexus` | Unchanged at `3d1e74416e8df80bf17eb87ae4de049c40676037` |
-| Historical tags | All retained unchanged |
+--- Historical preparation proposal retained below ---
 
-## Source publication versus an installable release
+# Omega alpha publication preparation
 
-Public development source can precede full runtime acceptance if its incomplete
-status is stated accurately and its redistribution rights are addressed.
-Screenshot dimensions and unfinished runtime tests are not themselves GitHub
-source-hosting requirements.
+The requested destination is https://github.com/kcook98765/kcook-lab-repo .
+No push, merge, tag, upload, release, Pages deployment or native operation is
+part of this preparation. Preserve historical Aura refs and all repository
+installers, published Tastemade/Hub ZIPs, reviews and download/retention history.
 
-The actual remaining source concerns are the inherited asset restrictions and
-permission gaps listed in [THIRD-PARTY-NOTICES.txt](../THIRD-PARTY-NOTICES.txt).
-In particular, the supplied SF Distant Galaxy and Nasalization terms do not
-establish public skin-bundling permission. The other disclosed icon/font/flag
-and artwork questions remain unresolved. A notice, personal purpose or an
-existing public copy does not supply missing rights. This proposal does not
-declare the source cleared for redistribution or require an unrelated redesign.
+The first artifact remains numeric 2.1.0, visibly labeled Omega alpha. Keep
+`skin.aura`, name Aura and original jurialmunkey attribution. Other Aura forks
+share this ID; explain replacement/settings/update-origin conflicts to users.
+`xbmc.gui.skin` selects Kodi's normal skin category. Admit only the Omega lane;
+GUI 5.17.0 alone cannot enforce an upper release bound. Existing installer
+repository.ai.kodi 0.1.1 already supplies version-routed catalogs.
 
-An installable release additionally needs representative runtime acceptance,
-honest compatibility claims, and resolution of applicable checker findings.
-The official Omega checker currently fails five legacy 1366x768 screenshots
-and reports three warnings (two offline URLs and the retained font-license PDF).
-An official repository submission needs compliant screenshots and review; a
-local test ZIP is not that submission or a validated release.
+The cleaned exact payload excludes restricted/unclear optional materials while
+retaining their original notices and Git history. Rights review applies only
+to these successor bytes, not old Git/source archives. See the separate asset
+review and shipped notice. No owner acknowledgment can cure missing rights.
 
-## Proposed later publication steps - approval required
+Required before public intake:
 
-1. Review the notice-only changes and the specific unresolved source concerns.
-   Make a separate decision about any permission or targeted asset work; no
-   further broad investigation or asset replacement is authorized here.
-2. Obtain approval for the exact local commit and intended publication. No
-   pending working-tree change is included merely by pushing the existing HEAD.
-3. Recheck local/remote refs; stop if they changed unexpectedly. Retain original
-   attribution, licenses and all historical branches/tags. Do not rewrite history.
-4. Dry-run an explicit push of only `matrix` and `main`; inspect the result, then
-   publish only those refs after approval. Do not use force, mirror, all-tags or
-   branch-deletion options. No default-branch/settings change is implied.
-5. Verify the published hashes and unchanged historical refs. Keep 2.1.0 marked
-   as a candidate; do not create a release/tag or deploy to Kodi as part of this.
+1. Independently review the frozen source, ZIP, per-file inventory, notices and
+   lane-matched static output; commit reviewed source under the existing history
+   only after its disposition is agreed. Dirty worktree packages are preparation,
+   not a frozen release commit. No commit/push was made in this task.
+2. Resolve repository dependency admission: current builder/auditor accept only
+   same-lane admitted packages and configured built-ins, and deliberately reject
+   external snapshots. Aura has eleven required official-repository add-ons plus
+   Kodi's GUI built-in. Do not mark official add-ons as built-ins or weaken the
+   closure gate. A separately reviewed pinned official-Omega adapter is needed,
+   or all dependencies require separate approved intake (not recommended).
+3. Separately authorize a disposable managed Omega smoke test, with exact target,
+   current source/ZIP grants, stopped-profile backup and Estuary rollback. Observe
+   installation/dependency resolution, first home/navigation/settings, restart,
+   changed language/lyric/fallback assets, and rollback. No live DVR is needed.
+   Authentic 1280x720 or 1920x1080 captures of cleared media may then be added;
+   a new package/hash and affected checks are required if they enter the ZIP.
+4. The established schema-3 initial-release exception is NOT directly applicable
+   solely to Aura's generic skin coverage gaps: its unofficial-integration
+   contract requires substantive provider service-terms concerns. Do not invent
+   concerns to obtain a waiver. Either finish the required strict-v2 runtime
+   scope, or obtain owner approval for a separately reviewed ordinary-skin
+   initial-alpha coverage policy retaining exact-artifact, finite-expiry,
+   named-scenario, independent native+offline core verification, all-risk
+   acknowledgment and separately bound final-decision safeguards. Such a policy
+   must retain runtime_accepted=false for deferred coverage, and cannot waive
+   rights, dependencies, security or known functionality defects. Neither route
+   has been approved or activated.
+5. Produce a reviewed successor record and proposed config/production.json intake;
+   run complete build/verify, independent audit, deterministic qualify and local
+   publication preflight, preserving every retained package and installer.
+6. Obtain final publication authorization binding exact source commit, ZIP,
+   record, Omega catalog/site digest and destination. Only then perform the
+   separately authorized remote operations. Verify public HTTPS and native
+   repository-category installation/update behavior as separate observations.
 
-Existing history continues to contain inherited assets. A later file deletion
-would not withdraw those historical copies; any repository-wide removal policy
-would need separate authorization.
+Fresh remote identity/history checks must precede publication. No new add-on ID,
+repository installer bump, raw ZIP bootstrap link, historical rewrite or broad
+OpenCode permission grant is needed.

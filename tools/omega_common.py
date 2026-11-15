@@ -14,23 +14,34 @@ VERSION = "2.1.0"
 BASELINE_VERSION = "2.0.23"
 RUNTIME_MANIFEST = "tools/runtime-files.txt"
 RUNTIME_REVIEW_COMMIT = "2402785e7f5e16184955a5bc1f1e92ef666fb7da"
-# The import commit remains the runtime review anchor. The sole subsequent
-# path approval is this root notice; no other import-tree delta is authorized.
-RUNTIME_REVIEW_ADDITIONS = frozenset({"THIRD-PARTY-NOTICES.txt"})
+# The import commit remains the historical runtime anchor. Exact successor
+# additions/removals below record the 2026-11-14 alpha rights cleanup.
+RUNTIME_REVIEW_ADDITIONS = frozenset((
+    'THIRD-PARTY-NOTICES.txt',
+    'fonts/Apache-2.0.txt',
+    'fonts/Roboto-Regular-LineSpacingMod-NOTICE.txt',
+    'resources/ICONMONSTR-LICENSE.txt',
+    'resources/LEGACY-ASSET-NOTICES.txt',
+))
+RUNTIME_EXCLUSIONS_SHA256 = "ca7432cd3319b9f5035a57828314e25423894f843264b1f22b43bbb686039fb1"
+_exclusions = (Path(__file__).resolve().parent / "runtime-exclusions.txt").read_bytes()
+if hashlib.sha256(_exclusions).hexdigest() != RUNTIME_EXCLUSIONS_SHA256:
+    raise ValueError("Runtime exclusions differ from the reviewed alpha inventory")
+RUNTIME_REVIEW_REMOVALS = frozenset(_exclusions.decode().splitlines())
 # Membership approval, not content hashes: a new path review must update both
 # this pin and the exact manifest. Never regenerate approval during a build.
-RUNTIME_MANIFEST_SHA256 = "200b1d2aa5d11e83afa0cc725d3feb112900d74a4681a805304044ef8e831979"
+RUNTIME_MANIFEST_SHA256 = "7788af3d8ab7f9832e70afed8374cd156467baf434643ea1045d41b8c22a1e2b"
 DIRECTORIES = (
     "1080i", "colors", "extras", "fonts", "language", "media", "resources",
     "shortcuts", "themes",
 )
 ROOT_FILES = (
     "addon.xml", "README", "LICENSE.txt", "changelog.txt", "icon.png", "fanart.jpg",
-    *sorted(RUNTIME_REVIEW_ADDITIONS),
+    "THIRD-PARTY-NOTICES.txt",
 )
 OPTIONAL_DOCS = ()  # Compatibility only: operational documentation is never runtime.
 GENERATED = "1080i/script-skinshortcuts-includes.xml"
-REMOVED_RUNTIME = frozenset("1080i/" + name + ".xml" for name in (
+REMOVED_RUNTIME = RUNTIME_REVIEW_REMOVALS | frozenset("1080i/" + name + ".xml" for name in (
     "DialogFavourites", "script-skin_helper_service-ColorPicker",
     "Includes_NextAired", "script-NextAired-TVGuide", "script-NextAired-TVGuide2",
     "Custom_1116_ColorBoxAdvancedSettings",
@@ -62,6 +73,33 @@ FOCUSED_DELTA = frozenset((
         # Official-only cleanup of optional legacy launchers/artwork consumers.
         "Includes_Defs", "DialogExtendedProgressBar", "script-script.extendedinfo-DialogVideoInfo",
     )),
+))
+
+# Owner-scoped alpha asset/metadata changes; exact membership retained above.
+FOCUSED_DELTA = FOCUSED_DELTA | RUNTIME_REVIEW_REMOVALS | frozenset((
+    '1080i/Custom_1117_EnableViews.xml',
+    '1080i/DialogVideoInfo.xml',
+    '1080i/Font.xml',
+    'README',
+    'THIRD-PARTY-NOTICES.txt',
+    'addon.xml',
+    'changelog.txt',
+    'extras/albumbacks/0.jpg',
+    'extras/albumbacks/1.jpg',
+    'extras/albumbacks/2.jpg',
+    'extras/albumbacks/3.jpg',
+    'extras/albumbacks/4.jpg',
+    'extras/albumbacks/5.jpg',
+    'extras/albumbacks/6.jpg',
+    'extras/albumbacks/7.jpg',
+    'extras/albumbacks/8.jpg',
+    'extras/albumbacks/9.jpg',
+    'fanart.jpg',
+    'fonts/Apache-2.0.txt',
+    'fonts/Roboto-Regular-LineSpacingMod-NOTICE.txt',
+    'icon.png',
+    'resources/ICONMONSTR-LICENSE.txt',
+    'resources/LEGACY-ASSET-NOTICES.txt',
 ))
 
 
@@ -214,6 +252,7 @@ class Source:
                 "sha256": digest,
                 "reviewed_commit": RUNTIME_REVIEW_COMMIT,
                 "reviewed_additions": sorted(RUNTIME_REVIEW_ADDITIONS),
+                "reviewed_removals_sha256": RUNTIME_EXCLUSIONS_SHA256,
                 "file_count": len(self.files),
             }
             # Scan disk, not git's tracked/ignored view. Even admissible additions

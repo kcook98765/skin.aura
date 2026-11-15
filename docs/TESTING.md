@@ -1,3 +1,13 @@
+# Current owner continuation
+
+Owner reports more than one week of stable production Omega use with minor
+layout issues. Exact installed-byte identity is unverified; cleaned distribution
+has no new native acceptance. No new native test occurs. Current independent
+static/package evidence: kodi-development/reports/aura-alpha-admission-20261114.
+Earlier results below remain historical; all original warnings are retained.
+
+--- Historical validation ---
+
 # Testing status and procedure
 
 ## Notice-only preparation results - 2026-10-20

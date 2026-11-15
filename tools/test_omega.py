@@ -944,7 +944,7 @@ class PackagingRegressions(unittest.TestCase):
                              (parent / "two" / two["zip"]["name"]).read_bytes())
             self.assertTrue(one["zip"]["crc_verified"])
             self.assertTrue(one["zip"]["readback_tree_consistent"])
-            self.assertEqual(one["zip"]["name"], "skin.aura-2.1.0-omega-official-local.zip")
+            self.assertEqual(one["zip"]["name"], "skin.aura-2.1.0.zip")
             self.assertEqual(one["addon"]["version"], "2.1.0")
             self.assertEqual(set(one["files"]), set(source.files))
             self.assertEqual(json.loads((parent / "one/receipt.json").read_text()), one)

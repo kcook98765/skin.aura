@@ -16,7 +16,7 @@ import zipfile
 from build_omega import ROOT, build
 from omega_common import (
     ADDED_RUNTIME, BASELINE_VERSION, DIRECTORIES, FOCUSED_DELTA, GENERATED,
-    REMOVED_RUNTIME, ROOT_FILES, RUNTIME_MANIFEST, RUNTIME_REVIEW_COMMIT, RUNTIME_REVIEW_ADDITIONS,
+    REMOVED_RUNTIME, ROOT_FILES, RUNTIME_MANIFEST, RUNTIME_REVIEW_COMMIT, RUNTIME_REVIEW_ADDITIONS, RUNTIME_REVIEW_REMOVALS, RUNTIME_EXCLUSIONS_SHA256,
     RUNTIME_MANIFEST_SHA256, VERSION, Source, git, parse_runtime_manifest, payload_path, runtime_path,
 )
 
@@ -227,7 +227,8 @@ class ManifestRegressions(unittest.TestCase):
             "kind": "reviewed-exact-file-list", "path": RUNTIME_MANIFEST,
             "sha256": hashlib.sha256(self.manifest_bytes()).hexdigest(),
             "reviewed_commit": RUNTIME_REVIEW_COMMIT,
-            "reviewed_additions": ["THIRD-PARTY-NOTICES.txt"], "file_count": len(self.files),
+            "reviewed_additions": sorted(RUNTIME_REVIEW_ADDITIONS),
+            "reviewed_removals_sha256": RUNTIME_EXCLUSIONS_SHA256, "file_count": len(self.files),
         })
         self.assertEqual(json.loads((self.parent / "one/receipt.json").read_text()), first)
         self.assertEqual((self.parent / "one" / first["zip"]["name"]).read_bytes(),
@@ -247,20 +248,20 @@ class ReviewedInventoryRegressions(unittest.TestCase):
         source = Source(ROOT)
         reviewed = {name for name in git(ROOT, "ls-tree", "-r", "--name-only", RUNTIME_REVIEW_COMMIT).decode().splitlines()
                     if payload_path(name)}
-        # The real import commit is unchanged; the notice is the ONLY approved
-        # membership addition since it, not a claim that a new commit exists.
+        # Keep the historical anchor and independently record the exact alpha
+        # exclusions/additions; do not relabel the historical package.
         self.assertEqual(RUNTIME_REVIEW_COMMIT, "2402785e7f5e16184955a5bc1f1e92ef666fb7da")
-        self.assertEqual(RUNTIME_REVIEW_ADDITIONS, {"THIRD-PARTY-NOTICES.txt"})
+        self.assertEqual(len(RUNTIME_REVIEW_ADDITIONS), 5)
         self.assertEqual(len(reviewed), 1801)
         self.assertTrue(reviewed.isdisjoint(RUNTIME_REVIEW_ADDITIONS))
-        self.assertEqual(set(source.files) - reviewed, {"THIRD-PARTY-NOTICES.txt"})
-        self.assertFalse(reviewed - set(source.files))
-        self.assertEqual(len(source.files), 1802)
+        self.assertEqual(set(source.files) - reviewed, RUNTIME_REVIEW_ADDITIONS)
+        self.assertEqual(reviewed - set(source.files), RUNTIME_REVIEW_REMOVALS)
+        self.assertEqual(len(source.files), 1300)
         self.assertEqual(set(source.files), (source.original_files - REMOVED_RUNTIME) | ADDED_RUNTIME)
         self.assertEqual(parse_runtime_manifest((ROOT / RUNTIME_MANIFEST).read_bytes()), source.files)
         self.assertEqual(source.runtime_manifest["sha256"], RUNTIME_MANIFEST_SHA256)
         self.assertEqual(source.runtime_manifest["reviewed_commit"], RUNTIME_REVIEW_COMMIT)
-        self.assertEqual(source.runtime_manifest["reviewed_additions"], ["THIRD-PARTY-NOTICES.txt"])
+        self.assertEqual(source.runtime_manifest["reviewed_additions"], sorted(RUNTIME_REVIEW_ADDITIONS))
         self.assertEqual({n for n in source.files if "/" not in n}, set(ROOT_FILES))
         self.assertEqual({n.split("/")[0] for n in source.files if "/" in n}, set(DIRECTORIES))
         self.assertFalse(any(n.lower().endswith((".md", ".markdown")) for n in source.files))

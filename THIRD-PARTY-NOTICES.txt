@@ -1,3 +1,11 @@
+Aura Omega 2.1.0 ALPHA — current distribution scope, 2026-11-14
+
+Read the final "ALPHA DISTRIBUTION SUCCESSOR" section for the CURRENT payload.
+The inherited findings below are retained history, not claims that excluded
+binaries remain in the new package. Independent exact-package approval pending.
+
+--- Preserved historical notice follows ---
+
 Aura Omega 2.1.0 - development candidate
 Third-party attribution and known licensing limitations
 
@@ -82,3 +90,43 @@ publication. Existing public history, personal use, candidate status and a
 successful build/checker run do not establish permission. No fonts or artwork
 have been removed, replaced or cleared by adding this notice. Further asset
 changes require a separate decision; all supplied notices must remain available.
+
+2026-11-14 ALPHA DISTRIBUTION SUCCESSOR — DISPOSITION
+
+The preceding findings describe the inherited baseline and remain for historical
+notice preservation. This successor changes the following current payload:
+
+- Removed SF Distant Galaxy, Nasalization, Geomancy Extra Bold, BOXING and
+  Theboldfont binaries. Font.xml retains lyric role names but uses existing
+  Exo 2, Poller One and Ranchers instead. Original supplied license documents,
+  including the Nasalization PDF, remain verbatim; they do not cover substitutes.
+- Removed all 483 Knavs language flag PNGs. Audio/subtitle rows now display actual
+  language codes with the normal skin font. Exact legacy metadata is preserved
+  in resources/LEGACY-ASSET-NOTICES.txt; no new flag license is asserted.
+- Replaced ten photographic album fallbacks with procedural geometric artwork;
+  omitted two unused photographic default icons, eleven commercial-art view
+  previews and five inherited screenshots. No replacement screenshot is claimed.
+- New icon/fanart and album fallbacks are reproducible with
+  tools/prepare_alpha_artwork.py in the source checkout. These simple geometric
+  and typographic compositions are CC BY-NC-SA 4.0, like Aura; they are not native
+  captures. Former Matrix title artwork contributor: Muhammad Hussein Ammari,
+  2022 (retained history commits cc4825a and 5e0ebb9).
+- Retained Apache/OFL fonts contain embedded copyright/license statements.
+  Full Apache text is additionally supplied as fonts/Apache-2.0.txt and the
+  LineSpacingMod change notice as fonts/Roboto-Regular-LineSpacingMod-NOTICE.txt.
+  Incomplete byte-build tracing alone is not treated as evidence of prohibition.
+- iconmonstr / Alexander Kahlkopf icons remain solely within Aura's application
+  design, relying on the application-design permission in section 2 of its
+  separate terms. Full current terms: resources/ICONMONSTR-LICENSE.txt. These
+  icons are not relicensed under Aura's CC license, and this distribution grants
+  no standalone icon-library redistribution or extraction rights. Brand symbols
+  identify UI formats/services; no affiliation, endorsement or trademark license
+  is asserted. Any use outside this application context needs its own rights.
+- Generic inherited Aura geometry/textures remain under the upstream project
+  license with jurialmunkey attribution. This is a bounded application-context
+  review, not a warranty of all historical third-party ownership or legal advice.
+
+Removed materials remain in Git history. This review applies only to the new
+alpha inventory, not historical branches/tags, old source archives or old ZIPs.
+Owner risk acceptance cannot clear a concrete missing redistribution permission.
+Independent exact-package review and release approval are still pending.
