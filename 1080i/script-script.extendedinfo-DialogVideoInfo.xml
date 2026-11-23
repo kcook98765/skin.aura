@@ -149,6 +149,8 @@
                         <param name="id" value="1000" />
                         <param name="ondown" value="150" />
                         <param name="label" value="$LOCALIZE[206]" />
+                        <param name="artTexture" value="$INFO[ListItem.Icon]" />
+                        <param name="fallbackimage" value="DefaultActor.png" />
                         <param name="infolabel" value="true" />
                         <param name="label2" value="$INFO[ListItem.Property(character)]" />
                         <param name="include_content" value="false" />

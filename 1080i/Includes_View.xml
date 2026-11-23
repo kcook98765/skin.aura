@@ -410,6 +410,7 @@
         <param name="fallbackimage" default="DefaultAddonImages.png" />
         <param name="aspect" default="scale" />
         <param name="altfocus" default="false" />
+        <param name="artTexture" default="$VAR[Image_Poster]" />
         <definition>
             <left>-10</left>
             <right>-10</right>
@@ -434,7 +435,7 @@
                         <top>10</top>
                         <bottom>10</bottom>
                         <aspectratio scalediffuse="false">$PARAM[aspect]</aspectratio>
-                        <texture fallback="$PARAM[fallbackimage]" background="true" diffuse="diffuse/widgetposter.png">$VAR[Image_Poster]</texture>
+                        <texture fallback="$PARAM[fallbackimage]" background="true" diffuse="diffuse/widgetposter.png">$PARAM[artTexture]</texture>
                         <visible>!$PARAM[episodelayout]</visible>
                         <visible>!$PARAM[textonly]</visible>
                     </control>
@@ -520,7 +521,7 @@
                         <top>10</top>
                         <bottom>10</bottom>
                         <aspectratio scalediffuse="false">$PARAM[aspect]</aspectratio>
-                        <texture fallback="$PARAM[fallbackimage]" background="true" diffuse="diffuse/widgetposter.png">$VAR[Image_Poster]</texture>
+                        <texture fallback="$PARAM[fallbackimage]" background="true" diffuse="diffuse/widgetposter.png">$PARAM[artTexture]</texture>
                         <visible>!$PARAM[episodelayout]</visible>
                         <visible>!$PARAM[textonly]</visible>
                     </control>
