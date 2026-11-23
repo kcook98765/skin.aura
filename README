@@ -1,8 +1,8 @@
 # Aura for Kodi Omega (21.x)
 
-**Aura 2.1.1 source — ALPHA, usable work in progress, unofficial continuation.**
+**Aura 2.1.1 ALPHA — usable work in progress, unofficial continuation.**
 
-Current source includes the 2.1.1 cast-artwork fix described below. The latest published package is **2.1.0 ALPHA**; the installation links and release hash below still refer to that package, not an unpublished 2.1.1 archive.
+The latest published package is **2.1.1 ALPHA**, including the cast-artwork fix described below. The package link and SHA-256 below identify the frozen release artifact.
 
 This project brings [jurialmunkey's original Aura skin](https://github.com/jurialmunkey/skin.aura) to **Kodi 21 Omega**. The aim is to preserve Aura's familiar appearance and workflow while adapting outdated integrations and Kodi interfaces to current Omega add-ons and APIs.
 
@@ -10,13 +10,13 @@ The skin is in regular use and is generally usable, but **it is not finished**. 
 
 - **Skin source and issues:** [kcook98765/skin.aura](https://github.com/kcook98765/skin.aura)
 - **Recommended installation:** [kcook-lab-repo](https://github.com/kcook98765/kcook-lab-repo)
-- **Direct ZIP:** [Aura 2.1.0 ALPHA](https://github.com/kcook98765/kcook-lab-repo/releases/tag/aura-omega-2.1.0-alpha)
+- **Direct ZIP:** [Aura 2.1.1 ALPHA](https://kcook98765.github.io/kcook-lab-repo/packages/skin.aura/skin.aura-2.1.1.zip)
 
 ## Install Aura
 
 ### Option 1 — Install from kcook-lab-repo (recommended)
 
-The repository currently publishes Aura 2.1.0 for its **Omega** catalog. If you already have the `kcook-lab-repo` repository installed, skip to step 4.
+The repository currently publishes Aura 2.1.1 for its **Omega** catalog. If you already have the `kcook-lab-repo` repository installed, skip to step 4.
 
 1. In Kodi, open **Settings → File manager → Add source**.
 2. Enter `https://kcook98765.github.io/kcook-lab-repo/` and name the source `kcook-lab-repo`.
@@ -28,14 +28,16 @@ The repository's display name is **kcook-lab-repo**, but its installer/add-on ID
 
 ### Option 2 — Download the skin ZIP directly
 
-1. Download **[skin.aura-2.1.0.zip](https://github.com/kcook98765/kcook-lab-repo/releases/download/aura-omega-2.1.0-alpha/skin.aura-2.1.0.zip)** from the [2.1.0 ALPHA release](https://github.com/kcook98765/kcook-lab-repo/releases/tag/aura-omega-2.1.0-alpha).
+1. Download **[skin.aura-2.1.1.zip](https://kcook98765.github.io/kcook-lab-repo/packages/skin.aura/skin.aura-2.1.1.zip)** from the repository's package directory.
 2. Make the downloaded ZIP accessible to Kodi, then select **Settings → Add-ons → Install from zip file** and choose it. Enable **Unknown sources** if prompted.
 3. Allow Kodi to resolve dependencies from the official Kodi add-on repository; if an installation reports missing dependencies, check the list below rather than installing obsolete legacy helper ZIPs.
 4. Select Aura from **Settings → Interface → Skin**.
 
 A direct ZIP install is a manual installation method; use the repository method for normal update management. The download is a packaged skin, **not** GitHub's automatically generated *Source code (zip)* archive.
 
-**Release package SHA-256:** `7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0`
+**Release package SHA-256:** `a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92`
+
+The earlier [2.1.0 ALPHA release](https://github.com/kcook98765/kcook-lab-repo/releases/tag/aura-omega-2.1.0-alpha) remains available for historical reference.
 
 ## What is retained and what changed
 
@@ -106,4 +108,4 @@ For detailed development/testing limitations, see [Compatibility](docs/COMPATIBI
 
 The project retains its Creative Commons Attribution-NonCommercial-ShareAlike 4.0 notices and original [license](LICENSE.txt). Separate fonts, icons, photographs, flags and other third-party materials have their own conditions. **Known redistribution permission questions remain unresolved**, including some inherited fonts and artwork; publication and attribution do not resolve them. See [Third-Party Notices](THIRD-PARTY-NOTICES.txt) and the [license review](docs/THIRD-PARTY-LICENSE-REVIEW.md).
 
-The current packaged alpha is tied to its published release asset; subsequent changes to this source README do not modify that frozen ZIP.
+The published 2.1.1 package is frozen at source commit [`bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab`](https://github.com/kcook98765/skin.aura/commit/bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab). Later changes to this source README do not modify that frozen ZIP or its source audit.
