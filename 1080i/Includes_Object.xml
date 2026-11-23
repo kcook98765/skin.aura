@@ -692,20 +692,20 @@
             </control>
         </control>
         <control type="label">
-            <label>$INFO[ListItem.Year]$INFO[ListItem.ChannelNumber,  |  [COLOR=main_fg_100],. [/COLOR]]$INFO[ListItem.ChannelName,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.StartTime,  |  [COLOR=main_fg_100]$LOCALIZE[19126] ,[/COLOR]]$INFO[ListItem.EndTime,  |  [COLOR=main_fg_100]$LOCALIZE[19127] ,[/COLOR]]</label>
+            <label>$INFO[ListItem.Year]$INFO[ListItem.ChannelNumberLabel,  |  [COLOR=main_fg_100],. [/COLOR]]$INFO[ListItem.ChannelName,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.StartTime,  |  [COLOR=main_fg_100]$LOCALIZE[19126] ,[/COLOR]]$INFO[ListItem.EndTime,  |  [COLOR=main_fg_100]$LOCALIZE[19127] ,[/COLOR]]</label>
             <height>55</height>
             <aligny>top</aligny>
             <textcolor>$VAR[ColorHighlight]</textcolor>
             <font>font_small</font>
-            <visible>[!String.IsEmpty(ListItem.Title) | !String.IsEmpty(ListItem.ChannelNumber)] + String.IsEmpty(ListItem.Season)</visible>
+            <visible>[!String.IsEmpty(ListItem.Title) | !String.IsEmpty(ListItem.ChannelNumberLabel)] + String.IsEmpty(ListItem.Season)</visible>
         </control>
         <control type="label">
-            <label>S$INFO[ListItem.Season]E$INFO[ListItem.Episode]$INFO[ListItem.ChannelNumber,  |  [COLOR=main_fg_100],. [/COLOR]]$INFO[ListItem.ChannelName,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.StartTime,  |  [COLOR=main_fg_100]$LOCALIZE[19126] ,[/COLOR]]$INFO[ListItem.EndTime,  |  [COLOR=main_fg_100]$LOCALIZE[19127] ,[/COLOR]]</label>
+            <label>S$INFO[ListItem.Season]E$INFO[ListItem.Episode]$INFO[ListItem.ChannelNumberLabel,  |  [COLOR=main_fg_100],. [/COLOR]]$INFO[ListItem.ChannelName,[COLOR=main_fg_100],[/COLOR]]$INFO[ListItem.StartTime,  |  [COLOR=main_fg_100]$LOCALIZE[19126] ,[/COLOR]]$INFO[ListItem.EndTime,  |  [COLOR=main_fg_100]$LOCALIZE[19127] ,[/COLOR]]</label>
             <height>55</height>
             <aligny>top</aligny>
             <textcolor>$VAR[ColorHighlight]</textcolor>
             <font>font_small</font>
-            <visible>[!String.IsEmpty(ListItem.Title) | !String.IsEmpty(ListItem.ChannelNumber)] + !String.IsEmpty(ListItem.Season)</visible>
+            <visible>[!String.IsEmpty(ListItem.Title) | !String.IsEmpty(ListItem.ChannelNumberLabel)] + !String.IsEmpty(ListItem.Season)</visible>
         </control>
 
 
