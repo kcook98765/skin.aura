@@ -1,0 +1,12 @@
+Original asset terms retained — restored-assets candidate
+
+All original fonts, flags, photographs, screenshots and preview resources are
+restored byte-for-byte from Aura Omega commit 688290914a31d0f595179043062cc57eb85ab8d9.
+The original font notices remain verbatim alongside the original binaries.
+No permission, relicensing or legal clearance is supplied by restoration.
+
+Original flag metadata (verbatim text):
+Free for opensource non-profitable projects. For anything else contact herbert@knavs.net
+
+The prior506 exclusions and generated alternatives are superseded and remain
+only in preserved candidate/history evidence. They are not the current payload.

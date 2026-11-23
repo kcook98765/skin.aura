@@ -427,6 +427,8 @@ extras/playlists/TopRatedTvShows.xsp
 extras/playlists/UnwatchedEpisodes.xsp
 extras/playlists/UnwatchedMovies.xsp
 fanart.jpg
+fonts/Apache-2.0.txt
+fonts/Roboto-Regular-LineSpacingMod-NOTICE.txt
 fonts/Roboto-Regular-LineSpacingMod.ttf
 fonts/RobotoCondensed-Bold.ttf
 fonts/RobotoCondensed-Light.ttf
@@ -1752,6 +1754,8 @@ media/subs/tr.png
 media/subs/uk.png
 media/subs/vi.png
 media/subs/zh.png
+resources/ICONMONSTR-LICENSE.txt
+resources/LEGACY-ASSET-NOTICES.txt
 resources/screenshot-01.jpg
 resources/screenshot-02.jpg
 resources/screenshot-03.jpg
