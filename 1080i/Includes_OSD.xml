@@ -131,12 +131,16 @@
                                 <include content="Object_Flags" condition="!Skin.HasSetting(MonochromeFlags)">
                                     <param name="align" value="left" />
                                     <param name="source" value="VideoPlayer." />
+                                    <param name="path" value="Player.Folderpath" />
+                                    <param name="filename" value="Player.FilenameAndPath" />
                                     <param name="fps" value="true" />
                                     <param name="directory" value="color" />
                                 </include>
                                 <include content="Object_Flags" condition="Skin.HasSetting(MonochromeFlags)">
                                     <param name="align" value="left" />
                                     <param name="source" value="VideoPlayer." />
+                                    <param name="path" value="Player.Folderpath" />
+                                    <param name="filename" value="Player.FilenameAndPath" />
                                     <param name="fps" value="true" />
                                     <param name="directory" value="monochrome" />
                                 </include>
@@ -339,12 +343,16 @@
                                     <visible>!Skin.HasSetting(HideOSDVideoCodec)</visible>
                                     <include content="Object_Flags" condition="!Skin.HasSetting(MonochromeFlags)">
                                         <param name="source" value="VideoPlayer." />
+                                        <param name="path" value="Player.Folderpath" />
+                                        <param name="filename" value="Player.FilenameAndPath" />
                                         <param name="fps" value="true" />
                                         <param name="directory" value="color" />
                                         <param name="align" value="right" />
                                     </include>
                                     <include content="Object_Flags" condition="Skin.HasSetting(MonochromeFlags)">
                                         <param name="source" value="VideoPlayer." />
+                                        <param name="path" value="Player.Folderpath" />
+                                        <param name="filename" value="Player.FilenameAndPath" />
                                         <param name="fps" value="true" />
                                         <param name="directory" value="monochrome" />
                                         <param name="align" value="right" />
