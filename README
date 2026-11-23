@@ -1,6 +1,8 @@
 # Aura for Kodi Omega (21.x)
 
-**Aura 2.1.0 ALPHA — usable work in progress, unofficial continuation.**
+**Aura 2.1.1 source — ALPHA, usable work in progress, unofficial continuation.**
+
+Current source includes the 2.1.1 cast-artwork fix described below. The latest published package is **2.1.0 ALPHA**; the installation links and release hash below still refer to that package, not an unpublished 2.1.1 archive.
 
 This project brings [jurialmunkey's original Aura skin](https://github.com/jurialmunkey/skin.aura) to **Kodi 21 Omega**. The aim is to preserve Aura's familiar appearance and workflow while adapting outdated integrations and Kodi interfaces to current Omega add-ons and APIs.
 
@@ -50,9 +52,15 @@ A direct ZIP install is a manual installation method; use the repository method 
 
 This is primarily a **compatibility restoration**, not a redesign. Additional features may be developed later, but they should not be assumed available in this alpha.
 
+### Episode cast artwork in 2.1.1 source
+
+Fixes a route-dependent Video Info problem: opening **TV list → series → season → episodes → an episode → Video Info** could repeat the season poster across different cast members, while opening the same episode through **Continue Watching** showed actor portraits. Cast cards now use each actor's artwork without changing general media-poster selection elsewhere.
+
+The focused source regression checks pass. Native acceptance of the corrected bad library route was not completed because the owner requested stopping further testing; this is not a claim of comprehensive native validation.
+
 ## Add-ons used by Aura on Omega
 
-The authoritative requirement list is in [`addon.xml`](addon.xml). The following dependencies are declared for 2.1.0; Kodi normally handles installation and their additional dependencies:
+The authoritative requirement list is in [`addon.xml`](addon.xml). The following dependencies are declared for current source, unchanged from 2.1.0; Kodi normally handles installation and their additional dependencies:
 
 | Add-on / resource | Role |
 | --- | --- |
@@ -71,6 +79,14 @@ The authoritative requirement list is in [`addon.xml`](addon.xml). The following
 Kodi provides the required `xbmc.gui` interface (minimum declared version **5.17.0**). Although Backup is included in the declared dependencies, **running backups is optional and requires configuration**. Other add-on features may use network services when invoked even with optional enrichment turned off.
 
 **For users moving from older Aura:** do not follow the old manual Skin Helper or CherryPy installation instructions. Saved widgets targeting discontinued providers will not automatically migrate; open the Aura menu/widget editor and reselect those sources as needed. Existing settings are not guaranteed to migrate cleanly.
+
+## Optional ratings and online enrichment
+
+Kodi's native/list-item ratings and stored library metadata are the baseline. The **Enable ratings** choices control which available scores are displayed; enabling every provider there does **not** fetch missing ratings. The **Votes** choice separately controls vote-count display.
+
+To use additional online metadata, enable **Skin Settings → Library → Online metadata enrichment (optional)**, which is **off by default**. Open **Enrichment provider settings** for Skin Info Service and configure a legitimate provider key where required—for example, your own valid **OMDb** key for data supplied by OMDb. Aura does not provision keys or guarantee provider access, title coverage or every score.
+
+Rotten Tomatoes **critics (Tomatometer)** and **audience (Popcornmeter)** are separate scores under the shared display choice. One may be available without the other; unavailable IMDb, TMDb, Metacritic or other provider data may also remain absent. Equal numeric scores from different providers are possible and do not by themselves indicate duplicated data.
 
 ## Known limitations and feedback
 

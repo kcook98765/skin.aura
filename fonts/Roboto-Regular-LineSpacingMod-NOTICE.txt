@@ -1,0 +1,7 @@
+Roboto-Regular-LineSpacingMod.ttf is a modified Roboto font.
+Google copyright 2014; Apache License 2.0 (Apache-2.0.txt).
+jurialmunkey modified the font line spacing so textboxes lay out correctly.
+Introduced 2017-07-19 in Horizon commit
+499b3044d358c6b26d7be826482df43dc4f15d26:
+https://github.com/jurialmunkey/skin.horizon/commit/499b3044d358c6b26d7be826482df43dc4f15d26
+The Aura Omega alpha retains that binary unmodified.
