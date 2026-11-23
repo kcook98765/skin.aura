@@ -1,3 +1,6 @@
+[B]2.1.1[/B]
+Fix episode video-info cast portraits inheriting season posters from the underlying library view.
+
 [B]2.0.0[/b]
 Initial changes to run on Matrix (V19) Kodi
 

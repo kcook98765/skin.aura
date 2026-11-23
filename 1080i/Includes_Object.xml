@@ -254,6 +254,7 @@
         <param name="fallbackimage" default="DefaultAddonImages.png" />
         <param name="showfocuslabel" default="true" />
         <param name="visible" default="true" />
+        <param name="artTexture" default="$VAR[Image_Poster]" />
         <definition>
             <control type="group">
                 <visible>Integer.IsGreater(Container($PARAM[id]).NumItems,0) | Container($PARAM[id]).IsUpdating</visible>
@@ -326,10 +327,7 @@
                         <param name="episodelayout" value="$PARAM[episodelayout]" />
                         <param name="aspect" value="$PARAM[aspect]" />
                         <param name="fallbackimage" value="$PARAM[fallbackimage]" />
-                        <!-- NEW: force cast art to use the actor headshot -->
-                        <param name="artTexture" value="$INFO[ListItem.Icon]" />
-                        <!-- Optional but recommended: actor placeholder if no headshot -->
-                        <param name="fallbackimage" value="DefaultActor.png" />
+                        <param name="artTexture" value="$PARAM[artTexture]" />
                     </include>
                     <include condition="$PARAM[include_content_nextup]">Object_VideoInfo_CastList_Content_NextUp</include>
                     <include content="Object_VideoInfo_CastList_Content" condition="$PARAM[include_content]">

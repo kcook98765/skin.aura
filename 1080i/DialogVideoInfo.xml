@@ -381,6 +381,8 @@
                                 <param name="content" value="$VAR[Aura_InfoCast]" />
                                 <param name="visible" value="Integer.IsEqual(Container(50).NumItems,0) + !Container(50).IsUpdating + [Integer.IsGreater(Window.Property(Aura.Info.DBID),0) | Skin.HasSetting(Aura.OnlineEnrichment)]" />
                                 <param name="actoronclick" value="true" />
+                                <param name="artTexture" value="$INFO[ListItem.Icon]" />
+                                <param name="fallbackimage" value="DefaultActor.png" />
                                 <param name="infolabel" value="true" />
                                 <param name="pad" value="0" />
                                 <param name="top" value="0" />
