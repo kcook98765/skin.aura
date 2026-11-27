@@ -2112,3 +2112,18 @@ msgstr "Library & Sources"
 msgctxt "#31941"
 msgid "Recent Shows with Unwatched Episodes"
 msgstr "Recent Shows with Unwatched Episodes"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31942"
+msgid "Online Discovery (TMDb)"
+msgstr "Online Discovery (TMDb)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31943"
+msgid "Trending Movies (Online, TMDb)"
+msgstr "Trending Movies (Online, TMDb)"
+
+#: /1080i/Includes_Widgets.xml
+msgctxt "#31944"
+msgid "Unavailable or no results. Check your connection."
+msgstr "Unavailable or no results. Check your connection."
