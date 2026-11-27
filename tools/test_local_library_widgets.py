@@ -11,25 +11,34 @@ from check_omega import po_messages
 ROOT = Path(__file__).resolve().parents[1]
 REFRESH = "$INFO[Window(Home).Property(SkinInfo.Library.Refreshed)]"
 PROVIDER = "plugin://script.skin.info.service/?action="
+GUARD = "System.AddonIsEnabled(script.skin.info.service)"
 NEW_IDS = ("AuraRecentEpisodesGrouped", "SkinInfoNextUpFavourites")
 
 
 class LocalLibraryWidgets(unittest.TestCase):
     def setUp(self):
         self.root = ET.parse(ROOT / "shortcuts/overrides.xml").getroot()
-        nodes = self.root.findall("./widget-groupings/node[@label='$LOCALIZE[31923]']")
-        self.assertEqual(len(nodes), 1)
-        self.node = nodes[0]
+        self.group = self.root.find("widget-groupings")
+        self.parents = {child: parent for parent in self.group.iter() for child in parent}
 
     def shortcut(self, widget):
         matches = self.root.findall(".//shortcut[@widget='%s']" % widget)
         self.assertEqual(len(matches), 1, widget)
-        self.assertIn(matches[0], list(self.node))
+        parent = matches[0]
+        guarded = False
+        while parent is not self.group:
+            guarded |= parent.get("condition") == GUARD
+            parent = self.parents[parent]
+        self.assertTrue(guarded, widget)
         return matches[0]
+
+    def binding_attributes(self, item):
+        # A provider may inherit the guard or carry it on its own shortcut.
+        return {key: value for key, value in item.attrib.items() if key != "condition"}
 
     def test_grouped_real_route_and_mixed_row_content_metadata(self):
         item = self.shortcut(NEW_IDS[0])
-        self.assertEqual(item.attrib, {
+        self.assertEqual(self.binding_attributes(item), {
             "widget": NEW_IDS[0], "label": "$LOCALIZE[31934]",
             "icon": "DefaultRecentlyAddedEpisodes.png",
             "widgetType": "tvshows", "widgetTarget": "videos"})
@@ -41,7 +50,7 @@ class LocalLibraryWidgets(unittest.TestCase):
 
     def test_favourites_real_route_and_episode_metadata(self):
         item = self.shortcut(NEW_IDS[1])
-        self.assertEqual(item.attrib, {
+        self.assertEqual(self.binding_attributes(item), {
             "widget": NEW_IDS[1], "label": "$ADDON[script.skin.info.service 32685]",
             "icon": "DefaultInProgressShows.png",
             "widgetType": "episodes", "widgetTarget": "videos"})
@@ -49,7 +58,7 @@ class LocalLibraryWidgets(unittest.TestCase):
         self.assertEqual(parse_qs(urlsplit(item.text).query), {
             "action": ["next_up_favourites"], "limit": ["25"]})
 
-    def test_existing_curated_choices_preserved_in_order(self):
+    def test_existing_curated_choices_preserved_with_guards(self):
         expected = [
             ("AuraSimilarMovies", "$LOCALIZE[31924]", "DefaultMovies.png", "movies",
              "similar&dbtype=movie&dbid=$INFO[Container(9986).ListItem.DBID]"),
@@ -62,14 +71,10 @@ class LocalLibraryWidgets(unittest.TestCase):
             ("SkinInfoNextUp", "$ADDON[script.skin.info.service 32620]",
              "DefaultInProgressShows.png", "episodes", "next_up"),
         ]
-        self.assertEqual(self.node.attrib, {"label": "$LOCALIZE[31923]",
-                         "condition": "System.AddonIsEnabled(script.skin.info.service)"})
-        self.assertEqual([n.get("widget") for n in self.node],
-                         [row[0] for row in expected] + list(NEW_IDS))
         for widget, label, icon, kind, action in expected:
             with self.subTest(widget=widget):
                 item = self.shortcut(widget)
-                self.assertEqual(item.attrib, dict(widget=widget, label=label, icon=icon,
+                self.assertEqual(self.binding_attributes(item), dict(widget=widget, label=label, icon=icon,
                                                   widgetType=kind, widgetTarget="videos"))
                 self.assertEqual(item.text, PROVIDER + action + "&limit=25&reload=" + REFRESH)
 
@@ -92,7 +97,7 @@ class LocalLibraryWidgets(unittest.TestCase):
         }
         for widget, playlist in expected.items():
             with self.subTest(widget=widget):
-                items = self.root.findall("./widget-groupings/node/node/shortcut[@widget='%s']" % widget)
+                items = self.group.findall(".//shortcut[@widget='%s']" % widget)
                 self.assertEqual(len(items), 1)
                 self.assertEqual(items[0].text, "special://skin/extras/playlists/" + playlist + ".xsp")
                 self.assertEqual(items[0].get("widgetTarget"), "video")

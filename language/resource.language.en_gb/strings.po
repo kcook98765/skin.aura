@@ -2077,3 +2077,38 @@ msgstr "Search by category"
 msgctxt "#31934"
 msgid "Recently Added Episodes (Grouped)"
 msgstr "Recently Added Episodes (Grouped)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31935"
+msgid "Continue Watching & Next Up"
+msgstr "Continue Watching & Next Up"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31936"
+msgid "Recently Added Video"
+msgstr "Recently Added Video"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31937"
+msgid "TV Shows & Episodes"
+msgstr "TV Shows & Episodes"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31938"
+msgid "Local Recommendations"
+msgstr "Local Recommendations"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31939"
+msgid "Live TV & Recordings"
+msgstr "Live TV & Recordings"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31940"
+msgid "Library & Sources"
+msgstr "Library & Sources"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31941"
+msgid "Recent Shows with Unwatched Episodes"
+msgstr "Recent Shows with Unwatched Episodes"

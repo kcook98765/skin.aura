@@ -1,8 +1,31 @@
 # Local library widgets in Aura Omega
 
-Both choices are opt-in under **Skin Info Service (library widgets)** in the
-existing Skin Shortcuts picker. Saved widget paths, layouts and defaults are
-preserved.
+Both choices are opt-in in the Skin Shortcuts widget picker: **Recently Added
+Episodes (Grouped)** is under **Recently Added Video**, and **Next Up
+(Favourites)** is under **Continue Watching & Next Up**.
+
+## Picker taxonomy (Stage 5, issue #38)
+
+The top-level order is **Continue Watching & Next Up**, **Recently Added Video**,
+**Movies**, **TV Shows & Episodes**, **Local Recommendations**, **Music**,
+**Live TV & Recordings**, **Library & Sources**, **Playlists**, **Add-ons**.
+Local Recommendations contains Similar and Recommended movies/shows. All seven
+Skin Info Service choices retain their add-on-enabled guard; mixed native/provider
+categories remain available without the provider.
+
+Library & Sources retains the direct movie, TV and music node widgets, native
+Video/Music Library browsers and their source folders, Pictures sources and the
+typed files/source widgets. Playlists has native Video and Music branches;
+Add-ons retains the original native browsers and fixed list shortcuts, without
+duplicate video/audio browsers elsewhere. None and Custom item remain supplied
+by Skin Shortcuts. Curated headings do not dynamically sort or browse providers.
+
+All 51 authored shortcuts remain reachable once, with byte-identical paths and
+unchanged IDs, types, targets and icons. Saved paths, layouts and defaults are
+not migrated or rewritten. Only the NewTvShows picker label changes to **Recent
+Shows with Unwatched Episodes**; supported `widgetName="$LOCALIZE[31367]"` keeps
+its original default row name. No routes or defaults are added. This uses Skin
+Shortcuts 2.0.3's `build_node_listing` / `get_node` hierarchical node model.
 
 ## Widget sources
 
