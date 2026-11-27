@@ -10,6 +10,7 @@
          pass an episode/season DBID as a tvshow DBID or an episode TMDb ID as a show. -->
     <onload>SetProperty(Aura.Info.DBID,$INFO[ListItem.DBID])</onload>
     <onload>SetProperty(Aura.Info.DBType,$INFO[ListItem.DBType])</onload>
+    <onload>SetProperty(Aura.Info.Category,$INFO[ListItem.Property(widget)])</onload>
     <onload>SetProperty(Aura.Info.TVShowDBID,$INFO[ListItem.TVShowDBID])</onload>
     <onload>SetProperty(Aura.Info.TMDB,$INFO[ListItem.UniqueID(tmdb)])</onload>
     <onload>SetProperty(Aura.Info.IMDB,$INFO[ListItem.UniqueID(imdb)])</onload>
@@ -20,6 +21,7 @@
     <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
     <onunload>ClearProperty(Aura.Info.DBID)</onunload>
     <onunload>ClearProperty(Aura.Info.DBType)</onunload>
+    <onunload>ClearProperty(Aura.Info.Category)</onunload>
     <onunload>ClearProperty(Aura.Info.TVShowDBID)</onunload>
     <onunload>ClearProperty(Aura.Info.TMDB)</onunload>
     <onunload>ClearProperty(Aura.Info.IMDB)</onunload>

@@ -8,7 +8,8 @@ from check_omega import po_messages
 
 ROOT = Path(__file__).resolve().parents[1]
 URL = ("plugin://plugin.video.themoviedb.helper/?info=trending_week&tmdb_type=movie"
-       "&widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false&reload=0")
+       "&widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false"
+       "&plugin_category=Aura%20Online%20Discovery&reload=0")
 MATCH = "String.IsEqual($PARAM[content]," + URL + ")"
 EMPTY = (MATCH + " + !Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
          " + !Container($PARAM[id]).IsUpdating")
@@ -64,6 +65,67 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertNotIn("$VAR[", path)
         self.assertNotIn("$", path)
 
+    def test_category_fingerprint_is_unique_and_all_uri_guards_follow_it(self):
+        self.assertIn("plugin_category=Aura%20Online%20Discovery&reload=0", URL)
+        self.assertEqual(dict(parse_qsl(urlsplit(URL).query))["plugin_category"],
+                         "Aura Online Discovery")
+        guards = []
+        for node in self.widgets.iter():
+            for text in [node.text or "", *node.attrib.values()]:
+                if "info=trending_week" in text:
+                    self.assertIn(MATCH, text)
+                    guards.append(text)
+        self.assertEqual(len(guards), 3)
+        routes = [n.text for n in self.overrides.iter()
+                  if "plugin_category=" in (n.text or "")]
+        self.assertEqual(routes, [URL])
+        for other in (URL.replace("&plugin_category=Aura%20Online%20Discovery", ""),
+                      URL.replace("trending_week", "popular"),
+                      URL.replace("tmdb_type=movie", "tmdb_type=tv"),
+                      URL.replace("Aura%20Online%20Discovery", "Other%20Widget")):
+            self.assertNotEqual(other, URL)
+
+    def test_info_subject_category_lifecycle_and_stock_play(self):
+        dialog = ET.parse(ROOT / "1080i/DialogVideoInfo.xml").getroot()
+        self.assertEqual([n.text for n in dialog.findall("onload")
+                          if "Aura.Info.Category" in (n.text or "")],
+                         ["SetProperty(Aura.Info.Category,$INFO[ListItem.Property(widget)])"])
+        self.assertEqual([n.text for n in dialog.findall("onunload")
+                          if "Aura.Info.Category" in (n.text or "")],
+                         ["ClearProperty(Aura.Info.Category)"])
+        self.assertIn("SetProperty(Aura.Info.DBID,$INFO[ListItem.DBID])",
+                      [n.text for n in dialog.findall("onload")])
+        self.assertIn("ClearProperty(Aura.Info.DBID)",
+                      [n.text for n in dialog.findall("onunload")])
+        stock = dialog.find(".//control[@id='8']")
+        self.assertEqual(stock.findtext("description"), "Play")
+        self.assertEqual(stock.findtext("include"), "Defs_Hidden_Button")
+        self.assertFalse(stock.findall("visible"))
+        self.assertFalse(stock.findall("enable"))
+
+    def test_visible_play_gate_is_subject_scoped_not_focused_item_or_player(self):
+        items = ET.parse(ROOT / "1080i/Includes_Items.xml").getroot()
+        play = items.find("include[@name='Items_Info']/content/item")
+        self.assertEqual(play.findtext("onclick"), "SendClick(8)")
+        enabled = "Control.IsEnabled(8)"
+        tagged = "String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery)"
+        local = "Integer.IsGreater(Window.Property(Aura.Info.DBID),0)"
+        gate = play.findtext("visible")
+        self.assertEqual(gate, enabled + " + ![" + tagged + " + !" + local + "]")
+        # Bounded Boolean translation of this exact source expression only;
+        # not a Kodi condition evaluator or native visibility acceptance.
+        for category in ("Aura Online Discovery", "", "Trending Movies", "Other Widget"):
+            for dbid in ("", "-1", "0", "1", "42"):
+                positive = bool(dbid) and int(dbid) > 0
+                for stock_enabled in (False, True):
+                    with self.subTest(category=category, dbid=dbid, enabled=stock_enabled):
+                        expression = gate.replace(enabled, str(stock_enabled)).replace(
+                            tagged, str(category == "Aura Online Discovery")).replace(local, str(positive))
+                        expression = expression.replace("+", " and ").replace("!", " not ").replace(
+                            "[", "(").replace("]", ")")
+                        self.assertEqual(eval(expression, {"__builtins__": {}}),
+                                         stock_enabled and (category != "Aura Online Discovery" or positive))
+
     def test_empty_state_reuses_header_and_is_row_scoped(self):
         widget = self.widgets.find("include[@name='Widget']/definition")
         header = widget.find("control")
@@ -99,9 +161,28 @@ class DiscoveryWidget(unittest.TestCase):
         clicks = definition.findall("onclick")
         self.assertEqual(len(clicks), 1)
         self.assertEqual(clicks[0].text, "Action(Info,home)")
-        self.assertEqual(clicks[0].get("condition"), MATCH +
-                         " + String.IsEqual(Container($PARAM[id]).ListItem.DBType,movie)"
-                         " + !Integer.IsGreater(Container($PARAM[id]).ListItem.DBID,0)")
+        tagged = "String.IsEqual(ListItem.Property(widget),Aura Online Discovery)"
+        movie = "String.IsEqual(ListItem.DBType,movie)"
+        local = "Integer.IsGreater(ListItem.DBID,0)"
+        condition = clicks[0].get("condition")
+        self.assertEqual(condition, tagged + " + " + movie + " + !" + local)
+        # OnClick checks without an item, then ExecuteActions checks with the
+        # clicked CFileItem. Neither pass may depend on another container.
+        self.assertNotIn("Container(", condition)
+        self.assertNotIn("$PARAM[", condition)
+        # Bounded source-expression scope, not native condition evaluation.
+        for category in ("Aura Online Discovery", "", "Trending Movies", "Other Widget"):
+            for dbtype in ("movie", "tvshow", "episode", ""):
+                for dbid in ("", "-1", "0", "1", "42"):
+                    with self.subTest(category=category, dbtype=dbtype, dbid=dbid):
+                        positive = bool(dbid) and int(dbid) > 0
+                        expression = condition.replace(
+                            tagged, str(category == "Aura Online Discovery")).replace(
+                            movie, str(dbtype == "movie")).replace(local, str(positive))
+                        expression = expression.replace("+", " and ").replace("!", " not ")
+                        self.assertEqual(eval(expression, {"__builtins__": {}}),
+                                         category == "Aura Online Discovery"
+                                         and dbtype == "movie" and not positive)
         self.assertFalse(self.widgets.findall("include[@name='Widget_Submenu']//onclick"))
 
     def test_bounded_show_more_keeps_user_limit(self):
