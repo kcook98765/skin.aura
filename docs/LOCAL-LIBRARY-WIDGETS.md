@@ -18,12 +18,23 @@ To populate the favourites queue, add a TV show from the Kodi library to
 Favourites. The provider reads the TV show DBID from the library favourite's
 window path. Episode and arbitrary add-on favourites are ignored.
 
-Aura passes its existing
-`reload=$INFO[Window(Home).Property(SkinInfo.Library.Refreshed)]` suffix to both
-queries. The local service debounces applicable scan, clean, update and remove
-notifications for two seconds. The provider's two directories disable
-disk caching. A favourites-only edit may become visible on the next widget
-reload because such an edit can occur without a library notification.
+Both new queries use only the static supported action parameters shown above,
+without a `reload=$INFO[Window(Home).Property(SkinInfo.Library.Refreshed)]`
+suffix. Kodi 21.3 Omega's `xbmc/guilib/listproviders/DirectoryProvider.cpp`
+(lines 266–305) invalidates populated typed results on applicable
+`OnScanFinished`, `OnCleanFinished`, `OnUpdate`, `OnRemove`, `OnRefresh` and
+certain player events. These native events refresh the populated typed lists;
+an already-empty widget or a favourites-only edit can require reopening or
+reloading the view after a change. The provider's two directories disable
+disk caching. The existing five SIS widgets remain unchanged.
+
+After one managed runtime exited with code 139 following playback, logs showed
+native invalidation of both new plugin directories on playback/library
+notifications, followed by a separate invocation batch when
+`SkinInfo.Library.Refreshed` changed. Removing the suffix eliminates that proven
+duplicate invocation trigger for these two widgets only. The segfault cause
+remains unclassified; this is not a claim to have fixed the crash. No custom
+polling, window wiring or dependency changes are introduced.
 The existing Aura display limit still applies to both lists.
 
 ## Existing options and alternatives

@@ -34,10 +34,10 @@ class LocalLibraryWidgets(unittest.TestCase):
             "icon": "DefaultRecentlyAddedEpisodes.png",
             "widgetType": "tvshows", "widgetTarget": "videos"})
         self.assertEqual(item.text, PROVIDER + "recent_episodes_grouped&include_watched=true"
-                         "&limit=25&reload=" + REFRESH)
+                         "&limit=25")
         self.assertEqual(parse_qs(urlsplit(item.text).query), {
             "action": ["recent_episodes_grouped"], "include_watched": ["true"],
-            "limit": ["25"], "reload": [REFRESH]})
+            "limit": ["25"]})
 
     def test_favourites_real_route_and_episode_metadata(self):
         item = self.shortcut(NEW_IDS[1])
@@ -45,9 +45,9 @@ class LocalLibraryWidgets(unittest.TestCase):
             "widget": NEW_IDS[1], "label": "$ADDON[script.skin.info.service 32685]",
             "icon": "DefaultInProgressShows.png",
             "widgetType": "episodes", "widgetTarget": "videos"})
-        self.assertEqual(item.text, PROVIDER + "next_up_favourites&limit=25&reload=" + REFRESH)
+        self.assertEqual(item.text, PROVIDER + "next_up_favourites&limit=25")
         self.assertEqual(parse_qs(urlsplit(item.text).query), {
-            "action": ["next_up_favourites"], "limit": ["25"], "reload": [REFRESH]})
+            "action": ["next_up_favourites"], "limit": ["25"]})
 
     def test_existing_curated_choices_preserved_in_order(self):
         expected = [
