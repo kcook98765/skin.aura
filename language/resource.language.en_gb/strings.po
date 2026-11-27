@@ -2068,6 +2068,7 @@ msgid "Programme options"
 msgstr "Programme options"
 
 #: /1080i/Includes_Items.xml
+#: /1080i/Custom_1141_SearchCategories.xml
 msgctxt "#31933"
-msgid "Search movies"
-msgstr "Search movies"
+msgid "Search by category"
+msgstr "Search by category"
