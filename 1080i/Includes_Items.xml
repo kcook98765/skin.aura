@@ -474,6 +474,24 @@
         </content>
     </include>
 
+    <!-- Explicit category search; keep the ordinary Search item/settings path separate. -->
+    <include name="Items_ScopedSearch">
+        <param name="label" />
+        <param name="category" />
+        <param name="icon" default="special://skin/extras/icons/search.png" />
+        <definition>
+            <item>
+                <label>$PARAM[label]</label>
+                <icon>$PARAM[icon]</icon>
+                <onclick>SetFocus(50)</onclick>
+                <onclick>RunScript(script.globalsearch,$PARAM[category]=true)</onclick>
+                <visible>Window.IsVisible(MyVideoNav.xml)</visible>
+                <visible>Control.IsEnabled(8)</visible>
+                <visible>System.AddonIsEnabled(script.globalsearch)</visible>
+            </item>
+        </definition>
+    </include>
+
     <include name="Items_View">
         <content>
             <!-- Group -->
@@ -550,6 +568,11 @@
                 <onclick condition="System.HasAddon(script.globalsearch)">RunScript(script.globalsearch)</onclick>
                 <visible>Control.IsEnabled(8)</visible>
             </item>
+            <include content="Items_ScopedSearch">
+                <param name="label" value="$LOCALIZE[31933]" />
+                <param name="category" value="movies" />
+                <param name="icon" value="special://skin/extras/icons/film.png" />
+            </include>
             <!-- Filter -->
             <item>
                 <label>$LOCALIZE[587]: $VAR[Label_Filtered]</label>

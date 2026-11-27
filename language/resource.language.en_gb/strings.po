@@ -2066,3 +2066,8 @@ msgstr "Choose date"
 msgctxt "#31932"
 msgid "Programme options"
 msgstr "Programme options"
+
+#: /1080i/Includes_Items.xml
+msgctxt "#31933"
+msgid "Search movies"
+msgstr "Search movies"
