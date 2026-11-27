@@ -659,7 +659,7 @@
         <param name="height" default="480" />
         <definition>
             <!-- Omega 21.3 falls through to native click when this does not match. -->
-            <onclick condition="String.IsEqual($PARAM[content],plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;reload=0) + String.IsEqual(Container($PARAM[id]).ListItem.DBType,movie) + !Integer.IsGreater(Container($PARAM[id]).ListItem.DBID,0)">Action(Info)</onclick>
+            <onclick condition="String.IsEqual($PARAM[content],plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;reload=0) + String.IsEqual(Container($PARAM[id]).ListItem.DBType,movie) + !Integer.IsGreater(Container($PARAM[id]).ListItem.DBID,0)">Action(Info,home)</onclick>
             <include content="Widget_Common">
                 <param name="top" value="$PARAM[top]" />
                 <param name="height" value="$PARAM[height]" />

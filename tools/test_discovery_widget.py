@@ -94,11 +94,11 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertIs(labels[2], status[0])
         self.assertFalse(status[0].findall("onclick"))
 
-    def test_info_only_nonlocal_movie_and_native_fallthrough(self):
+    def test_home_targeted_info_only_nonlocal_movie_and_native_fallthrough(self):
         definition = self.widgets.find("include[@name='Widget_Items']/definition")
         clicks = definition.findall("onclick")
         self.assertEqual(len(clicks), 1)
-        self.assertEqual(clicks[0].text, "Action(Info)")
+        self.assertEqual(clicks[0].text, "Action(Info,home)")
         self.assertEqual(clicks[0].get("condition"), MATCH +
                          " + String.IsEqual(Container($PARAM[id]).ListItem.DBType,movie)"
                          " + !Integer.IsGreater(Container($PARAM[id]).ListItem.DBID,0)")
