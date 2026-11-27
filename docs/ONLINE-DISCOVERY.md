@@ -21,7 +21,7 @@ saved bindings are retained. Exact editor wording may vary.
 
 This is online TMDb metadata browsing, not a catalogue of playable files.
 The installed TMDb Helper dispatches `info=trending_week&tmdb_type=movie`.
-The curated URL adds `widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false`.
+The curated URL adds `widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false&reload=0`.
 `ListBasic` applies the list limit; the existing user widget item limit still
 applies and may show fewer titles. The redundant skin Show More is suppressed
 only for this bounded source.
@@ -29,9 +29,19 @@ only for this bounded source.
 `cacheonly=true` limits per-item detail enrichment; it does **not** prevent the
 online list fetch. `fanarttv=false` limits auxiliary artwork-provider use.
 TMDb list/artwork traffic and normal Helper/Kodi caching remain possible; there
-is no reload token, query-time cache buster, retry loop or secondary provider.
+is no variable reload trigger, clock/query-time cache buster, retry loop or secondary provider.
 No provider settings are changed. Native Info can request additional details
 through the directory provider, independently of this bounded list request.
+
+The terminal literal `reload=0` is inert. Native Skin Shortcuts 2.0.3 assignment
+otherwise appended `&reload=$INFO[Window(Home).Property(widgetreload-movies)]`,
+breaking Aura's exact-path guards and allowing library refresh changes to cause
+unnecessary calls. Its versioned `library.py` function `add_widget_reload`
+returns the original path immediately when it already contains `reload=`.
+The static value therefore prevents assignment from injecting that variable
+trigger and keeps the saved URI identical to every exact-path match. In TMDb
+Helper 5.4.16, the normal `ListBasic` list operation ignores this inert parameter
+for query/cache purposes; it does not force refresh or bypass normal caching.
 
 For this exact source, Select on a movie without a positive local DBID requests
 Kodi native Info. Locally matched movies retain native click behaviour; non-title

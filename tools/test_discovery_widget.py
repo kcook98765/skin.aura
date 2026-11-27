@@ -1,13 +1,14 @@
 """Focused Omega 21.3 source contracts; does not execute Kodi or providers."""
 from pathlib import Path
 import unittest
+from urllib.parse import parse_qsl, urlsplit
 import xml.etree.ElementTree as ET
 
 from check_omega import po_messages
 
 ROOT = Path(__file__).resolve().parents[1]
 URL = ("plugin://plugin.video.themoviedb.helper/?info=trending_week&tmdb_type=movie"
-       "&widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false")
+       "&widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false&reload=0")
 MATCH = "String.IsEqual($PARAM[content]," + URL + ")"
 EMPTY = (MATCH + " + !Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
          " + !Container($PARAM[id]).IsUpdating")
@@ -50,8 +51,18 @@ class DiscoveryWidget(unittest.TestCase):
                 self.assertNotIn("trending_week", text, str(path))
                 self.assertNotIn("AuraDiscoverTrendingMovies", text, str(path))
         self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='AuraDiscoverTrendingMovies']")), 1)
-        self.assertNotIn("reload=", URL)
         self.assertNotIn("RunScript", URL)
+
+    def test_assignment_reload_is_literal_and_inert(self):
+        path = self.overrides.find(".//shortcut[@widget='AuraDiscoverTrendingMovies']").text
+        # Shortcuts 2.0.3 preserves paths already containing reload= rather than
+        # appending its variable library-refresh trigger. No Kodi execution.
+        self.assertTrue(path.endswith("&reload=0"))
+        self.assertEqual([(key, value) for key, value in parse_qsl(urlsplit(path).query)
+                          if key == "reload"], [("reload", "0")])
+        self.assertNotIn("$INFO[", path)
+        self.assertNotIn("$VAR[", path)
+        self.assertNotIn("$", path)
 
     def test_empty_state_reuses_header_and_is_row_scoped(self):
         widget = self.widgets.find("include[@name='Widget']/definition")
