@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window type="dialog" id="1141">
+    <defaultcontrol always="true">9000</defaultcontrol>
+
+    <controls>
+        <include>Global_Overlay</include>
+        <control type="group">
+            <include content="Dialog_Standard_Group" condition="Window.IsVisible(MyVideoNav.xml)">
+                <param name="width" value="640" />
+                <param name="height" value="556" />
+            </include>
+            <include content="Dialog_Standard_Group" condition="Window.IsVisible(MyMusicNav.xml)">
+                <param name="width" value="640" />
+                <param name="height" value="334" />
+            </include>
+            <control type="label">
+                <label>$LOCALIZE[31933]</label>
+                <include>Dialog_Standard_Header</include>
+            </control>
+            <control type="grouplist" id="9000">
+                <left>20</left>
+                <top>100</top>
+                <width>600</width>
+                <bottom>20</bottom>
+                <itemgap>8</itemgap>
+                <orientation>vertical</orientation>
+                <onup>9000</onup>
+                <ondown>9000</ondown>
+                <onleft>9000</onleft>
+                <onright>9000</onright>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9001" />
+                    <param name="label" value="342" />
+                    <param name="query" value="movies=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9002" />
+                    <param name="label" value="20343" />
+                    <param name="query" value="tvshows=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9003" />
+                    <param name="label" value="20360" />
+                    <param name="query" value="episodes=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9004" />
+                    <!-- Generic Kodi Actors label; upstream retains two tabs. -->
+                    <param name="label" value="344" />
+                    <param name="query" value="actors=true&amp;tvactors=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9005" />
+                    <param name="label" value="20348" />
+                    <param name="query" value="directors=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyVideoNav.xml)">
+                    <param name="id" value="9006" />
+                    <param name="label" value="20389" />
+                    <param name="query" value="musicvideos=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyMusicNav.xml)">
+                    <param name="id" value="9011" />
+                    <param name="label" value="133" />
+                    <param name="query" value="artists=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyMusicNav.xml)">
+                    <param name="id" value="9012" />
+                    <param name="label" value="132" />
+                    <param name="query" value="albums=true" />
+                </include>
+                <include content="SearchCategories_Row" condition="Window.IsVisible(MyMusicNav.xml)">
+                    <param name="id" value="9013" />
+                    <param name="label" value="134" />
+                    <param name="query" value="songs=true" />
+                </include>
+            </control>
+        </control>
+    </controls>
+</window>
