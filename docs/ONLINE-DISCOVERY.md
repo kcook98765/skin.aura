@@ -30,9 +30,11 @@ In Helper 5.4.16, `Container.get_directory` accepts this category override and
 `_make_item` → `set_params_to_info` maps it into `ListItem.Property(widget)` as
 `Aura Online Discovery`. The provider category tag also preserves the plain-language
 title `Aura Online Discovery` in its native More view. Only this curated route
-supplies that marker. Existing
-assignments with the older URI need reselecting to receive it; the exact guards
-intentionally do not broaden to untagged or third-party widget routes.
+supplies that marker. The older curated URI existed only in disposable draft
+test profiles; no prior Aura release contained the curated route, so no existing
+released user assignment requires migration. Draft test assignments need
+reselecting to receive the marker; the exact guards intentionally do not broaden
+to untagged or third-party widget routes.
 In TMDb Helper 5.4.16, `ListBasic` passes `limit=12`, but
 `get_paginated_items` returns the entire current response ahead of applying that
 limit when `total_pages>1`. The URL therefore does not guarantee a 12-title cap.
@@ -139,21 +141,4 @@ left Home unchanged while its condition referred to `Container(300)` and the
 widget container, despite physical Info opening accurate Video Info. The
 per-item onclick correction above addresses the two evaluation contexts; its
 runtime outcome remains unverified. The category marker and visible Play gate
-are also source-tested only. This follow-up performs no Kodi or network activity.
-
-Current offline checks: all nine focused `test_discovery_widget.py` tests pass,
-including the three retained exact URI guards, per-item onclick scope and native
-fallback contract, category lifecycle, stock-control contract
-and visible Play Boolean scope (tagged/untagged, missing/zero/negative/positive
-DBIDs, stock enabled/disabled). The onclick regression was first confirmed failing
-against the cross-container condition before the correction. `git diff --check`
-passes. Previously, the full discovered suite ran 93 tests but was not clean:
-two failures concern historical README
-wording and the expected manifest version (2.1.0 versus current 2.1.1); seven
-errors report a reviewed runtime-manifest digest mismatch. Those unrelated
-expectations/approval guards were not changed or rerun for this narrow correction.
-Toolkit Omega lane inspection
-and official checker validation were unavailable under this session's access
-and command restrictions; no substitute lane, installation or network fetch
-was used. These limits do not invalidate the focused source results, but leave
-broader validation incomplete.
+are also source-tested only. Broader validation remains incomplete.
