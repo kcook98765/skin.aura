@@ -2072,3 +2072,8 @@ msgstr "Programme options"
 msgctxt "#31933"
 msgid "Search by category"
 msgstr "Search by category"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31934"
+msgid "Recently Added Episodes (Grouped)"
+msgstr "Recently Added Episodes (Grouped)"
