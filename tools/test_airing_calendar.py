@@ -132,7 +132,7 @@ class AiringCalendar(unittest.TestCase):
         clicks = self.control(50).findall("onclick")
         self.assertEqual(len(clicks), 2)
         self.assertEqual(clicks[0].text, "ActivateWindow(videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.Property(tvshowdbid)]/,return)")
-        self.assertEqual(clicks[0].get("condition"), ENABLED + " + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0) + String.StartsWith(Container(50).ListItem.FileNameAndPath,videodb://tvshows/titles/)")
+        self.assertEqual(clicks[0].get("condition"), ENABLED + " + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0)")
         self.assertEqual((clicks[1].text, clicks[1].attrib), ("noop", {}))
         # The ID is provider-owned: 2.0.2 assigns VideoLibrary's numeric tvshowid,
         # not external IDs/names. No independent arbitrary-string parser in XML.

@@ -105,9 +105,9 @@
             <onright>60</onright>
             <onback>9000</onback>
             <!-- Provider tvshowdbid comes from VideoLibrary's numeric tvshowid,
-                 never a title search. Require a positive ID and its exact folder.
+                 never a title search. Construct the exact native videodb folder from the positive numeric ID.
                  Schedule metadata is not playable availability. -->
-            <onclick condition="System.AddonIsEnabled(script.skin.info.service) + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0) + String.StartsWith(Container(50).ListItem.FileNameAndPath,videodb://tvshows/titles/)">ActivateWindow(videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.Property(tvshowdbid)]/,return)</onclick>
+            <onclick condition="System.AddonIsEnabled(script.skin.info.service) + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0)">ActivateWindow(videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.Property(tvshowdbid)]/,return)</onclick>
             <!-- Reject missing IDs without the directory's default action. -->
             <onclick>noop</onclick>
             <itemlayout width="1100" height="150">

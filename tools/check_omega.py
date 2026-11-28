@@ -870,7 +870,7 @@ def migration_checks(checks, source, roots, original_xml):
     clicks = calendar.findall(".//control[@id='50']/onclick")
     checks.require("calendar:non-playable-info", len(clicks) == 2 and
                    clicks[0].text == "ActivateWindow(videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.Property(tvshowdbid)]/,return)" and
-                   clicks[0].get("condition") == enabled + " + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0) + String.StartsWith(Container(50).ListItem.FileNameAndPath,videodb://tvshows/titles/)" and
+                   clicks[0].get("condition") == enabled + " + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0)" and
                    clicks[1].text == "noop" and not clicks[1].attrib and "PlayMedia(" not in text(calendar))
     labels = [(node.findtext("label", ""), node.findtext("visible", "")) for node in calendar.iter("control")]
     def terms(condition):
