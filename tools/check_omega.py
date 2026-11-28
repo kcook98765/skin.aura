@@ -838,37 +838,53 @@ def migration_checks(checks, source, roots, original_xml):
                    sum(root.tag == "window" and root.get("id") == "1140" for root in roots.values()) == 1)
     checks.require("calendar:default9000", calendar.findtext("defaultcontrol") == "9000" and control(calendar, 9000, "list") is not None)
     days = calendar.findall(".//control[@id='9000']/content/item")
-    checks.require("calendar:week-and-weekday-routes", [n.findtext("property[@name='day']") for n in days] == ["week", *map(str, range(7))] and
+    checks.require("calendar:week-and-weekday-routes", [n.findtext("property[@name='day']") for n in days] == ["week", "today", "tomorrow", *map(str, range(7))] and
                    all(n.findtext("onclick") == "SetProperty(Aura.Calendar.Day,%s)" % n.findtext("property[@name='day']") for n in days))
-    checks.require("calendar:localized-weekdays", [n.findtext("label") for n in days[1:]] == ["$LOCALIZE[%d]" % n for n in range(11, 18)])
+    checks.require("calendar:localized-weekdays", [n.findtext("label") for n in days[1:]] == ["$LOCALIZE[33006]", "$LOCALIZE[33007]", *["$LOCALIZE[%d]" % n for n in range(11, 18)]])
     content = calendar.find(".//control[@id='50']/content")
-    route = "plugin://script.embuary.info/nextaired/$INFO[Window.Property(Aura.Calendar.Day)]"
-    enabled = "System.AddonIsEnabled(script.embuary.info)"
+    route = "$VAR[AiringCalendar_Route]$VAR[AiringCalendar_Range]"
+    enabled = "System.AddonIsEnabled(script.skin.info.service)"
+    library = "Library.HasContent(tvshows)"
     definitions = xml("1080i/Includes_Topbar.xml").findall("variable[@name='AiringCalendar_Content']")
     values = definitions[0].findall("value") if len(definitions) == 1 else []
     gate_valid = (sum(len(root.findall("variable[@name='AiringCalendar_Content']")) for root in roots.values()) == 1 and
-                  len(values) == 2 and values[0].text == route and values[0].attrib == {"condition": enabled} and
+                  len(values) == 2 and values[0].text == route and values[0].attrib == {"condition": enabled + " + " + library} and
                   not (values[1].text or "").strip() and not values[1].attrib and
                   len(xml("1080i/Includes.xml").findall("include[@file='Includes_Topbar.xml']")) == 1)
     checks.require("calendar:content-enabled-gate", gate_valid,
                    "Known AiringCalendar_Content variable: enabled official route, unconditional empty fallback, registered include")
+    route_values = xml("1080i/Includes_Topbar.xml").findall("variable[@name='AiringCalendar_Route']/value")
+    range_values = xml("1080i/Includes_Topbar.xml").findall("variable[@name='AiringCalendar_Range']/value")
+    routes_valid = [(n.get("condition"), n.text or "") for n in route_values] == [
+        (enabled + " + " + library + " + String.IsEqual(Window.Property(Aura.Calendar.Retry),alternate)",
+         "plugin://script.skin.info.service/?shows=library&action=next_aired&"),
+        (enabled + " + " + library, "plugin://script.skin.info.service/?action=next_aired&shows=library&"),
+        (None, "")]
+    ranges_valid = [(n.get("condition"), n.text) for n in range_values] == [
+        ("String.IsEqual(Window.Property(Aura.Calendar.Day),today)", "day=0&days=1"),
+        ("String.IsEqual(Window.Property(Aura.Calendar.Day),tomorrow)", "day=1&days=1"),
+        ("!String.IsEqual(Window.Property(Aura.Calendar.Day),week)", "weekday=$INFO[Window.Property(Aura.Calendar.Day)]&days=1"),
+        (None, "day=0&days=7")]
     checks.require("calendar:provider-route", control(calendar, 50, "list") is not None and content is not None and content.get("browse") == "never" and
-                   content.text == "$VAR[AiringCalendar_Content]" and gate_valid)
+                   content.text == "$VAR[AiringCalendar_Content]" and gate_valid and routes_valid and ranges_valid)
     clicks = calendar.findall(".//control[@id='50']/onclick")
     checks.require("calendar:non-playable-info", len(clicks) == 2 and
-                   clicks[0].text == "RunPlugin($ESCINFO[Container(50).ListItem.FileNameAndPath])" and
-                   clicks[0].get("condition") == enabled + " + String.StartsWith(Container(50).ListItem.FileNameAndPath,plugin://script.embuary.info/)" and
+                   clicks[0].text == "ActivateWindow(videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.Property(tvshowdbid)]/,return)" and
+                   clicks[0].get("condition") == enabled + " + !Container(50).IsUpdating + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),0)" and
                    clicks[1].text == "noop" and not clicks[1].attrib and "PlayMedia(" not in text(calendar))
     labels = [(node.findtext("label", ""), node.findtext("visible", "")) for node in calendar.iter("control")]
     def terms(condition):
         return {part.strip() for part in condition.split("+")}
     checks.require("calendar:empty-state", any("$LOCALIZE[" in label and terms(condition) == {
-        enabled, "!Container(50).IsUpdating", "!Integer.IsGreater(Container(50).NumItems,0)"} for label, condition in labels))
-    checks.require("calendar:loading-state", any("$LOCALIZE[" in label and terms(condition) == {enabled, "Container(50).IsUpdating"} for label, condition in labels))
+        enabled, library, "!Container(50).IsUpdating", "!Integer.IsGreater(Container(50).NumItems,0)"} for label, condition in labels))
+    checks.require("calendar:loading-state", any("$LOCALIZE[" in label and terms(condition) == {enabled, library, "Container(50).IsUpdating"} for label, condition in labels))
     checks.require("calendar:disabled-state", any("$LOCALIZE[" in label and condition == "!" + enabled for label, condition in labels))
-    checks.require("calendar:selection-lifecycle", "SetProperty(Aura.Calendar.Day,week)" in actions(calendar, "onload") and
-                   "ClearProperty(Aura.Calendar.Day)" in actions(calendar, "onunload"))
-    checks.require("calendar:locale-dates", "ListItem.Premiered" in text(calendar) and "ListItem.Property(AirDay)" in text(calendar) and "ListItem.Property(AirTime)" in text(calendar))
+    checks.require("calendar:selection-lifecycle", calendar.find("onload") is not None and
+                   calendar.find("onload").attrib == {"condition": "String.IsEmpty(Window.Property(Aura.Calendar.Day))"} and
+                   "SetProperty(Aura.Calendar.Day,week)" in actions(calendar, "onload") and
+                   not actions(calendar, "onunload") and calendar.find("defaultcontrol").get("always") != "true")
+    checks.require("calendar:locale-dates", all("ListItem.Property(%s)" % prop in text(calendar) for prop in ("airdate", "airdatelong", "airday")) and
+                   "airtime" not in text(calendar).lower() and "ListItem.Premiered" not in text(calendar))
     known_ids = {node.get("id") for node in calendar.iter("control") if node.get("id")}
     if any(node.text == "Topbar" for node in calendar.iter("include")):
         known_ids.add("300")  # Existing shared topbar menu; not a global include expansion.

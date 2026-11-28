@@ -386,7 +386,7 @@ class StaticRegressions(unittest.TestCase):
             ("defaultcontrol", None, "50", "default9000"),
             (".//item/property[.='0']", None, "7", "week-and-weekday-routes"),
             (".//item/label[.='$LOCALIZE[11]']", None, "Monday", "localized-weekdays"),
-            (".//control[@id='50']/content", None, "plugin://script.embuary.info/nextaired/today", "provider-route"),
+            (".//control[@id='50']/content", None, "plugin://script.skin.info.service/?action=next_aired&day=today", "provider-route"),
             (".//control[@id='50']/onclick[1]", None, "PlayMedia($INFO[ListItem.FileNameAndPath])", "non-playable-info"),
             (".//control[label='$LOCALIZE[31929]']/visible", None, "false", "loading-state"),
             (".//control[@id='50']/onright", None, "99999", "focus-targets"),
@@ -398,11 +398,11 @@ class StaticRegressions(unittest.TestCase):
     def test_calendar_disabled_guard_variable_prefix_and_noop(self):
         path = "1080i/Custom_1140_AiringCalendar.xml"
         for xpath, attribute, value, remove, check in (
-            (".//control[@id='50']/onclick[1]", "condition", "System.AddonIsEnabled(script.embuary.info)", False, "non-playable-info"),
+            (".//control[@id='50']/onclick[1]", "condition", "System.AddonIsEnabled(script.skin.info.service)", False, "non-playable-info"),
             (".//control[@id='50']/onclick[2]", None, None, True, "non-playable-info"),
-            (".//control[@id='50']/onclick[1]", "condition", "System.AddonIsEnabled(script.embuary.info) + String.StartsWith(Container(50).ListItem.FileNameAndPath,plugin://script.embuary.info)", False, "non-playable-info"),
+            (".//control[@id='50']/onclick[1]", "condition", "System.AddonIsEnabled(script.skin.info.service) + Integer.IsGreater(Container(50).ListItem.Property(tvshowdbid),-1)", False, "non-playable-info"),
             (".//control[label='$LOCALIZE[31929]']/visible", None, "Container(50).IsUpdating", False, "loading-state"),
-            (".//control[label='$LOCALIZE[31928]']/visible", None, "false", False, "disabled-state"),
+            (".//control[label='$LOCALIZE[31978]']/visible", None, "false", False, "disabled-state"),
         ):
             with self.subTest(check=check, xpath=xpath):
                 self.assertFails(self.report(lambda data: self.edit(data, path, xpath, attribute, value, remove)), "calendar:" + check)
@@ -413,6 +413,13 @@ class StaticRegressions(unittest.TestCase):
         ):
             with self.subTest(variable=xpath):
                 self.assertFails(self.report(lambda data: self.edit(data, "1080i/Includes_Topbar.xml", xpath, attribute, value, remove)), "calendar:content-enabled-gate")
+        for xpath, value in (
+            ("variable[@name='AiringCalendar_Route']/value[1]", "plugin://script.skin.info.service/?action=next_aired&shows=trakt&"),
+            ("variable[@name='AiringCalendar_Range']/value[1]", "day=1&days=1"),
+            ("variable[@name='AiringCalendar_Range']/value[4]", "day=0&days=8"),
+        ):
+            with self.subTest(route=xpath):
+                self.assertFails(self.report(lambda data: self.edit(data, "1080i/Includes_Topbar.xml", xpath, value=value)), "calendar:provider-route")
 
     def test_enrichment_old_state_transition_and_toggle_order(self):
         row = ET.fromstring(self.data["1080i/SkinSettings.xml"]).find(".//control[@id='9513']")
