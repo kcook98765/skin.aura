@@ -935,7 +935,7 @@ def provider_boundary_checks(checks, roots):
 def actor_checks(checks, roots, original_xml):
     """Literal native actor browsers are manual selection, not filmography lookup.
 
-    Exact tagged-core URL shapes and reviewed Embuary quote wrappers only; no
+    Exact tagged-core URL shapes and reviewed Stage 7A SIS contracts only; no
     asynchronous helper execution or arbitrary builtin/condition evaluation.
     """
     root = roots.get("1080i/Includes_Object.xml", ET.Element("missing"))
@@ -943,19 +943,47 @@ def actor_checks(checks, roots, original_xml):
     expressions = {node.get("name"): node.text for node in root.findall("expression")}
     launch = root.find("include[@name='Object_Aura_Actor_OnClick']")
     actions = launch.findall("onclick") if launch is not None else []
-    online = "Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info)"
-    query = "RunScript(script.embuary.info,call=person,query=$ESCINFO[%s," + "'\"" + "," + "\"'" + "])"
-    checks.require("actor:online-quoted-query", expressions.get("Aura.ActorOnline") == online and len(actions) == 5 and
-                   actions[0].text == "RunScript(script.embuary.info,call=person,tmdb_id=$INFO[ListItem.Property(person_id)])" and
-                   actions[0].get("condition") == "$EXP[Aura.ActorOnline] + Integer.IsGreater(ListItem.Property(person_id),0)" and
-                   actions[1].text == query % "ListItem.Label" and actions[1].get("condition") ==
-                   "$EXP[Aura.ActorOnline] + !Integer.IsGreater(ListItem.Property(person_id),0) + !String.IsEmpty(ListItem.Label)")
+    online = "Skin.HasSetting(Aura.OnlineEnrichment) + $EXP[Aura.PersonAction]"
+    checks.require("actor:online-sis-dispatch", expressions.get("Aura.ActorOnline") == online and len(actions) == 4 and
+                   actions[0].text == "SendClick(9551)" and actions[0].get("condition") == "$EXP[Aura.ActorOnline]")
+    identity_gates = {
+        "Aura.PersonDiscovery": "String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery) | String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery TV)",
+        "Aura.PersonTitleType": "String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow)",
+        "Aura.PersonLibraryType": "$EXP[Aura.PersonTitleType] | String.IsEqual(Window.Property(Aura.Info.DBType),episode)",
+        "Aura.PersonTitleID": "Integer.IsGreater(Window.Property(Aura.Info.TMDB),0) | String.StartsWith(Window.Property(Aura.Info.IMDB),tt)",
+        "Aura.PersonExact": "Control.IsVisible(9550) + Integer.IsGreater(Container(9550).NumItems,0) + !Container(9550).IsUpdating + Integer.IsGreater(Container(9550).ListItem.Property(person_id),0)",
+        "Aura.PersonContext": "Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + $EXP[Aura.PersonLibraryType] + [String.IsEqual(Window.Property(Aura.Info.DBType),episode) | $EXP[Aura.PersonTitleID]]",
+        "Aura.PersonNativeCard": "Control.IsVisible(50) + Integer.IsGreater(Container(50).NumItems,0) + !Container(50).IsUpdating + !String.IsEmpty(Container(50).ListItem.Label)",
+        "Aura.PersonNativeSelection": "!String.IsEmpty(Window(movieinformation).Property(Aura.Info.Cast50.Name)) + String.IsEqual(Window(movieinformation).Property(Aura.Info.Cast50.DBID),Window(movieinformation).Property(Aura.Info.DBID)) + String.IsEqual(Window(movieinformation).Property(Aura.Info.Cast50.Position),Container(50).Position) + String.IsEqual(Window(movieinformation).Property(Aura.Info.Cast50.Name),Container(50).ListItem.Label) + String.IsEqual(Window(movieinformation).Property(Aura.Info.Cast50.Role),Container(50).ListItem.Label2)",
+        "Aura.PersonFallbackCard": "Control.IsVisible(9550) + Integer.IsGreater(Container(9550).NumItems,0) + !Container(9550).IsUpdating + !String.IsEmpty(Container(9550).ListItem.Label)",
+        "Aura.PersonAction": "System.AddonIsEnabled(script.skin.info.service) + !Skin.HasSetting(VideoInfo.CastList) + [[$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonTitleType] + Integer.IsGreater(Window.Property(Aura.Info.TMDB),0)] | [!$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonLibraryType] + [$EXP[Aura.PersonExact] | [$EXP[Aura.PersonContext] + [$EXP[Aura.PersonNativeCard] | $EXP[Aura.PersonFallbackCard]]]]]]",
+    }
+    checks.require("actor:sis-identity-gates", all(expressions.get(k) == v for k, v in identity_gates.items()),
+                   "Positive typed subject IDs; settled selected cast; exact fallback person before credit matching; no global guesses")
+    secondary = control(dialog, 9551, "button")
+    routes = secondary.findall("onclick") if secondary is not None else []
+    prefix = "$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + "
+    expected_routes = [
+        (prefix + "!$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard] + !$EXP[Aura.PersonNativeSelection]",
+         "SetFocus(50)"),
+        ("$EXP[Aura.PersonAction] + $EXP[Aura.PersonDiscovery]",
+         "RunScript(script.skin.info.service,action=dialog_video_info,dbtype=$INFO[Window.Property(Aura.Info.DBType)],tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],focus=9551)"),
+        (prefix + "$EXP[Aura.PersonExact]",
+         "RunScript(script.skin.info.service,action=dialog_actor_info,person_id=$INFO[Container(9550).ListItem.Property(person_id)],$ESCINFO[Container(9550).ListItem.Label,name=],auto_search=false,separator=,focus=9550)"),
+        (prefix + "!$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonNativeSelection]",
+         "RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=],auto_search=false,separator=,focus=50)"),
+        (prefix + "!$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + !$EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonFallbackCard]",
+         "RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Container(9550).ListItem.Label,name=],$ESCINFO[Container(9550).ListItem.Label2,role=],auto_search=false,separator=,focus=9550)"),
+    ]
+    checks.require("actor:sis-typed-dialog-routes", [(n.get("condition"), n.text) for n in routes] == expected_routes and
+                   secondary.findtext("visible") == "$EXP[Aura.PersonAction]",
+                   "Captured typed title/episode identity, whole-argument ESCINFO name=/role=, auto_search=false, single-name separator and originating focus")
     tv = "[String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)]"
     expected = [("Dialog.Close(movieinformation)", "!$EXP[Aura.ActorOnline]"),
                 ("ActivateWindow(Videos,videodb://tvshows/actors/,return)", "!$EXP[Aura.ActorOnline] + " + tv),
                 ("ActivateWindow(Videos,videodb://movies/actors/,return)", "!$EXP[Aura.ActorOnline] + !" + tv)]
-    checks.require("actor:offline-literal-native-browsers", len(actions) == 5 and
-                   [(n.text, n.get("condition")) for n in actions[2:]] == expected,
+    checks.require("actor:offline-literal-native-browsers", len(actions) == 4 and
+                   [(n.text, n.get("condition")) for n in actions[1:]] == expected,
                    "Conditions use the pre-close subject type; actor names are never interpolated into either literal URL")
     stale = [name for name, other in roots.items() if re.search(
         r"Aura\.Actor\.(?:Encoding|Encoded|Choose|Name|CanEncode|EncodedReady)|Object_Aura_Actor_Workflow", ET.tostring(other, encoding="unicode")) or
@@ -970,17 +998,50 @@ def actor_checks(checks, roots, original_xml):
                    call.find("param[@name='content'][@value='$VAR[Aura_InfoCast]']") is not None)
     native = copy.deepcopy(control(dialog, 50, "list"))
     original = copy.deepcopy(control(original_xml("1080i/DialogVideoInfo.xml"), 50, "list"))
+    captures = [
+        "SetProperty(Aura.Info.Cast50.Name,$ESCINFO[Container(50).ListItem.Label],movieinformation)",
+        "SetProperty(Aura.Info.Cast50.Role,$ESCINFO[Container(50).ListItem.Label2],movieinformation)",
+        "SetProperty(Aura.Info.Cast50.Position,$INFO[Container(50).Position],movieinformation)",
+        "SetProperty(Aura.Info.Cast50.DBID,$INFO[Window(movieinformation).Property(Aura.Info.DBID)],movieinformation)",
+    ]
+    checks.require("actor:native-selection-snapshot", native is not None and
+                   all([(n.get("condition"), n.text) for n in native.findall(event)] ==
+                       [(None, action) for action in captures] for event in ("onfocus", "onunfocus")) and
+                   all("ClearProperty(Aura.Info.Cast50.%s,movieinformation)" % field in
+                       [n.text for n in dialog.findall(event)]
+                       for field in ("Name", "Role", "Position", "DBID") for event in ("onload", "onunload")))
+    if native is not None:
+        for node in list(native):
+            if node.tag in ("onfocus", "onunfocus") and node.text in captures and not node.attrib:
+                native.remove(node)
     for item in (native, original):
         if item is not None:
             for visible in item.findall("visible"):
                 item.remove(visible)
+    # Permit only the approved secondary-action Down link, not arbitrary edits
+    # to native cards, includes, orientation or core Select semantics.
+    native_down = native.find("ondown") if native is not None else None
+    approved_down = native_down is not None and native_down.text == "SetFocus($VAR[Aura_PersonDown])"
+    if approved_down:
+        native_down.text = "9501"
     checks.require("actor:native-cast50-core-selection", native is not None and original is not None and
-                   signature(native) == signature(original), "Only direct visibility predicates excluded from the native cast-list baseline comparison")
+                   approved_down and signature(native) == signature(original),
+                   "Only visibility, separately verified local selection capture and the exact Stage 7A Down link excluded from the native cast-list baseline comparison")
+    down = root.find("variable[@name='Aura_PersonDown']")
+    checks.require("actor:cast-return-focus", down is not None and
+                   [(n.get("condition"), n.text) for n in down.findall("value")] ==
+                   [("Control.IsVisible(9551)", "9551"), ("Control.IsVisible(9553)", "9553"),
+                    ("Control.IsVisible(9554)", "9554"), (None, "9501")] and secondary is not None and
+                   all([(n.get("condition"), n.text) for n in secondary.findall(event)] == [
+                       ("Control.IsVisible(50)", "50"),
+                       ("!Control.IsVisible(50) + Control.IsVisible(9550)", "9550"),
+                       ("!Control.IsVisible(50) + !Control.IsVisible(9550)", "9570")]
+                       for event in ("onup", "onback")))
     button = control(dialog, 9958, "button")
     direct = button.findall("onclick") if button is not None else []
-    direct_gate = "Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + !String.IsEmpty(Container(50).ListItem.Label)"
-    checks.require("actor:container50-online-quoted-query", len(direct) == 2 and direct[0].text == "SetFocus(9950)" and
-                   direct[1].text == query % "Container(50).ListItem.Label" and direct[1].get("condition") == direct_gate and
+    direct_gate = "$EXP[Aura.ActorOnline]"
+    checks.require("actor:container50-online-sis-dispatch", len(direct) == 1 and direct[0].text == "SendClick(9551)" and
+                   direct[0].get("condition") == direct_gate and
                    button.findtext("visible") == direct_gate)
     hints = [n for n in dialog.iter("control") if n.findtext("label") == "$LOCALIZE[31907]"]
     checks.require("actor:manual-browser-help", len(hints) == 1 and all(token in hints[0].findtext("visible", "") for token in (
