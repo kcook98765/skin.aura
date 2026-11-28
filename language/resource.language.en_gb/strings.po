@@ -2132,3 +2132,23 @@ msgstr "Unavailable or no results. Check your connection."
 msgctxt "#31945"
 msgid "Trending TV Shows (Online, TMDb)"
 msgstr "Trending TV Shows (Online, TMDb)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31946"
+msgid "Discover (Online)"
+msgstr "Discover (Online)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31947"
+msgid "Popular Movies (Online, TMDb)"
+msgstr "Popular Movies (Online, TMDb)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31948"
+msgid "Popular TV Shows (Online, TMDb)"
+msgstr "Popular TV Shows (Online, TMDb)"
+
+#: /shortcuts/overrides.xml
+msgctxt "#31949"
+msgid "Upcoming Movies (Online, TMDb)"
+msgstr "Upcoming Movies (Online, TMDb)"

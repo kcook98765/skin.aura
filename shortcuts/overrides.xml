@@ -396,6 +396,9 @@
     <groupings>
         <node label="32029">
             <content>common</content>
+            <!-- Explicit opt-in anchor only. No widget defaults: Shortcuts 2.0.3
+                 control 401 also replaces existing items and can overwrite slots. -->
+            <shortcut label="$LOCALIZE[31946]" type="$LOCALIZE[31018]" icon="special://skin/extras/icons/compass.png">noop</shortcut>
             <shortcut label="$LOCALIZE[33060]" type="$LOCALIZE[31018]" icon="special://skin/extras/icons/power.png">ActivateWindow(shutdownmenu)</shortcut>
             <shortcut label="$LOCALIZE[31920]" type="32010" icon="special://skin/extras/icons/tvguide.png">ActivateWindow(1140)</shortcut>
         </node>
@@ -605,6 +608,9 @@
         <node label="$LOCALIZE[31942]" condition="System.AddonIsEnabled(plugin.video.themoviedb.helper)">
             <shortcut widget="AuraDiscoverTrendingMovies" label="$LOCALIZE[31943]" widgetName="$LOCALIZE[31943]" icon="DefaultMovies.png" widgetType="movies" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery&amp;reload=0</shortcut>
             <shortcut widget="AuraDiscoverTrendingTVShows" label="$LOCALIZE[31945]" widgetName="$LOCALIZE[31945]" icon="DefaultTVShows.png" widgetType="tvshows" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=tv&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery%20TV&amp;reload=0</shortcut>
+            <shortcut widget="AuraDiscoverPopularMovies" label="$LOCALIZE[31947]" widgetName="$LOCALIZE[31947]" icon="DefaultMovies.png" widgetType="movies" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=popular&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery&amp;reload=0</shortcut>
+            <shortcut widget="AuraDiscoverPopularTVShows" label="$LOCALIZE[31948]" widgetName="$LOCALIZE[31948]" icon="DefaultTVShows.png" widgetType="tvshows" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=popular&amp;tmdb_type=tv&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery%20TV&amp;reload=0</shortcut>
+            <shortcut widget="AuraDiscoverUpcomingMovies" label="$LOCALIZE[31949]" widgetName="$LOCALIZE[31949]" icon="DefaultMovies.png" widgetType="movies" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=upcoming&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery&amp;reload=0</shortcut>
         </node>
     </widget-groupings>
 
