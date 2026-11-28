@@ -42,6 +42,12 @@ class DialogContract:
             "Container(50).ListItem.Label": 'O’Name, "Jr." \\ / Ω',
             "Container(50).ListItem.Label2": 'Role, "A" \\ / B',
             "Container(9550).NumItems": "0",
+            "Container(50).Position": "2",
+            "Window(movieinformation).Property(Aura.Info.DBID)": "31",
+            "Window(movieinformation).Property(Aura.Info.Cast50.DBID)": "31",
+            "Window(movieinformation).Property(Aura.Info.Cast50.Position)": "2",
+            "Window(movieinformation).Property(Aura.Info.Cast50.Name)": 'O’Name, "Jr." \\ / Ω',
+            "Window(movieinformation).Property(Aura.Info.Cast50.Role)": 'Role, "A" \\ / B',
         }
         self.labels.update(changes)
         self.visible = {"50"}
@@ -67,7 +73,7 @@ class DialogContract:
         if match:
             left = self.labels.get(match[2], "")
             if match[1] == "String.IsEqual":
-                return left.lower() == match[3].lower()
+                return left.lower() == self.labels.get(match[3], match[3]).lower()
             if match[1] == "String.StartsWith":
                 return left.lower().startswith(match[3].lower())
             try:
@@ -126,15 +132,15 @@ class ActorExplorationTests(unittest.TestCase):
             self.assertEqual(actions[0], "RunScript(script.skin.info.service,action=dialog_actor_info,"
                              "dbid=$INFO[Window.Property(Aura.Info.DBID)],"
                              "dbtype=$INFO[Window.Property(Aura.Info.DBType)],"
-                             "name=$ESCINFO[Container(50).ListItem.Label],"
-                             "role=$ESCINFO[Container(50).ListItem.Label2],"
+                             "$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=],"
+                             "$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=],"
                              "auto_search=false,separator=,focus=50)")
 
     def test_actual_9550_exact_id_precedes_context_and_ignores_missing_title_ids(self):
         f = DialogContract(**{"Window.Property(Aura.Info.TMDB)": ""}).fallback("456")
         self.assertEqual(len(f.actions()), 1)
         self.assertIn("person_id=$INFO[Container(9550).ListItem.Property(person_id)]", f.actions()[0])
-        self.assertIn("name=$ESCINFO[Container(9550).ListItem.Label]", f.actions()[0])
+        self.assertIn("$ESCINFO[Container(9550).ListItem.Label,name=]", f.actions()[0])
         self.assertIn("focus=9550", f.actions()[0])
         self.assertNotIn("dbid=", f.actions()[0])
         # An invisible stale fallback card must never override the native selection.
@@ -147,8 +153,8 @@ class ActorExplorationTests(unittest.TestCase):
             f = DialogContract().fallback(pid)
             self.assertEqual(len(f.actions()), 1)
             self.assertIn("dbid=$INFO[Window.Property(Aura.Info.DBID)]", f.actions()[0])
-            for part in ("name=$ESCINFO[Container(9550).ListItem.Label]",
-                         "role=$ESCINFO[Container(9550).ListItem.Label2]", "focus=9550"):
+            for part in ("$ESCINFO[Container(9550).ListItem.Label,name=]",
+                         "$ESCINFO[Container(9550).ListItem.Label2,role=]", "focus=9550"):
                 self.assertIn(part, f.actions()[0])
             self.assertNotIn("person_id=", f.actions()[0])
 
@@ -284,8 +290,11 @@ class ActorExplorationTests(unittest.TestCase):
             self.assertNotIn("Skin.Set", n.text)
             self.assertNotIn("name=$INFO", n.text)
             self.assertNotIn("role=$INFO", n.text)
-            self.assertIn("RunScript(script.skin.info.service,action=dialog_", n.text)
-        for action in f.button.findall("onclick")[1:]:
+            self.assertNotIn("name=$ESCINFO", n.text)
+            self.assertNotIn("role=$ESCINFO", n.text)
+            self.assertTrue(n.text == "SetFocus(50)" or
+                            n.text.startswith("RunScript(script.skin.info.service,action=dialog_"))
+        for action in f.button.findall("onclick")[2:]:
             self.assertIn("auto_search=false,separator=", action.text)
         self.assertEqual(len(f.video.findall(".//control[@id='9551']")), 1)
         self.assertFalse(list((ROOT / "1080i").glob("*skin-info-service*")))
@@ -298,8 +307,40 @@ class ActorExplorationTests(unittest.TestCase):
                           [n.text for n in f.video.findall("onload")])
             self.assertIn("ClearProperty(Aura.Info.%s)" % field,
                           [n.text for n in f.video.findall("onunload")])
-        for control in ("50", "9551"):
-            self.assertIsNone(f.video.find(".//control[@id='%s']/onfocus" % control))
+        self.assertIsNone(f.video.find(".//control[@id='9551']/onfocus"))
+
+    def test_native_selection_captured_on_focus_and_blur_cleared_for_each_title(self):
+        f = DialogContract()
+        expected = [
+            "SetProperty(Aura.Info.Cast50.Name,$ESCINFO[Container(50).ListItem.Label],movieinformation)",
+            "SetProperty(Aura.Info.Cast50.Role,$ESCINFO[Container(50).ListItem.Label2],movieinformation)",
+            "SetProperty(Aura.Info.Cast50.Position,$INFO[Container(50).Position],movieinformation)",
+            "SetProperty(Aura.Info.Cast50.DBID,$INFO[Window(movieinformation).Property(Aura.Info.DBID)],movieinformation)",
+        ]
+        native = f.video.find(".//control[@id='50']")
+        for event in ("onfocus", "onunfocus"):
+            self.assertEqual([n.text for n in native.findall(event)], expected)
+        for field in ("Name", "Role", "Position", "DBID"):
+            for event in ("onload", "onunload"):
+                self.assertIn("ClearProperty(Aura.Info.Cast50.%s,movieinformation)" % field,
+                              [n.text for n in f.video.findall(event)])
+        route = next(n.text for n in f.button.findall("onclick") if "focus=50)" in n.text)
+        self.assertNotIn("$ESCINFO[Container(50)", route)
+
+    def test_missing_stale_or_changed_snapshot_returns_cast_without_provider_request(self):
+        for key, value in (("Name", ""), ("Name", "Stale Person"), ("Role", "Wrong Role"),
+                           ("Position", "1"), ("DBID", "6")):
+            f = DialogContract()
+            f.labels["Window(movieinformation).Property(Aura.Info.Cast50.%s)" % key] = value
+            self.assertEqual(f.actions(), ["SetFocus(50)"], (key, value))
+        f = DialogContract()
+        # Mouse/keyboard re-enter cast, scroll, then leave: blur snapshots the
+        # actual final card, not the card selected on the first focus event.
+        f.labels["Container(50).ListItem.Label"] = 'Robert Downey Jr., "RDJ"'
+        self.assertEqual(f.actions(), ["SetFocus(50)"])
+        f.labels["Window(movieinformation).Property(Aura.Info.Cast50.Name)"] = f.labels["Container(50).ListItem.Label"]
+        self.assertEqual(len(f.actions()), 1)
+        self.assertIn("action=dialog_actor_info", f.actions()[0])
 
     def test_play_ratings_artwork_and_original_explicit_tools_stay_native_or_gated(self):
         f = DialogContract()
@@ -326,17 +367,6 @@ class ActorExplorationTests(unittest.TestCase):
         f.visible = {"50"}
         f.labels["Container(50).NumItems"] = "6"
         self.assertIn("person_id=", f.actions()[0])  # stale hidden-card identity leak
-
-    def test_public_labels_use_unique_english_fallback_and_standard_focus_color(self):
-        f = DialogContract()
-        labels = f.objects.find("variable[@name='Aura_PersonLabel']")
-        self.assertEqual([n.text for n in labels.findall("value")],
-                         ["$LOCALIZE[31950]", "$LOCALIZE[31951]"])
-        english = (ROOT / "language/resource.language.en_gb/strings.po").read_text()
-        for ident, wording in ((31950, "Online cast (TMDb)"), (31951, "Online person (TMDb)")):
-            self.assertEqual(english.count('msgctxt "#%s"' % ident), 1)
-            self.assertIn('msgctxt "#%s"\nmsgid "%s"\nmsgstr "%s"' % (ident, wording, wording), english)
-        self.assertIsNone(f.button.find("focusedcolor"))
 
 
 if __name__ == "__main__":

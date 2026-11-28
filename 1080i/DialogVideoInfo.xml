@@ -19,6 +19,10 @@
     <onload>SetProperty(Aura.Info.ShowIMDB,$INFO[ListItem.UniqueID(tvshow.imdb)])</onload>
     <onload>SetProperty(Aura.Info.Season,$INFO[ListItem.Season])</onload>
     <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
+    <onload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onload>
+    <onload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onload>
+    <onload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onload>
+    <onload>ClearProperty(Aura.Info.Cast50.DBID,movieinformation)</onload>
     <onunload>ClearProperty(Aura.Info.DBID)</onunload>
     <onunload>ClearProperty(Aura.Info.DBType)</onunload>
     <onunload>ClearProperty(Aura.Info.Category)</onunload>
@@ -29,6 +33,10 @@
     <onunload>ClearProperty(Aura.Info.ShowIMDB)</onunload>
     <onunload>ClearProperty(Aura.Info.Season)</onunload>
     <onunload>ClearProperty(Aura.Info.Episode)</onunload>
+    <onunload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.Cast50.DBID,movieinformation)</onunload>
 
     <onload>ClearProperty(TrailerPlaying,Home)</onload>
     <onunload>ClearProperty(TrailerPlaying,Home)</onunload>
@@ -351,6 +359,17 @@
                             <control type="list" id="50">
                                 <include>Animation_FadeInOut</include>
                                 <visible>Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating</visible>
+                                <!-- Capture while the cast list owns the selection context.
+                                     Blur refreshes after scrolling and covers mouse departure.
+                                     Empty/loading selections overwrite, never retain old names. -->
+                                <onfocus>SetProperty(Aura.Info.Cast50.Name,$ESCINFO[Container(50).ListItem.Label],movieinformation)</onfocus>
+                                <onfocus>SetProperty(Aura.Info.Cast50.Role,$ESCINFO[Container(50).ListItem.Label2],movieinformation)</onfocus>
+                                <onfocus>SetProperty(Aura.Info.Cast50.Position,$INFO[Container(50).Position],movieinformation)</onfocus>
+                                <onfocus>SetProperty(Aura.Info.Cast50.DBID,$INFO[Window(movieinformation).Property(Aura.Info.DBID)],movieinformation)</onfocus>
+                                <onunfocus>SetProperty(Aura.Info.Cast50.Name,$ESCINFO[Container(50).ListItem.Label],movieinformation)</onunfocus>
+                                <onunfocus>SetProperty(Aura.Info.Cast50.Role,$ESCINFO[Container(50).ListItem.Label2],movieinformation)</onunfocus>
+                                <onunfocus>SetProperty(Aura.Info.Cast50.Position,$INFO[Container(50).Position],movieinformation)</onunfocus>
+                                <onunfocus>SetProperty(Aura.Info.Cast50.DBID,$INFO[Window(movieinformation).Property(Aura.Info.DBID)],movieinformation)</onunfocus>
                                 <onup>9570</onup>
                                 <ondown>SetFocus($VAR[Aura_PersonDown])</ondown>
                                 <orientation>horizontal</orientation>
@@ -417,10 +436,13 @@
                             <onback condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onback>
                             <onback condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onback>
                             <ondown>9501</ondown>
+                            <!-- First mouse click without a cast-focus snapshot returns to
+                                 Cast. No request is made until a current selection is captured. -->
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard] + !$EXP[Aura.PersonNativeSelection]">SetFocus(50)</onclick>
                             <onclick condition="$EXP[Aura.PersonAction] + $EXP[Aura.PersonDiscovery]">RunScript(script.skin.info.service,action=dialog_video_info,dbtype=$INFO[Window.Property(Aura.Info.DBType)],tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],focus=9551)</onclick>
-                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonExact]">RunScript(script.skin.info.service,action=dialog_actor_info,person_id=$INFO[Container(9550).ListItem.Property(person_id)],name=$ESCINFO[Container(9550).ListItem.Label],auto_search=false,separator=,focus=9550)</onclick>
-                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],name=$ESCINFO[Container(50).ListItem.Label],role=$ESCINFO[Container(50).ListItem.Label2],auto_search=false,separator=,focus=50)</onclick>
-                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + !$EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonFallbackCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],name=$ESCINFO[Container(9550).ListItem.Label],role=$ESCINFO[Container(9550).ListItem.Label2],auto_search=false,separator=,focus=9550)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonExact]">RunScript(script.skin.info.service,action=dialog_actor_info,person_id=$INFO[Container(9550).ListItem.Property(person_id)],$ESCINFO[Container(9550).ListItem.Label,name=],auto_search=false,separator=,focus=9550)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonNativeSelection]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=],auto_search=false,separator=,focus=50)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + !$EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonFallbackCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Container(9550).ListItem.Label,name=],$ESCINFO[Container(9550).ListItem.Label2,role=],auto_search=false,separator=,focus=9550)</onclick>
                         </control>
                     </control>
 

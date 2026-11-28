@@ -544,6 +544,7 @@ class StaticRegressions(unittest.TestCase):
     def test_actor_native_browser_fallback_and_online_sis(self):
         baseline = self.report()
         for name in ("online-sis-dispatch", "sis-identity-gates", "sis-typed-dialog-routes", "cast-return-focus",
+                     "native-selection-snapshot",
                      "offline-literal-native-browsers", "no-async-lock-or-confirmation-panel", "fallback9550-wired",
                      "native-cast50-core-selection", "container50-online-sis-dispatch", "manual-browser-help"):
             self.assertPasses(baseline, "actor:" + name)
@@ -583,8 +584,12 @@ class StaticRegressions(unittest.TestCase):
         video = "1080i/DialogVideoInfo.xml"
         for old, new in (
             (b"auto_search=false", b"auto_search=true"),
-            (b"name=$ESCINFO[", b"name=$INFO["),
-            (b"role=$ESCINFO[", b"role=$INFO["),
+            (b"$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=]", b"name=$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name)]"),
+            (b"$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=]", b"role=$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role)]"),
+            (b"$ESCINFO[Container(9550).ListItem.Label,name=]", b"name=$ESCINFO[Container(9550).ListItem.Label]"),
+            (b"$ESCINFO[Container(9550).ListItem.Label2,role=]", b"role=$ESCINFO[Container(9550).ListItem.Label2]"),
+            (b"$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=]", b"$INFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=]"),
+            (b"$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=]", b"$INFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=]"),
             (b"dbid=$INFO[Window.Property(Aura.Info.DBID)]", b"dbid=$INFO[ListItem.DBID]"),
             (b"dbtype=$INFO[Window.Property(Aura.Info.DBType)]", b"dbtype=tvshow"),
             (b"tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)]", b"tmdb_id=$INFO[Window.Property(Aura.Info.ShowTMDB)]"),
@@ -597,7 +602,11 @@ class StaticRegressions(unittest.TestCase):
             with self.subTest(route_mutation=old):
                 self.assertFails(self.report(mutate), "actor:sis-typed-dialog-routes")
         self.assertFails(self.report(lambda data: self.edit(data, video,
-            ".//control[@id='9551']/onclick[3]", "condition", "$EXP[Aura.PersonAction]")), "actor:sis-typed-dialog-routes")
+            ".//control[@id='9551']/onclick[4]", "condition", "$EXP[Aura.PersonAction]")), "actor:sis-typed-dialog-routes")
+        self.assertFails(self.report(lambda data: self.edit(data, video,
+            ".//control[@id='50']/onunfocus[1]", remove=True)), "actor:native-selection-snapshot")
+        self.assertFails(self.report(lambda data: self.edit(data, video,
+            ".//control[@id='9551']/onclick[4]", value="RunScript(script.skin.info.service,action=dialog_actor_info,name=$ESCINFO[Container(50).ListItem.Label])")), "actor:sis-typed-dialog-routes")
         self.assertFails(self.report(lambda data: self.edit(data, video,
             ".//control[@id='9551']/onback[1]", value="SetFocus(50,0)")), "actor:cast-return-focus")
 
@@ -701,6 +710,10 @@ class ActorCheckerRegressions(unittest.TestCase):
             "1080i/Includes_Object.xml", "1080i/DialogVideoInfo.xml")}
         cls.reference = ET.fromstring(cls.data["1080i/DialogVideoInfo.xml"])
         cls.reference.find(".//control[@id='50']/ondown").text = "9501"
+        native = cls.reference.find(".//control[@id='50']")
+        for node in list(native):
+            if node.tag in ("onfocus", "onunfocus"):
+                native.remove(node)
 
     def report(self, mutate=None):
         from check_omega import actor_checks
