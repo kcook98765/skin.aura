@@ -21,6 +21,10 @@
     <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
     <onload>SetProperty(Aura.Info.Director,$ESCINFO[ListItem.Director],movieinformation)</onload>
     <onload>SetProperty(Aura.Info.Writer,$ESCINFO[ListItem.Writer],movieinformation)</onload>
+    <!-- Stage 8A/8B: native subject association, not the focused cast/Similar card.
+         Escape free text; empty snapshots overwrite previous dialog subjects. -->
+    <onload>SetProperty(Aura.Info.MovieTitle,$ESCINFO[ListItem.Title],movieinformation)</onload>
+    <onload>SetProperty(Aura.Info.MoviePath,$ESCINFO[ListItem.FileNameAndPath],movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onload>
@@ -37,6 +41,8 @@
     <onunload>ClearProperty(Aura.Info.Episode)</onunload>
     <onunload>ClearProperty(Aura.Info.Director,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Writer,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.MovieTitle,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.MoviePath,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onunload>
@@ -47,6 +53,18 @@
     <controls>
         <include>Object_Aura_BlurSource</include>
 
+        <!-- Episode-only SIS 2.0.2 FirstAired is a local library query, not online enrichment.
+             Disabled/offscreen, never a navigation target. Empty dynamic content
+             for unsupported/Discovery subjects; every read checks returned identity. -->
+        <control type="list" id="9587">
+            <left>-2160</left>
+            <width>1</width>
+            <height>1</height>
+            <enable>false</enable>
+            <itemlayout width="1" height="1" />
+            <focusedlayout width="1" height="1" />
+            <content browse="never">$VAR[Aura_LocalTVDetails]</content>
+        </control>
 
         <control type="list" id="300">
             <top>30</top>
@@ -163,6 +181,10 @@
                                     <param name="visible" value="true" />
                                     <param name="plot_height" value="95" />
                                     <param name="titleright" value="300" />
+                                    <!-- Named native pairs have one presentation below.
+                                         Keep stars, unnamed/default and other ratings intact. -->
+                                    <param name="imdb" value="![$EXP[Aura.MovieSubject] + !String.IsEmpty(ListItem.Rating(imdb))]" />
+                                    <param name="tmdb" value="![$EXP[Aura.MovieSubject] + [!String.IsEmpty(ListItem.Rating(themoviedb)) | !String.IsEmpty(ListItem.Rating(tmdb))]]" />
                                 </include>
                                 <control type="image">
                                     <texture colordiffuse="main_fg_100">$INFO[ListItem.Studio,resource://resource.images.studios.white/,.png]</texture>
@@ -183,6 +205,63 @@
                                     <param name="visible" value="true" />
                                     <param name="plot_height" value="170" />
                                 </include>
+                            </control>
+                        </control>
+                        <!-- Stage 8A: two compact lines in the existing 410px block,
+                             below the native plot. No fetch, focus action or playback claim.
+                             Kodi 21.3 VideoGUIInfo localizes Premiered and pairs each
+                             RatingAndVotes(source); Rating(source) guards missing material. -->
+                        <control type="group" id="9580">
+                            <left>270</left>
+                            <right>0</right>
+                            <top>360</top>
+                            <height>48</height>
+                            <visible>$EXP[Aura.MovieSubject]</visible>
+                            <control type="label" id="9581">
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_MovieContext]$INFO[ListItem.Premiered,   $LOCALIZE[31955]: ,]</label>
+                            </control>
+                            <control type="label" id="9582">
+                                <top>24</top>
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_MovieIMDB]$VAR[Aura_MovieTMDB,   ,]</label>
+                            </control>
+                        </control>
+                        <!-- Stage 8B: same compact native context space as movies.
+                             Show-only Premiered is localized. On episodes Kodi 21.3
+                             falls back to the series premiere if firstAired is absent;
+                             only the exact local SIS FirstAired property supplies an
+                             episode date. No schedule inference, online fetch or new action. -->
+                        <control type="group" id="9584">
+                            <left>270</left>
+                            <right>0</right>
+                            <top>360</top>
+                            <height>48</height>
+                            <visible>$EXP[Aura.LocalTVSubject]</visible>
+                            <control type="label" id="9585">
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_TVStatus]$VAR[Aura_TVSeason]$VAR[Aura_TVEpisode,   ,]$VAR[Aura_TVAired,   ,]</label>
+                            </control>
+                            <control type="label" id="9586">
+                                <top>24</top>
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_TVProgress]$VAR[Aura_TVEpisodeState]</label>
                             </control>
                         </control>
                         <!-- Audio Flags -->

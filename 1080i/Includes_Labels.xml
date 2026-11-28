@@ -1,5 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <!-- Stage 8C: both native dialogs use DialogMusicInfo.xml and return their
+         subject from GetCurrentListItem(), independently of control 50's rows. -->
+    <expression name="Aura.MusicInfo">[Window.IsVisible(musicinformation) | Window.IsVisible(songinformation)] + [String.IsEqual(ListItem.DBType,artist) | String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</expression>
+    <expression name="Aura.MusicRows">$EXP[Aura.MusicInfo] + Integer.IsGreater(Container(50).NumItems,0)</expression>
+    <expression name="Aura.MusicContextAction">$EXP[Aura.MusicInfo] + [String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</expression>
+    <expression name="Aura.MusicPlayable">$EXP[Aura.MusicContextAction] + Integer.IsGreater(ListItem.DBID,0)</expression>
+    <variable name="Aura_MusicContext">
+        <value condition="String.IsEqual(ListItem.DBType,artist)">$LOCALIZE[31968]</value>
+        <value condition="String.IsEqual(ListItem.DBType,album)">$LOCALIZE[31969]</value>
+        <value condition="String.IsEqual(ListItem.DBType,song)">$LOCALIZE[31970]</value>
+    </variable>
+    <!-- Evaluated inside the native row layouts, NOT against the dialog subject.
+         SongInfo binds Label=role, Label2=contributor. No availability badge:
+         imported discography rows need not have a positive local album ID. -->
+    <variable name="Aura_MusicRowDetail">
+        <value condition="String.IsEqual(ListItem.DBType,song)">$INFO[ListItem.Artist]$INFO[ListItem.Duration, · ,]</value>
+        <value condition="String.IsEqual(ListItem.DBType,album)">$INFO[ListItem.Year]</value>
+        <value>$INFO[ListItem.Label2]</value>
+    </variable>
+    <!-- MusicGUIInfo supplies both dates, including partial dates and the user's
+         ISO/localized preference. Do not substitute Year or album properties. -->
+    <variable name="Aura_MusicReleaseDate">
+        <value condition="$EXP[Aura.MusicContextAction] + !String.IsEmpty(ListItem.ReleaseDate)">$LOCALIZE[31955]: $INFO[ListItem.ReleaseDate]</value>
+    </variable>
+    <variable name="Aura_MusicOriginalDate">
+        <value condition="$EXP[Aura.MusicContextAction] + !String.IsEmpty(ListItem.OriginalDate) + !String.IsEqual(ListItem.OriginalDate,ListItem.ReleaseDate)">$LOCALIZE[31971]: $INFO[ListItem.OriginalDate]</value>
+    </variable>
+    <!-- Stage 8A/8B: GUIInfoManager resolves unqualified ListItem in the window's
+         native context. Fail closed if it no longer matches the captured subject;
+         never read Home service ratings or a cast/Similar container as this title. -->
+    <expression name="Aura.InfoSubject">Window.IsVisible(movieinformation) + String.IsEqual(ListItem.DBType,Window(movieinformation).Property(Aura.Info.DBType)) + !String.IsEmpty(Window(movieinformation).Property(Aura.Info.MovieTitle)) + String.IsEqual(ListItem.Title,Window(movieinformation).Property(Aura.Info.MovieTitle)) + String.IsEqual(ListItem.FileNameAndPath,Window(movieinformation).Property(Aura.Info.MoviePath)) + String.IsEqual(ListItem.DBID,Window(movieinformation).Property(Aura.Info.DBID)) + String.IsEqual(ListItem.UniqueID(tmdb),Window(movieinformation).Property(Aura.Info.TMDB))</expression>
+    <expression name="Aura.MovieSubject">$EXP[Aura.InfoSubject] + String.IsEqual(Window(movieinformation).Property(Aura.Info.DBType),movie)</expression>
+    <!-- Stage 8B: only positively local TV subjects; no default/online-row state.
+         Reuse 8A's escaped title/path snapshots (names retained for compatibility).
+         Coordinates also bind seasons/episodes, including specials season zero. -->
+    <expression name="Aura.LocalTVSubject">$EXP[Aura.InfoSubject] + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.DBID),0) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery TV) + [String.IsEqual(ListItem.DBType,tvshow) | [[String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + String.IsEqual(ListItem.Season,Window(movieinformation).Property(Aura.Info.Season)) + String.IsEqual(ListItem.Episode,Window(movieinformation).Property(Aura.Info.Episode))]]</expression>
+    <expression name="Aura.ShowDetails">$EXP[Aura.LocalTVSubject] + String.IsEqual(Window(movieinformation).Property(Aura.Info.DBType),tvshow) + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.TMDB),0) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(System.AddonVersion(script.skin.info.service),2.0.2)</expression>
+    <!-- Episode FirstAired only. Show/season counts are native Kodi properties,
+         not a reason to query SIS. Its local handler sets InfoTag type and DBID;
+         use that identity, NOT Property(DBID), and reject stale/loading results. -->
+    <expression name="Aura.LocalTVDetailsRequest">$EXP[Aura.LocalTVSubject] + String.IsEqual(Window(movieinformation).Property(Aura.Info.DBType),episode) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(System.AddonVersion(script.skin.info.service),2.0.2)</expression>
+    <variable name="Aura_LocalTVDetails">
+        <value condition="$EXP[Aura.LocalTVDetailsRequest]">plugin://script.skin.info.service/?action=getdetails&amp;dbid=$INFO[Window(movieinformation).Property(Aura.Info.DBID)]&amp;dbtype=$INFO[Window(movieinformation).Property(Aura.Info.DBType)]</value>
+    </variable>
+    <expression name="Aura.LocalTVDetailsReady">$EXP[Aura.LocalTVDetailsRequest] + !Container(9587).IsUpdating + String.IsEqual(Container(9587).NumItems,1) + String.IsEqual(Container(9587).ListItem.DBID,Window(movieinformation).Property(Aura.Info.DBID)) + String.IsEqual(Container(9587).ListItem.DBType,Window(movieinformation).Property(Aura.Info.DBType))</expression>
+    <variable name="Aura_TVStatus">
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(ListItem.Status) + !String.IsEqual(ListItem.Status,Unknown) + !String.IsEqual(ListItem.Status,N/A) + !String.IsEqual(ListItem.Status,None) + !String.IsEqual(ListItem.Status,0) + !String.IsEqual(ListItem.Status,-)">$LOCALIZE[31960]: $INFO[ListItem.Status]</value>
+    </variable>
+    <!-- Native date for shows only: Kodi 21.3 GetDetailsForEpisode puts the series premiere
+         on episode tags. LISTITEM_PREMIERED falls back to that when firstAired
+         is absent, so it is not an independently verified episode air date.
+         Exact local SIS build_episode_data copies actual firstaired to FirstAired;
+         only that property is used for episodes, displayed as supplied (ISO). -->
+    <variable name="Aura_TVAired">
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(ListItem.Premiered)">$LOCALIZE[31961]: $INFO[ListItem.Premiered]</value>
+        <value condition="$EXP[Aura.LocalTVDetailsReady] + String.IsEqual(Window(movieinformation).Property(Aura.Info.DBType),episode) + !String.IsEmpty(Container(9587).ListItem.Property(FirstAired))">$LOCALIZE[31961]: $INFO[Container(9587).ListItem.Property(FirstAired)]</value>
+    </variable>
+    <variable name="Aura_TVSeason">
+        <value condition="$EXP[Aura.LocalTVSubject] + [String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.Season)">$LOCALIZE[31962]: $INFO[ListItem.Season]</value>
+    </variable>
+    <variable name="Aura_TVEpisode">
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,episode) + Integer.IsGreater(ListItem.Episode,0)">$LOCALIZE[31963]: $INFO[ListItem.Episode]</value>
+    </variable>
+    <!-- Kodi supplies typed integer count properties. Direct INFO prefixes are
+         conditional on presence and preserve zero; no numeric conversion or SIS
+         count fallback. Episode native state shares the same live second line. -->
+    <variable name="Aura_TVProgress">
+        <value condition="$EXP[Aura.LocalTVSubject] + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season)]">$INFO[ListItem.Property(TotalEpisodes),$LOCALIZE[31964]: ,]$INFO[ListItem.Property(WatchedEpisodes),$COMMA $LOCALIZE[31965]: ,]$INFO[ListItem.Property(UnWatchedEpisodes),$COMMA $LOCALIZE[31967]: ,]</value>
+    </variable>
+    <variable name="Aura_TVEpisodeState">
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,episode) + ListItem.IsResumable">$LOCALIZE[31966]</value>
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,episode) + Integer.IsGreater(ListItem.PlayCount,0)">$LOCALIZE[31965]</value>
+    </variable>
+    <!-- Positive captured IDs only. Both Discovery markers remain exclusively
+         on Stage 7's exact-title action, even when a Discovery item has a DBID.
+         Audited SIS 2.0.2 script.py/video.py fetch on Select and restore focus 300. -->
+    <expression name="Aura.MovieDetails">$EXP[Aura.MovieSubject] + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.DBID),0) + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.TMDB),0) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery TV) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(System.AddonVersion(script.skin.info.service),2.0.2)</expression>
+    <variable name="Aura_MovieContext">
+        <value condition="Integer.IsGreater(Window(movieinformation).Property(Aura.Info.DBID),0)">$LOCALIZE[31956]</value>
+        <value condition="String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery) | String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery TV)">$LOCALIZE[31957]</value>
+    </variable>
+    <variable name="Aura_MovieIMDB">
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.IMDB) + !String.IsEmpty(ListItem.Rating(imdb))">$LOCALIZE[31958]: $INFO[ListItem.RatingAndVotes(imdb)]</value>
+    </variable>
+    <!-- Exact stored alias only: prefer themoviedb; do not mix one alias's
+         rating with the other's votes, default rating, or online properties. -->
+    <variable name="Aura_MovieTMDB">
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.TheMovieDB) + !String.IsEmpty(ListItem.Rating(themoviedb))">$LOCALIZE[31959]: $INFO[ListItem.RatingAndVotes(themoviedb)]</value>
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.TheMovieDB) + !String.IsEmpty(ListItem.Rating(tmdb))">$LOCALIZE[31959]: $INFO[ListItem.RatingAndVotes(tmdb)]</value>
+    </variable>
     <!-- Library is the baseline. Never enable the broad SkinInfo.Service switch.
          Positive native IDs suppress the published service's ID-less stale-property case.
          Player-online 2.0.0 has no per-result identity/clear contract: rapid item changes
@@ -157,6 +247,7 @@
     </variable>
 
     <variable name="Label_Info_NextAired_Status">
+        <value condition="$EXP[Aura.LocalTVSubject] + String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(ListItem.Status) + !String.IsEqual(ListItem.Status,Unknown) + !String.IsEqual(ListItem.Status,N/A) + !String.IsEqual(ListItem.Status,None) + !String.IsEqual(ListItem.Status,0) + !String.IsEqual(ListItem.Status,-)"></value>
         <value condition="!String.IsEmpty(ListItem.Status)">$INFO[ListItem.Status]</value>
         <value condition="String.IsEqual(ListItem.DBType,tvshow) + Integer.IsGreater(ListItem.DBID,0) + !String.IsEmpty(Window(Home).Property(SkinInfo.TVShow.Status))">$INFO[Window(Home).Property(SkinInfo.TVShow.Status)]</value>
         <value condition="$EXP[Aura.ItemOnline] + String.IsEqual(ListItem.DBType,tvshow)">$INFO[Window(Home).Property(SkinInfo.Online.Status)]</value>
@@ -386,6 +477,7 @@
     </variable>
 
     <variable name="Label_ShowCase_InfoLine">
+        <value condition="$EXP[Aura.LocalTVSubject]">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_EndTime,[COLOR=main_fg_100]$LOCALIZE[31106] ,[/COLOR]]</value>
         <value condition="Window.IsVisible(script-script.extendedinfo-VideoList.xml)">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Premiered,[COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="ListItem.IsCollection + Integer.IsGreater(ListItem.DBID,0)">$INFO[Window(Home).Property(SkinInfo.Set.Years.Range),[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Sets_Count,[COLOR=main_fg_100],[/COLOR]]</value>
         <value condition="[Container.Content(seasons) | Container.Content(tvshows)] + [!String.IsEmpty(ListItem.MPAA) | !String.IsEmpty(ListItem.Duration) | !String.IsEmpty(ListItem.Premiered)] + !String.IsEmpty(ListItem.Property(TotalEpisodes))">$INFO[ListItem.MPAA,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Premiered,[COLOR=main_fg_100],[/COLOR]  |  ]$VAR[Label_Duration,[COLOR=main_fg_100],[/COLOR]  |  ]$INFO[ListItem.Property(WatchedEpisodes),[COLOR=main_fg_100]$LOCALIZE[16102] , $LOCALIZE[20163] [/COLOR]]$INFO[ListItem.Property(TotalEpisodes),[COLOR=main_fg_100],[/COLOR]]</value>

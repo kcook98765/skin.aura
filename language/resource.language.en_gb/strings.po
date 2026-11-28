@@ -2172,3 +2172,85 @@ msgstr "Online directors (TMDb)"
 msgctxt "#31953"
 msgid "Online writers (TMDb)"
 msgstr "Online writers (TMDb)"
+
+#: /1080i/Includes_Items.xml
+msgctxt "#31954"
+msgid "Online details (TMDb)"
+msgstr "Online details (TMDb)"
+
+#: /1080i/DialogVideoInfo.xml
+msgctxt "#31955"
+msgid "Release date"
+msgstr "Release date"
+
+#: /1080i/Includes_Labels.xml
+msgctxt "#31956"
+msgid "Local library"
+msgstr "Local library"
+
+#: /1080i/Includes_Labels.xml
+msgctxt "#31957"
+msgid "Discovery · Not matched to library"
+msgstr "Discovery · Not matched to library"
+
+#: /1080i/Includes_Labels.xml
+msgctxt "#31958"
+msgid "Stored IMDb"
+msgstr "Stored IMDb"
+
+#: /1080i/Includes_Labels.xml
+msgctxt "#31959"
+msgid "Stored TMDb"
+msgstr "Stored TMDb"
+
+msgctxt "#31960"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "#31961"
+msgid "First aired"
+msgstr "First aired"
+
+msgctxt "#31962"
+msgid "Season"
+msgstr "Season"
+
+msgctxt "#31963"
+msgid "Episode"
+msgstr "Episode"
+
+msgctxt "#31964"
+msgid "Episodes"
+msgstr "Episodes"
+
+msgctxt "#31965"
+msgid "Watched"
+msgstr "Watched"
+
+msgctxt "#31966"
+msgid "Resumable"
+msgstr "Resumable"
+
+msgctxt "#31967"
+msgid "Unwatched"
+msgstr "Unwatched"
+
+#: /1080i/DialogMusicInfo.xml /1080i/Includes_Items.xml
+msgctxt "#31968"
+msgid "Discography"
+msgstr "Discography"
+
+#: /1080i/DialogMusicInfo.xml /1080i/Includes_Items.xml
+msgctxt "#31969"
+msgid "Album tracks"
+msgstr "Album tracks"
+
+#: /1080i/DialogMusicInfo.xml /1080i/Includes_Items.xml
+msgctxt "#31970"
+msgid "Song contributors"
+msgstr "Song contributors"
+
+#: /1080i/Includes_Labels.xml
+msgctxt "#31971"
+msgid "Original release date"
+msgstr "Original release date"
