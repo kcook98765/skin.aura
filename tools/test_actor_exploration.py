@@ -56,6 +56,8 @@ class DialogContract:
         self.enabled = True
 
     def condition(self, text):
+        if text in ("true", "false"):
+            return text == "true"
         parts = split_top(text, " | ")
         if len(parts) > 1:
             return any(self.condition(p) for p in parts)
@@ -85,7 +87,8 @@ class DialogContract:
             return not self.labels.get(match[1], "")
         match = re.fullmatch(r"Control.IsVisible\((\d+)\)", text)
         if match:
-            return self.condition("$EXP[Aura.PersonAction]") if match[1] == "9551" else match[1] in self.visible
+            action = {"9551": "Aura.PersonAction", "9553": "Aura.DirectorAction", "9554": "Aura.WriterAction"}.get(match[1])
+            return self.condition("$EXP[%s]" % action) if action else match[1] in self.visible
         match = re.fullmatch(r"Container\((\d+)\).IsUpdating", text)
         if match:
             return match[1] in self.updating
@@ -116,7 +119,7 @@ class ActorExplorationTests(unittest.TestCase):
                          [("$EXP[Aura.PersonDiscovery]", "$LOCALIZE[31950]"),
                           (None, "$LOCALIZE[31951]")])
         english = (ROOT / "language/resource.language.en_gb/strings.po").read_text()
-        for ident, wording in ((31950, "Online cast (TMDb)"), (31951, "Online person (TMDb)")):
+        for ident, wording in ((31950, "Online cast & crew (TMDb)"), (31951, "Online person (TMDb)")):
             self.assertEqual(english.count('msgctxt "#%s"' % ident), 1)
             self.assertIn('msgctxt "#%s"\nmsgid "%s"\nmsgstr "%s"' %
                           (ident, wording, wording), english)
@@ -173,7 +176,7 @@ class ActorExplorationTests(unittest.TestCase):
                 self.assertEqual(len(f.actions()), 1)
                 self.assertIn("action=dialog_video_info", f.actions()[0])
                 row = f.video.find(".//control[@id='9552']")
-                self.assertEqual(row.findtext("visible"), "$EXP[Aura.PersonAction]")
+                self.assertEqual(row.findtext("visible"), "$EXP[Aura.CreditsAction]")
                 self.assertIsNotNone(row.find("control[@id='9551']"))
                 self.assertIsNone(f.video.find(".//control[@id='9500']//control[@id='9551']"))
 
@@ -255,7 +258,8 @@ class ActorExplorationTests(unittest.TestCase):
         self.assertEqual(f.video.findtext(".//control[@id='50']/ondown"), "SetFocus($VAR[Aura_PersonDown])")
         values = f.objects.find("variable[@name='Aura_PersonDown']").findall("value")
         self.assertEqual([(n.get("condition"), n.text) for n in values],
-                         [("Control.IsVisible(9551)", "9551"), (None, "9501")])
+                         [("Control.IsVisible(9551)", "9551"), ("Control.IsVisible(9553)", "9553"),
+                          ("Control.IsVisible(9554)", "9554"), (None, "9501")])
         for n in f.button:
             self.assertNotIn("SetFocus(50,", n.text or "")
             self.assertNotIn("SetFocus(9550,", n.text or "")
@@ -367,6 +371,147 @@ class ActorExplorationTests(unittest.TestCase):
         f.visible = {"50"}
         f.labels["Container(50).NumItems"] = "6"
         self.assertIn("person_id=", f.actions()[0])  # stale hidden-card identity leak
+
+
+class CrewActionTests(unittest.TestCase):
+    """Stage 7B source contracts; the provider picker is not executed here."""
+
+    def fixture(self, **changes):
+        f = DialogContract(**changes)
+        f.labels.update({"Window(movieinformation).Property(Aura.Info.Director)": "Native Director",
+                         "Window(movieinformation).Property(Aura.Info.Writer)": "Native Writer"})
+        return f
+
+    def button(self, f, ident):
+        return f.video.find(".//control[@id='%s']" % ident)
+
+    def actions(self, f, ident):
+        return [n.text for n in self.button(f, ident).findall("onclick") if f.condition(n.get("condition"))]
+
+    def test_exact_typed_movie_roles_no_name_guess_and_correct_return_origin(self):
+        f = self.fixture()
+        for ident, role in ((9553, "director"), (9554, "writer")):
+            node = self.button(f, ident)
+            self.assertTrue(f.condition(node.findtext("visible")))
+            self.assertEqual(self.actions(f, ident), [
+                "RunScript(script.skin.info.service,action=dialog_actor_info,crew=%s,dbtype=movie,"
+                "tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],auto_search=false,focus=%s)" % (role, ident)])
+            for forbidden in ("name=", "query=", "person_id=", "dbid=", "imdb_id=", "ListItem."):
+                self.assertNotIn(forbidden, self.actions(f, ident)[0])
+
+    def test_role_specific_empty_credits_hide_only_that_action(self):
+        for missing, other in (("Director", 9554), ("Writer", 9553)):
+            f = self.fixture()
+            f.labels["Window(movieinformation).Property(Aura.Info.%s)" % missing] = ""
+            self.assertEqual(self.actions(f, 9553 if missing == "Director" else 9554), [])
+            self.assertEqual(len(self.actions(f, other)), 1)
+        f.labels["Window(movieinformation).Property(Aura.Info.Director)"] = ""
+        self.assertEqual(self.actions(f, 9553), [])
+        self.assertEqual(self.actions(f, 9554), [])
+
+    def test_unsupported_types_and_nonpositive_or_missing_identity_never_dispatch(self):
+        for kind in ("tvshow", "episode", "season", "set", "musicvideo", "actor", ""):
+            f = self.fixture(**{"Window.Property(Aura.Info.DBType)": kind})
+            self.assertEqual(self.actions(f, 9553) + self.actions(f, 9554), [])
+        for field in ("DBID", "TMDB"):
+            for value in ("", "0", "-1", "bad", "tt12345"):
+                f = self.fixture(**{"Window.Property(Aura.Info.%s)" % field: value,
+                                    "Window.Property(Aura.Info.IMDB)": "tt12345"})
+                self.assertEqual(self.actions(f, 9553) + self.actions(f, 9554), [], (field, value))
+
+    def test_discovery_keeps_one_exact_title_view_for_extended_crew(self):
+        for marker, kind in (("Aura Online Discovery", "movie"), ("Aura Online Discovery TV", "tvshow")):
+            f = self.fixture(**{"Window.Property(Aura.Info.Category)": marker,
+                                "Window.Property(Aura.Info.DBType)": kind})
+            self.assertEqual(self.actions(f, 9553) + self.actions(f, 9554), [])
+            self.assertEqual(len(f.actions()), 1)
+            self.assertIn("action=dialog_video_info", f.actions()[0])
+
+    def test_independent_explicit_consent_and_existing_visibility_settings(self):
+        f = self.fixture()
+        before = [self.actions(f, ident) for ident in (9553, 9554)]
+        f.settings.add("Aura.OnlineEnrichment")
+        self.assertEqual(before, [self.actions(f, ident) for ident in (9553, 9554)])
+        f.enabled = False
+        self.assertEqual(self.actions(f, 9553) + self.actions(f, 9554), [])
+        f.enabled = True
+        f.settings.add("VideoInfo.CastList")
+        self.assertEqual(self.actions(f, 9553) + self.actions(f, 9554), [])
+
+    def test_crew_can_be_reached_without_any_native_cast(self):
+        f = self.fixture()
+        f.visible.clear()
+        f.labels["Container(50).NumItems"] = "0"
+        self.assertEqual(f.actions(), [])
+        self.assertTrue(f.condition("$EXP[Aura.CreditsAction]"))
+        self.assertEqual(len(self.actions(f, 9553)), 1)
+        top = f.video.find(".//control[@id='300']")
+        self.assertEqual([n.text for n in top.findall("ondown") if f.condition(n.get("condition"))],
+                         ["SetFocus($VAR[Aura_PersonDown])"])
+
+    def test_credits_snapshotted_before_focus_and_cleared_on_unload(self):
+        f = self.fixture()
+        for field in ("Director", "Writer"):
+            self.assertIn("SetProperty(Aura.Info.%s,$ESCINFO[ListItem.%s],movieinformation)" % (field, field),
+                          [n.text for n in f.video.findall("onload")])
+            self.assertIn("ClearProperty(Aura.Info.%s,movieinformation)" % field,
+                          [n.text for n in f.video.findall("onunload")])
+        # Moving to a cast or Similar card cannot replace the captured title or
+        # availability gate with that focused item's media identity/credits.
+        before = self.actions(f, 9553)
+        f.labels.update({"ListItem.DBType": "tvshow", "ListItem.UniqueID(tmdb)": "999",
+                         "ListItem.Director": "", "ListItem.Writer": ""})
+        self.assertEqual(self.actions(f, 9553), before)
+        for n in [*f.video.findall("onload"), *f.video.findall(".//onfocus"), *f.video.findall(".//onunfocus")]:
+            self.assertNotIn("crew=", n.text or "")
+        for ident in (9553, 9554):
+            self.assertIsNone(self.button(f, ident).find("onfocus"))
+
+    def test_horizontal_navigation_skips_every_combination_of_hidden_actions(self):
+        ids = (9551, 9553, 9554)
+        for bits in range(8):
+            f = self.fixture()
+            visible = {ident for i, ident in enumerate(ids) if bits & (1 << i)}
+            for ident, action in zip(ids, ("Aura.PersonAction", "Aura.DirectorAction", "Aura.WriterAction")):
+                f.expressions[action] = "true" if ident in visible else "false"
+            values = f.objects.find("variable[@name='Aura_PersonDown']").findall("value")
+            entry = next(n.text for n in values if n.get("condition") is None or f.condition(n.get("condition")))
+            self.assertEqual(entry, str(min(visible)) if visible else "9501")
+            self.assertEqual(f.condition("$EXP[Aura.CreditsAction]"), bool(visible))
+            for ident in visible:
+                for direction in ("onleft", "onright"):
+                    dest = [n.text for n in self.button(f, ident).findall(direction) if f.condition(n.get("condition"))]
+                    self.assertEqual(len(dest), 1)
+                    self.assertIn(int(dest[0]), visible)
+                    if len(visible) > 1:
+                        self.assertNotEqual(dest[0], str(ident))
+
+    def test_up_back_preserve_cast_selection_and_no_cast_returns_to_top(self):
+        for cast in ({"50"}, {"9550"}, set()):
+            f = self.fixture()
+            f.visible = cast
+            for ident in (9553, 9554):
+                for event in ("onup", "onback"):
+                    self.assertEqual([n.text for n in self.button(f, ident).findall(event)
+                                      if f.condition(n.get("condition"))],
+                                     ["50" if "50" in cast else "9550" if "9550" in cast else "9570"])
+
+    def test_localized_compact_controls_use_existing_row_and_unique_ids(self):
+        f = self.fixture()
+        row = f.video.find(".//control[@id='9552']")
+        self.assertEqual(row.findtext("height"), "60")
+        english = (ROOT / "language/resource.language.en_gb/strings.po").read_text()
+        ids = [n.get("id") for n in f.video.findall(".//control") if n.get("id")]
+        self.assertEqual(len(ids), len(set(ids)))
+        for ident, loc, wording in ((9553, 31952, "Online directors (TMDb)"),
+                                    (9554, 31953, "Online writers (TMDb)")):
+            button = row.find("control[@id='%s']" % ident)
+            self.assertEqual(button.findtext("label"), "$LOCALIZE[%s]" % loc)
+            self.assertEqual(button.findtext("height"), "40")
+            self.assertEqual(button.findtext("width"), "360")
+            self.assertIsNone(button.find("focusedcolor"))
+            self.assertEqual(english.count('msgctxt "#%s"' % loc), 1)
+            self.assertIn('msgctxt "#%s"\nmsgid "%s"\nmsgstr "%s"' % (loc, wording, wording), english)
 
 
 if __name__ == "__main__":

@@ -19,6 +19,8 @@
     <onload>SetProperty(Aura.Info.ShowIMDB,$INFO[ListItem.UniqueID(tvshow.imdb)])</onload>
     <onload>SetProperty(Aura.Info.Season,$INFO[ListItem.Season])</onload>
     <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
+    <onload>SetProperty(Aura.Info.Director,$ESCINFO[ListItem.Director],movieinformation)</onload>
+    <onload>SetProperty(Aura.Info.Writer,$ESCINFO[ListItem.Writer],movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onload>
@@ -33,6 +35,8 @@
     <onunload>ClearProperty(Aura.Info.ShowIMDB)</onunload>
     <onunload>ClearProperty(Aura.Info.Season)</onunload>
     <onunload>ClearProperty(Aura.Info.Episode)</onunload>
+    <onunload>ClearProperty(Aura.Info.Director,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.Writer,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onunload>
@@ -47,8 +51,8 @@
         <control type="list" id="300">
             <top>30</top>
             <onup condition="Skin.HasSetting(EnablePressingUp)">9601</onup>
-            <ondown condition="!Control.IsVisible(50) + !Control.IsVisible(9550) + Control.IsVisible(9551)">9551</ondown>
-            <ondown condition="Control.IsVisible(50) | Control.IsVisible(9550) | !Control.IsVisible(9551)">9500</ondown>
+            <ondown condition="!Control.IsVisible(50) + !Control.IsVisible(9550) + $EXP[Aura.CreditsAction]">SetFocus($VAR[Aura_PersonDown])</ondown>
+            <ondown condition="Control.IsVisible(50) | Control.IsVisible(9550) | !$EXP[Aura.CreditsAction]">9500</ondown>
             <include>Topbar_Menu_Layout</include>
             <include>Items_Info</include>
         </control>
@@ -419,7 +423,7 @@
                         <left>view_pad</left>
                         <right>view_pad</right>
                         <height>60</height>
-                        <visible>$EXP[Aura.PersonAction]</visible>
+                        <visible>$EXP[Aura.CreditsAction]</visible>
                         <control type="button" id="9551">
                             <width>400</width>
                             <height>40</height>
@@ -429,6 +433,12 @@
                             <texturenofocus border="8" colordiffuse="main_fg_12">common/box.png</texturenofocus>
                             <label>$VAR[Aura_PersonLabel]</label>
                             <visible>$EXP[Aura.PersonAction]</visible>
+                            <onleft condition="Control.IsVisible(9554)">9554</onleft>
+                            <onleft condition="!Control.IsVisible(9554) + Control.IsVisible(9553)">9553</onleft>
+                            <onleft condition="!Control.IsVisible(9554) + !Control.IsVisible(9553)">9551</onleft>
+                            <onright condition="Control.IsVisible(9553)">9553</onright>
+                            <onright condition="!Control.IsVisible(9553) + Control.IsVisible(9554)">9554</onright>
+                            <onright condition="!Control.IsVisible(9553) + !Control.IsVisible(9554)">9551</onright>
                             <onup condition="Control.IsVisible(50)">50</onup>
                             <onup condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onup>
                             <onup condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onup>
@@ -443,6 +453,58 @@
                             <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonExact]">RunScript(script.skin.info.service,action=dialog_actor_info,person_id=$INFO[Container(9550).ListItem.Property(person_id)],$ESCINFO[Container(9550).ListItem.Label,name=],auto_search=false,separator=,focus=9550)</onclick>
                             <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonNativeSelection]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Name),name=],$ESCINFO[Window(movieinformation).Property(Aura.Info.Cast50.Role),role=],auto_search=false,separator=,focus=50)</onclick>
                             <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + !$EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonFallbackCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],$ESCINFO[Container(9550).ListItem.Label,name=],$ESCINFO[Container(9550).ListItem.Label2,role=],auto_search=false,separator=,focus=9550)</onclick>
+                        </control>
+                        <!-- Native movie crew only. Omit name: SIS chooses exact people
+                             from this movie's credits, with its own multi-person picker. -->
+                        <control type="button" id="9553">
+                            <left>420</left>
+                            <width>360</width>
+                            <height>40</height>
+                            <font>font_tiny</font>
+                            <textcolor>main_fg_100</textcolor>
+                            <texturefocus border="8" colordiffuse="$VAR[ColorHighlight]">common/box.png</texturefocus>
+                            <texturenofocus border="8" colordiffuse="main_fg_12">common/box.png</texturenofocus>
+                            <label>$LOCALIZE[31952]</label>
+                            <visible>$EXP[Aura.DirectorAction]</visible>
+                            <onleft condition="Control.IsVisible(9551)">9551</onleft>
+                            <onleft condition="!Control.IsVisible(9551) + Control.IsVisible(9554)">9554</onleft>
+                            <onleft condition="!Control.IsVisible(9551) + !Control.IsVisible(9554)">9553</onleft>
+                            <onright condition="Control.IsVisible(9554)">9554</onright>
+                            <onright condition="!Control.IsVisible(9554) + Control.IsVisible(9551)">9551</onright>
+                            <onright condition="!Control.IsVisible(9554) + !Control.IsVisible(9551)">9553</onright>
+                            <onup condition="Control.IsVisible(50)">50</onup>
+                            <onup condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onup>
+                            <onup condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onup>
+                            <onback condition="Control.IsVisible(50)">50</onback>
+                            <onback condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onback>
+                            <onback condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onback>
+                            <ondown>9501</ondown>
+                            <onclick condition="$EXP[Aura.DirectorAction]">RunScript(script.skin.info.service,action=dialog_actor_info,crew=director,dbtype=movie,tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],auto_search=false,focus=9553)</onclick>
+                        </control>
+                        <control type="button" id="9554">
+                            <left>800</left>
+                            <width>360</width>
+                            <height>40</height>
+                            <font>font_tiny</font>
+                            <textcolor>main_fg_100</textcolor>
+                            <texturefocus border="8" colordiffuse="$VAR[ColorHighlight]">common/box.png</texturefocus>
+                            <texturenofocus border="8" colordiffuse="main_fg_12">common/box.png</texturenofocus>
+                            <label>$LOCALIZE[31953]</label>
+                            <visible>$EXP[Aura.WriterAction]</visible>
+                            <onleft condition="Control.IsVisible(9553)">9553</onleft>
+                            <onleft condition="!Control.IsVisible(9553) + Control.IsVisible(9551)">9551</onleft>
+                            <onleft condition="!Control.IsVisible(9553) + !Control.IsVisible(9551)">9554</onleft>
+                            <onright condition="Control.IsVisible(9551)">9551</onright>
+                            <onright condition="!Control.IsVisible(9551) + Control.IsVisible(9553)">9553</onright>
+                            <onright condition="!Control.IsVisible(9551) + !Control.IsVisible(9553)">9554</onright>
+                            <onup condition="Control.IsVisible(50)">50</onup>
+                            <onup condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onup>
+                            <onup condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onup>
+                            <onback condition="Control.IsVisible(50)">50</onback>
+                            <onback condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onback>
+                            <onback condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onback>
+                            <ondown>9501</ondown>
+                            <onclick condition="$EXP[Aura.WriterAction]">RunScript(script.skin.info.service,action=dialog_actor_info,crew=writer,dbtype=movie,tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],auto_search=false,focus=9554)</onclick>
                         </control>
                     </control>
 

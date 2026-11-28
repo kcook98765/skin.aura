@@ -1030,7 +1030,8 @@ def actor_checks(checks, roots, original_xml):
     down = root.find("variable[@name='Aura_PersonDown']")
     checks.require("actor:cast-return-focus", down is not None and
                    [(n.get("condition"), n.text) for n in down.findall("value")] ==
-                   [("Control.IsVisible(9551)", "9551"), (None, "9501")] and secondary is not None and
+                   [("Control.IsVisible(9551)", "9551"), ("Control.IsVisible(9553)", "9553"),
+                    ("Control.IsVisible(9554)", "9554"), (None, "9501")] and secondary is not None and
                    all([(n.get("condition"), n.text) for n in secondary.findall(event)] == [
                        ("Control.IsVisible(50)", "50"),
                        ("!Control.IsVisible(50) + Control.IsVisible(9550)", "9550"),

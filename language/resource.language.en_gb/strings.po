@@ -2155,10 +2155,20 @@ msgstr "Upcoming Movies (Online, TMDb)"
 
 #: /1080i/Includes_Object.xml
 msgctxt "#31950"
-msgid "Online cast (TMDb)"
-msgstr "Online cast (TMDb)"
+msgid "Online cast & crew (TMDb)"
+msgstr "Online cast & crew (TMDb)"
 
 #: /1080i/Includes_Object.xml
 msgctxt "#31951"
 msgid "Online person (TMDb)"
 msgstr "Online person (TMDb)"
+
+#: /1080i/DialogVideoInfo.xml
+msgctxt "#31952"
+msgid "Online directors (TMDb)"
+msgstr "Online directors (TMDb)"
+
+#: /1080i/DialogVideoInfo.xml
+msgctxt "#31953"
+msgid "Online writers (TMDb)"
+msgstr "Online writers (TMDb)"

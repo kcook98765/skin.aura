@@ -396,8 +396,16 @@
     </variable>
     <variable name="Aura_PersonDown">
         <value condition="Control.IsVisible(9551)">9551</value>
+        <value condition="Control.IsVisible(9553)">9553</value>
+        <value condition="Control.IsVisible(9554)">9554</value>
         <value>9501</value>
     </variable>
+    <!-- Explicit movie crew consent is independent of background enrichment.
+         Native credit strings only gate availability; never use them as queries. -->
+    <expression name="Aura.CrewMovie">System.AddonIsEnabled(script.skin.info.service) + !Skin.HasSetting(VideoInfo.CastList) + !$EXP[Aura.PersonDiscovery] + String.IsEqual(Window.Property(Aura.Info.DBType),movie) + Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + Integer.IsGreater(Window.Property(Aura.Info.TMDB),0)</expression>
+    <expression name="Aura.DirectorAction">$EXP[Aura.CrewMovie] + !String.IsEmpty(Window(movieinformation).Property(Aura.Info.Director))</expression>
+    <expression name="Aura.WriterAction">$EXP[Aura.CrewMovie] + !String.IsEmpty(Window(movieinformation).Property(Aura.Info.Writer))</expression>
+    <expression name="Aura.CreditsAction">$EXP[Aura.PersonAction] | $EXP[Aura.DirectorAction] | $EXP[Aura.WriterAction]</expression>
     <expression name="Aura.ActorOnline">Skin.HasSetting(Aura.OnlineEnrichment) + $EXP[Aura.PersonAction]</expression>
     <include name="Object_Aura_Actor_OnClick">
         <!-- Keep the old explicitly enabled fallback Select, using the same
