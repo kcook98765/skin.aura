@@ -70,6 +70,7 @@ CATEGORIES = [
     ("$LOCALIZE[31940]", "MovieNodes TvShowNodes MusicNodes"),
     ("32040", ""),
     ("24001", "addon addon addon addon addon"),
+    ("$LOCALIZE[31942]", "AuraDiscoverTrendingMovies AuraDiscoverTrendingTVShows"),
 ]
 
 
@@ -80,7 +81,7 @@ class WidgetPicker(unittest.TestCase):
         self.leaves = self.group.findall(".//shortcut")
 
     def test_exact_categories_and_direct_choices(self):
-        self.assertEqual([n.tag for n in self.group], ["node"] * 10)
+        self.assertEqual([n.tag for n in self.group], ["node"] * 11)
         self.assertEqual([n.get("label") for n in self.group], [r[0] for r in CATEGORIES])
         for node, (label, widgets) in zip(self.group, CATEGORIES):
             expected = widgets.split() if isinstance(widgets, str) else widgets
@@ -90,8 +91,11 @@ class WidgetPicker(unittest.TestCase):
             self.assertTrue(all(n.tag == "shortcut" for n in node))
 
     def test_retained_count_unique_paths_and_native_bindings(self):
-        self.assertEqual(len(self.leaves), 51)
-        self.assertEqual(len({n.text for n in self.leaves}), 51)
+        curated = {"AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"}
+        historical = [n for n in self.leaves if n.get("widget") not in curated]
+        self.assertEqual(len(historical), 51)
+        self.assertEqual(len({n.text for n in historical}), 51)
+        self.assertEqual(len(self.leaves), 53)
         for row in NATIVE.strip().splitlines():
             widget, label, icon, path = row.split("|")
             if path.startswith("@"):
@@ -112,7 +116,7 @@ class WidgetPicker(unittest.TestCase):
 
     def test_provider_visibility_and_reachability_without_provider(self):
         def visible_leaves(node, enabled):
-            if node.get("condition") == GUARD and not enabled:
+            if node.get("condition") in {GUARD, "System.AddonIsEnabled(plugin.video.themoviedb.helper)"} and not enabled:
                 return []
             if node.tag == "shortcut":
                 return [node]
@@ -121,12 +125,13 @@ class WidgetPicker(unittest.TestCase):
         providers = [n for n in self.leaves if n.text.startswith("plugin://script.skin.info.service/")]
         self.assertEqual(len(providers), 7)
         self.assertEqual(visible_leaves(self.group, True), self.leaves)
-        self.assertEqual(visible_leaves(self.group, False), [n for n in self.leaves if n not in providers])
+        self.assertEqual(visible_leaves(self.group, False), [n for n in self.leaves if n not in providers and n.get("widget") not in {"AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"}])
         self.assertEqual(self.group[4].attrib, dict(label="$LOCALIZE[31938]", condition=GUARD))
         for index in (0, 1):
             self.assertNotIn("condition", self.group[index].attrib)
         self.assertEqual(Counter(n.get("condition") for n in self.group.iter() if n.get("condition")),
-                         Counter({GUARD: 4, "System.Platform.Android": 1}))
+                         Counter({GUARD: 4, "System.Platform.Android": 1,
+                                  "System.AddonIsEnabled(plugin.video.themoviedb.helper)": 1}))
 
     def test_native_content_and_source_hierarchy(self):
         library = self.group[7]

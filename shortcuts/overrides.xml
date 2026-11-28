@@ -602,6 +602,10 @@
             <shortcut label="1038" type="32019" icon="DefaultAddonMusic.png" widget="addon" widgetType="music" widgetTarget="music">addons://sources/audio/</shortcut>
             <shortcut label="1039" type="32020" icon="DefaultAddonPicture.png" widget="addon" widgetType="picture" widgetTarget="pictures">addons://sources/image/</shortcut>
         </node>
+        <node label="$LOCALIZE[31942]" condition="System.AddonIsEnabled(plugin.video.themoviedb.helper)">
+            <shortcut widget="AuraDiscoverTrendingMovies" label="$LOCALIZE[31943]" widgetName="$LOCALIZE[31943]" icon="DefaultMovies.png" widgetType="movies" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=movie&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery&amp;reload=0</shortcut>
+            <shortcut widget="AuraDiscoverTrendingTVShows" label="$LOCALIZE[31945]" widgetName="$LOCALIZE[31945]" icon="DefaultTVShows.png" widgetType="tvshows" widgetTarget="videos">plugin://plugin.video.themoviedb.helper/?info=trending_week&amp;tmdb_type=tv&amp;widget=true&amp;limit=12&amp;nextpage=false&amp;cacheonly=true&amp;fanarttv=false&amp;plugin_category=Aura%20Online%20Discovery%20TV&amp;reload=0</shortcut>
+        </node>
     </widget-groupings>
 
 </overrides>

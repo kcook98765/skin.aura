@@ -200,7 +200,7 @@
                 <label>$INFO[Control.GetLabel(8)]</label>
                 <icon>special://skin/extras/icons/play3.png</icon>
                 <onclick>SendClick(8)</onclick>
-                <visible>Control.IsEnabled(8)</visible>
+                <visible>Control.IsEnabled(8) + ![[String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery) | String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery TV)] + !Integer.IsGreater(Window.Property(Aura.Info.DBID),0)]</visible>
             </item>
 
             <!-- Plot -->
