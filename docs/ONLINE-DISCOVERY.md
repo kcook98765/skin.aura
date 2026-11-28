@@ -6,7 +6,7 @@ In the existing widget picker, the final **Online Discovery (TMDb)** heading
 offers **Trending Movies (Online, TMDb)** and **Trending TV Shows (Online, TMDb)**
 when TMDb Helper is enabled. Their stable shortcut IDs are
 `AuraDiscoverTrendingMovies` and `AuraDiscoverTrendingTVShows`. This does not assign a
-widget, add a home menu entry, change settings/dependencies, enable a monitor,
+widget, automatically add a home menu entry, change settings/dependencies, enable a monitor,
 or require an account. Opening the curated picker is not a provider directory
 request. Only choosing and assigning this source opts that widget into loading;
 an assigned home widget may subsequently load through Kodi's normal lifecycle.
@@ -181,7 +181,7 @@ DBID qualify. The TV marker cannot qualify, even if an item reports movie type.
 Both exact curated routes receive settled-empty status/reload and duplicate
 Show More suppression. The visible Info Play gate recognizes only their two
 exact subject markers; arbitrary Helper routes/categories retain native behavior.
-No defaults, provider settings, dependencies or broader discovery menu are added.
+No defaults, provider settings, dependencies or broader provider catalogue are added.
 
 The native TV campaign verified cold isolated startup and a visible last-slot
 status/action. The inline Reload skin action recovered ten shows plus Kodi's
@@ -219,16 +219,88 @@ available buttons, provider Info dispatch, focus/return, local matches and
 playback outcomes depend on Kodi 21.3, the provider and available media; static
 source checks do not establish these runtime outcomes.
 
-## Future proposal only: opt-in Discover home menu
+## Stage 6C-A: opt-in Discover home shortcut
 
-A later, separately approved change could offer an explicitly added **Discover
-(Online)** home menu item. It should never replace Movies/TV, appear by default,
-assign itself during upgrades, or silently enable enrichment/accounts. Explain
-online metadata/artwork traffic before the user adds it; reuse the existing menu
-editor, picker and removable widget slots, initially offering only this source.
-The proposed flow is Add menu item → choose Discover (Online) → explicitly choose
-an online widget → save → browse → Info → separately choose available playback.
-Removing the entry should restore the prior layout without resetting defaults.
+Based on merged Stage 6B `f83b495`, the common home shortcut chooser now offers
+localized **Discover (Online)**. It is absent from packaged Home defaults and
+does not add itself on startup or upgrade. Movies/TV and their defaults remain
+unchanged. This reuses the horizontal Home menu, existing Widgets and editor;
+there is no new window, runtime file, service, dependency or Stage 6C-B work.
+
+Before opting in: these are **online metadata/artwork** sources, not a promise
+of playable files. Assigning either widget permits normal provider list/artwork
+traffic and caching, even without pressing Select on a title. Automatic
+enrichment preferences are preserved, not enabled or disabled by this shortcut.
+The chooser itself supplies only the local inert `noop` action, never a plugin
+invocation. Select on the Home anchor intentionally does nothing; use **Down**
+to enter its assigned widgets through existing Home navigation.
+
+### Add, configure and remove without resetting other assignments
+
+1. Open Skin Settings → customise home menu. Use the existing **+ / Add** control
+   to create a **blank shortcut**; do not repurpose Movies, TV or another populated
+   shortcut. The existing editor allows up to 12 menu items; if full, stop rather
+   than deleting a configured item just to follow this example.
+2. With that blank selected, open **Choose shortcut** (control 401), then
+   **Common → Discover (Online)**. Exact translated chooser wording may vary.
+   No widget is preassigned. Choosing the anchor is separate from choosing a
+   widget and does not browse a provider directory.
+3. Open that entry's widget editor. In its empty primary slot choose
+   **Online Discovery (TMDb) → Trending Movies (Online, TMDb)**. In a separate
+   empty additional slot choose **Trending TV Shows (Online, TMDb)** from the same
+   heading. The heading is visible when TMDb Helper is enabled. Use the existing
+   picker, not a custom URL or preset; both qualified Helper 5.4.16 URLs and their
+   inert `reload=0` stay unchanged. Leave every other assigned slot untouched.
+4. Back out to save, return Home, highlight Discover and press **Down** to browse
+   its widgets. Movies retains the Stage 6B native Info behavior; TV keeps native
+   series/season navigation and physical Info. Playback is a separate available
+   action, not something the chooser initiates.
+5. To **rename**, select only this entry in the same editor and use **Set label**;
+   keep “Online” or another clear network indication. To **reorder**, use its
+   existing Up/Down arrow controls. Neither operation requires reassigning widgets.
+6. To opt out of one widget, remove/replace only its slot. To **remove Discover**,
+   select only that menu entry and use **Delete**, then back out to save. Other
+   menu items and their assignments stay in place; do not use Reset/restore
+   defaults. Removing an entry discards its own configuration, not a backup of it.
+
+### Why manual widgets, not a default or preset
+
+Official **Skin Shortcuts 2.0.3** source, `resources/lib/skinshorcuts/gui.py:2054–2126`:
+control **401** handles both choosing on a blank and replacing an existing
+shortcut. `_duplicate_listitem` (`2428–2506`) retains the original label ID and
+additional properties, including widget assignments, but control 401 then calls
+`find_default_widget` and **unconditionally writes the primary widget fields if
+a matching default is returned** (`2099–2112`). There is no blank-only guard.
+`find_default` (`2616–2646`) can match either retained label ID or default ID;
+a replacement may also encounter historical defaults.
+
+Consequently this change adds **no Discover `widgetdefaultnode`, `widgetdefault`,
+`propertydefault`, smart properties or widget preset**, and changes none of the
+historical defaults. Manual selection into new blank slots avoids that overwrite
+risk; this change does not patch the dependency's replacement behavior or migrate
+user assignments. All 51 historical picker bindings and the two curated online
+choices remain intact.
+
+### Recovery and verification boundary
+
+Retain Stage 6B's explicit **Reload skin** on a settled empty curated widget.
+It invokes `ReloadSkin()` for the **whole skin**, not just Discover or one row;
+the existing Power menu action is also available. Restore connectivity and allow
+Helper 5.4.16 / request library 0.2.28's **15-second connection-error backoff** to
+expire before choosing reload. Immediate reload during outage/backoff can still
+be empty. There is no automatic retry, timer, cache busting or provider-setting
+change, and reload does not guarantee recovery.
+
+Independent review passed **40 focused tests**, **128 XML parses**, and Toolkit
+syntax, manifest, path and package checks. Baseline diagnostics remain unchanged;
+this is not warning-free validation or official-repository approval.
+
+The native qualifier observed the Common shortcut, manual Trending Movies and TV
+assignments, unchanged other saved widget paths, both populated rows, physical
+**Down** navigation and cold offline messaging. Further native results and their
+exact scope belong to the qualification report and draft PR; these observations
+do not establish universal provider behavior or full native acceptance. This
+documentation edit repeats no tests or native operations.
 
 ## Evidence boundary
 

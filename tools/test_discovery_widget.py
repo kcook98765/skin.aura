@@ -50,6 +50,56 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertCountEqual([n.attrib for n in imports], [
             dict(addon=addon, version=version) for addon, version in OFFICIAL_MINIMUMS.items()])
 
+    def test_discover_is_explicit_common_chooser_anchor_only(self):
+        common = self.overrides.find("groupings/node[@label='32029']")
+        self.assertEqual(common.findtext("content"), "common")
+        entries = self.overrides.findall(".//shortcut[@label='$LOCALIZE[31946]']")
+        self.assertEqual(len(entries), 1)
+        entry = entries[0]
+        self.assertIn(entry, list(common))
+        # Exact whitelist excludes widget*, preset, smart properties and hooks.
+        self.assertEqual(entry.attrib, dict(label="$LOCALIZE[31946]",
+                         type="$LOCALIZE[31018]",
+                         icon="special://skin/extras/icons/compass.png"))
+        self.assertEqual(entry.text, "noop")
+        self.assertEqual(list(entry), [])
+        self.assertTrue((ROOT / "extras/icons/compass.png").is_file())
+        messages, duplicates = po_messages((ROOT / "language/resource.language.en_gb/strings.po").read_bytes())
+        self.assertFalse(duplicates)
+        self.assertEqual(messages[31946], "Discover (Online)")
+
+    def test_discover_has_no_packaged_defaults_or_preassigned_widgets(self):
+        # Includes defaults, templates, settings and services, not just mainmenu.
+        for folder in ("1080i", "shortcuts", "resources"):
+            for path in (ROOT / folder).rglob("*.xml"):
+                tree = ET.parse(path).getroot()
+                for node in tree.iter():
+                    if (path == ROOT / "shortcuts/overrides.xml"
+                            and node.tag == "shortcut"
+                            and node.get("label") == "$LOCALIZE[31946]"):
+                        continue  # sole chooser leaf is checked exactly above
+                    for text in (node.text or "", *node.attrib.values()):
+                        self.assertNotIn("31946", text, str(path))
+                        self.assertNotIn("Discover (Online)", text, str(path))
+        # Every existing default widget/property binding is independently pinned
+        # by test_widget_picker; neither curated route can acquire another role.
+        for node in self.overrides:
+            if node.tag != "widget-groupings":
+                text = ET.tostring(node, encoding="unicode")
+                self.assertNotIn(URL, text)
+                self.assertNotIn(TV_URL, text)
+
+    def test_inert_anchor_keeps_existing_horizontal_home_down_path(self):
+        home = ET.parse(ROOT / "1080i/Home.xml").getroot()
+        self.assertIn("Widgets", [n.text for n in home.findall("controls/include")])
+        menu = self.widgets.find("include[@name='Widgets']/control[@id='300']")
+        self.assertEqual(menu.findtext("orientation"), "horizontal")
+        self.assertEqual(menu.findtext("content/include"), "skinshortcuts-mainmenu")
+        self.assertEqual(menu.findall("ondown")[0].text, "3000")
+        group = self.widgets.find("include[@name='Widgets']//control[@id='3000']")
+        self.assertEqual(group.findtext("include"), "Widgets_Grouplist")
+        # Structural navigation evidence only; not Kodi focus/runtime acceptance.
+
     def test_no_implicit_assignment_or_monitor(self):
         # Two routes in picker only; existing provider integrations are not hooks
         # for this opt-in source. Templates/defaults/settings remain independent.

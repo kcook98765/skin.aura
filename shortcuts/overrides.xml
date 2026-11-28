@@ -396,6 +396,9 @@
     <groupings>
         <node label="32029">
             <content>common</content>
+            <!-- Explicit opt-in anchor only. No widget defaults: Shortcuts 2.0.3
+                 control 401 also replaces existing items and can overwrite slots. -->
+            <shortcut label="$LOCALIZE[31946]" type="$LOCALIZE[31018]" icon="special://skin/extras/icons/compass.png">noop</shortcut>
             <shortcut label="$LOCALIZE[33060]" type="$LOCALIZE[31018]" icon="special://skin/extras/icons/power.png">ActivateWindow(shutdownmenu)</shortcut>
             <shortcut label="$LOCALIZE[31920]" type="32010" icon="special://skin/extras/icons/tvguide.png">ActivateWindow(1140)</shortcut>
         </node>
