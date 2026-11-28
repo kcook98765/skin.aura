@@ -209,6 +209,14 @@
                 <icon>special://skin/extras/icons/quote.png</icon>
                 <onclick>SetFocus(9601)</onclick>
             </item>
+
+            <!-- Native music rows, only when core actually supplied context. -->
+            <item>
+                <label>$VAR[Aura_MusicContext]</label>
+                <icon>special://skin/extras/icons/folder.png</icon>
+                <onclick>SetFocus(50)</onclick>
+                <visible>$EXP[Aura.MusicRows]</visible>
+            </item>
  
  
             <!-- EXPERIMENT  -->
@@ -283,7 +291,7 @@
                 <visible>!Skin.HasSetting(global.kioskmode)</visible>
             </item>
 
-            <!-- Fanart -->
+            <!-- Video Fanart (music 12 is navigation, not artwork). -->
 
             <item>
                 <label>$INFO[Control.GetLabel(12)]</label>
@@ -291,6 +299,14 @@
                 <onclick>SendClick(12)</onclick>
                 <visible>Control.IsEnabled(12)</visible>
                 <visible>!Skin.HasSetting(global.kioskmode)</visible>
+                <visible>!Window.IsVisible(musicinformation) + !Window.IsVisible(songinformation)</visible>
+            </item>
+
+            <item>
+                <label>$INFO[Control.GetLabel(12)]</label>
+                <icon>special://skin/extras/icons/infobubble.png</icon>
+                <onclick>SendClick(12)</onclick>
+                <visible>$EXP[Aura.MusicContextAction] + Control.IsEnabled(12)</visible>
             </item>
 
             <!-- Art Downloader -->

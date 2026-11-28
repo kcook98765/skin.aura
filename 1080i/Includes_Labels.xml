@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <!-- Stage 8C: both native dialogs use DialogMusicInfo.xml and return their
+         subject from GetCurrentListItem(), independently of control 50's rows. -->
+    <expression name="Aura.MusicInfo">[Window.IsVisible(musicinformation) | Window.IsVisible(songinformation)] + [String.IsEqual(ListItem.DBType,artist) | String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</expression>
+    <expression name="Aura.MusicRows">$EXP[Aura.MusicInfo] + Integer.IsGreater(Container(50).NumItems,0)</expression>
+    <expression name="Aura.MusicContextAction">$EXP[Aura.MusicInfo] + [String.IsEqual(ListItem.DBType,album) | String.IsEqual(ListItem.DBType,song)]</expression>
+    <expression name="Aura.MusicPlayable">$EXP[Aura.MusicContextAction] + Integer.IsGreater(ListItem.DBID,0)</expression>
+    <variable name="Aura_MusicContext">
+        <value condition="String.IsEqual(ListItem.DBType,artist)">$LOCALIZE[31968]</value>
+        <value condition="String.IsEqual(ListItem.DBType,album)">$LOCALIZE[31969]</value>
+        <value condition="String.IsEqual(ListItem.DBType,song)">$LOCALIZE[31970]</value>
+    </variable>
+    <!-- Evaluated inside the native row layouts, NOT against the dialog subject.
+         SongInfo binds Label=role, Label2=contributor. No availability badge:
+         imported discography rows need not have a positive local album ID. -->
+    <variable name="Aura_MusicRowDetail">
+        <value condition="String.IsEqual(ListItem.DBType,song)">$INFO[ListItem.Artist]$INFO[ListItem.Duration, · ,]</value>
+        <value condition="String.IsEqual(ListItem.DBType,album)">$INFO[ListItem.Year]</value>
+        <value>$INFO[ListItem.Label2]</value>
+    </variable>
+    <!-- MusicGUIInfo supplies both dates, including partial dates and the user's
+         ISO/localized preference. Do not substitute Year or album properties. -->
+    <variable name="Aura_MusicReleaseDate">
+        <value condition="$EXP[Aura.MusicContextAction] + !String.IsEmpty(ListItem.ReleaseDate)">$LOCALIZE[31955]: $INFO[ListItem.ReleaseDate]</value>
+    </variable>
+    <variable name="Aura_MusicOriginalDate">
+        <value condition="$EXP[Aura.MusicContextAction] + !String.IsEmpty(ListItem.OriginalDate) + !String.IsEqual(ListItem.OriginalDate,ListItem.ReleaseDate)">$LOCALIZE[31971]: $INFO[ListItem.OriginalDate]</value>
+    </variable>
     <!-- Stage 8A/8B: GUIInfoManager resolves unqualified ListItem in the window's
          native context. Fail closed if it no longer matches the captured subject;
          never read Home service ratings or a cast/Similar container as this title. -->

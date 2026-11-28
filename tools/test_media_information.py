@@ -1,4 +1,4 @@
-"""Stage 8A/8B authored source contracts only, not native/provider acceptance.
+"""Stage 8A/8B/8C authored source contracts only, not native/provider acceptance.
 
 Kodi 21.3 audit: GUIInfoManager.cpp TranslateListItem/GetMultiInfoLabel keeps
 the requested source; VideoGUIInfo.cpp 175-237 pairs ratings/votes and localizes
@@ -562,6 +562,269 @@ class LocalTVDetailsTests(unittest.TestCase):
         f = self.row("tvshow", **{"ListItem.Premiered": "localized series date"})
         self.assertEqual(f.variable("Aura_TVAired"), "$LOCALIZE[31961]: $INFO[ListItem.Premiered]")
         self.assertEqual(self.row("season").variable("Aura_TVAired"), "")
+
+
+class MusicContract(MovieContract):
+    """Evaluate authored gates; core enable flags are inputs, not emulated Kodi.
+
+    Kodi 21.3 GUIDialogMusicInfo.cpp: 394-410 selects artist discography only
+    for ID > 0; 506-551 binds songs/discography without skin content; 574-586
+    sets native button labels. GUIDialogSongInfo.cpp: 162-191 handles album,
+    contributor and Play; 234-272 gates album ID and binds role/name in order.
+    MusicGUIInfo.cpp: 303-321 supplies OriginalDate/ReleaseDate, not properties.
+    """
+    def __init__(self, kind="album", **changes):
+        super().__init__()
+        self.music = ET.parse(ROOT / "1080i/DialogMusicInfo.xml").getroot()
+        self.active_window = "songinformation" if kind == "song" else "musicinformation"
+        self.core_enabled = {"8", "12"}
+        self.labels.update({"ListItem.DBType": kind, "ListItem.DBID": "31",
+                            "ListItem.ReleaseDate": "", "ListItem.OriginalDate": "",
+                            "Container(50).NumItems": "2"})
+        self.labels.update(changes)
+
+    def condition(self, text):
+        if text in ("Window.IsVisible(musicinformation)", "Window.IsVisible(songinformation)"):
+            return text == "Window.IsVisible(%s)" % self.active_window
+        match = re.fullmatch(r"Control.IsEnabled\((8|12)\)", text)
+        if match:
+            ident = match[1]
+            if self.active_window not in ("musicinformation", "songinformation"):
+                return ident in self.core_enabled  # other window's native controls
+            enable = self.music.find(".//control[@id='%s']/enable" % ident)
+            return ident in self.core_enabled and (enable is None or self.condition(enable.text))
+        if text == "Control.IsVisible(50)":
+            return self.condition("$EXP[Aura.MusicRows]")
+        return super().condition(text)
+
+    def item_visible(self, item):
+        return all(self.condition(n.text) for n in item.findall("visible"))
+
+
+class MusicInformationTests(unittest.TestCase):
+    def test_one_core_bound_list_and_native_buttons(self):
+        music = ET.parse(ROOT / "1080i/DialogMusicInfo.xml").getroot()
+        rows = music.findall(".//control[@id='50']")
+        self.assertEqual(len(rows), 1, "Both native music dialogs bind control 50")
+        self.assertEqual(rows[0].get("type"), "list")
+        self.assertIsNone(rows[0].find("content"))
+        for ident in ("8", "12"):
+            button = music.find(".//control[@id='%s']" % ident)
+            self.assertIsNotNone(button)
+            self.assertEqual(button.findall("onclick"), [])
+            self.assertEqual(button.findtext("include"), "Defs_Hidden_Button")
+        self.assertIsNone(music.find(".//control[@id='12']/visible"))
+
+    def test_native_rows_not_replaced_reordered_filtered_or_scripted(self):
+        f = MusicContract()
+        rows = f.music.find(".//control[@id='50']")
+        self.assertEqual(rows.findtext("visible"), "$EXP[Aura.MusicRows]")
+        self.assertEqual(rows.findtext("orientation"), "horizontal")
+        self.assertEqual(rows.findtext("height"), "100")
+        self.assertEqual([n.tag for n in rows], [
+            "top", "right", "height", "orientation", "scrolltime", "visible",
+            "onup", "ondown", "onback", "itemlayout", "focusedlayout"])
+        # No XML content, sort/filter, row onclick, selection proxy or local-ID
+        # invention: core indexes the same unmodified contributor/discography rows.
+        authored = ET.tostring(rows, encoding="unicode")
+        detail = f.includes.find("variable[@name='Aura_MusicRowDetail']")
+        authored += ET.tostring(detail, encoding="unicode")
+        for forbidden in ("onclick", "onfocus", "onunfocus", "content", "sort",
+                          "filter", "RunScript", "PlayMedia", "ActivateWindow",
+                          "DBID", "Property(", "Container(50).ListItem", "31956"):
+            self.assertNotIn(forbidden, authored)
+        for layout_name in ("itemlayout", "focusedlayout"):
+            layout = rows.find(layout_name)
+            self.assertEqual(layout.attrib, {"width": "420", "height": "96"})
+            self.assertEqual([n.findtext("label") for n in layout.findall("control[@type='label']")],
+                             ["$INFO[ListItem.Label]", "$VAR[Aura_MusicRowDetail]"])
+        self.assertEqual(rows.find("focusedlayout/control[@type='image']/texture").get("colordiffuse"),
+                         "$VAR[ColorHighlight]")
+        for kind, expected in (("song", "$INFO[ListItem.Artist]$INFO[ListItem.Duration, · ,]"),
+                                ("album", "$INFO[ListItem.Year]"),
+                                ("artist", "$INFO[ListItem.Label2]")):
+            # These are ROW types: song contributor rows are typed artist.
+            f.labels["ListItem.DBType"] = kind
+            self.assertEqual(f.variable("Aura_MusicRowDetail"), expected)
+
+    def test_context_only_for_actual_rows_and_native_music_types(self):
+        for kind, ident in (("artist", 31968), ("album", 31969), ("song", 31970)):
+            f = MusicContract(kind)
+            self.assertEqual(f.variable("Aura_MusicContext"), "$LOCALIZE[%s]" % ident)
+            item = next(n for n in f.items if n.findtext("label") == "$VAR[Aura_MusicContext]")
+            self.assertEqual([n.text for n in item.findall("onclick")], ["SetFocus(50)"])
+            area = f.music.find(".//control[@description='Native music context']")
+            self.assertEqual(area.findtext("visible"), item.findtext("visible"))
+            self.assertEqual(area.findtext("height"), "170")
+            self.assertTrue(f.item_visible(item))
+            for count in ("", "0", "-1", "bad"):
+                f.labels["Container(50).NumItems"] = count
+                self.assertFalse(f.item_visible(item), (kind, count))
+            f.labels["Container(50).NumItems"] = "1"
+            # Imported discography remains readable even without local IDs. No
+            # availability claim or replacement action is inferred from row presence.
+            for dbid in ("", "0", "-1", "27"):
+                f.labels["Container(50).ListItem.DBID"] = dbid
+                self.assertTrue(f.item_visible(item))
+            f.active_window = "movieinformation"
+            self.assertFalse(f.item_visible(item))
+        for kind in ("movie", "tvshow", "episode", "musicvideo", "actor", "", "set"):
+            f = MusicContract(kind)
+            self.assertFalse(f.condition("$EXP[Aura.MusicInfo]"), kind)
+            self.assertFalse(f.condition("$EXP[Aura.MusicRows]"), kind)
+
+    def test_native_play_is_typed_positive_subject_not_selected_row(self):
+        for kind in ("artist", "album", "song", "musicvideo", "movie", ""):
+            for dbid in ("", "0", "-1", "bad", "31"):
+                f = MusicContract(kind, **{"ListItem.DBID": dbid,
+                                         "Container(50).ListItem.DBID": "99",
+                                         "Container(50).ListItem.DBType": "album"})
+                expected = kind in ("album", "song") and dbid == "31"
+                self.assertEqual(f.condition("Control.IsEnabled(8)"), expected, (kind, dbid))
+                play = f.items.find("item")
+                self.assertEqual(f.item_visible(play), expected, (kind, dbid))
+                self.assertEqual([n.text for n in play.findall("onclick")], ["SendClick(8)"])
+                f.core_enabled.clear()
+                self.assertFalse(f.item_visible(play))
+        f = MusicContract()
+        f.active_window = "movieinformation"
+        self.assertFalse(f.condition("$EXP[Aura.MusicPlayable]"))
+
+    def test_context_12_is_native_navigation_not_fanart_or_kiosk_management(self):
+        for kind in ("artist", "album", "song", "musicvideo", "movie", ""):
+            f = MusicContract(kind)
+            items = [n for n in f.items if n.findtext("onclick") == "SendClick(12)"]
+            self.assertEqual(len(items), 2)  # mutually exclusive video art / music navigation
+            video, music = items
+            self.assertFalse(f.item_visible(video))
+            self.assertEqual(music.findtext("label"), "$INFO[Control.GetLabel(12)]")
+            self.assertEqual(music.findtext("icon"), "special://skin/extras/icons/infobubble.png")
+            for kiosk in (False, True):
+                f.settings = {"global.kioskmode"} if kiosk else set()
+                self.assertEqual(f.item_visible(music), kind in ("album", "song"), (kind, kiosk))
+            # Song core disables 12 for unknown/nonpositive album IDs. The skin
+            # must honor that flag, not guess an album from selected contributor.
+            f.core_enabled.discard("12")
+            f.labels["Container(50).ListItem.DBID"] = "99"
+            self.assertFalse(f.item_visible(music))
+            self.assertEqual(music.find("onclick").attrib, {})
+        f = MusicContract()
+        button = f.music.find(".//control[@id='12']")
+        self.assertEqual(button.findtext("label"), "21891")  # SongInfo overrides to 10523
+        self.assertIsNone(button.find("enable"))  # never override core's album-ID decision
+        f.active_window = "movieinformation"
+        self.assertTrue(f.item_visible(video))  # video art's original kiosk guard remains
+        f.settings.add("global.kioskmode")
+        self.assertFalse(f.item_visible(video))
+
+    def test_native_dates_missing_equal_distinct_partial_and_unrelated_types(self):
+        for kind in ("artist", "album", "song", "musicvideo", "movie", ""):
+            for release, original in (("", ""), ("2020", ""), ("", "1999"),
+                                       ("2020", "2020"), ("2020-06", "1999"),
+                                       ("28 November 2026", "1 January 2000")):
+                f = MusicContract(kind, **{"ListItem.ReleaseDate": release,
+                                         "ListItem.OriginalDate": original,
+                                         "ListItem.Year": "wrong date",
+                                         "ListItem.Property(Album_ReleaseDate)": "wrong date",
+                                         "Container(50).ListItem.ReleaseDate": "wrong date"})
+                supported = kind in ("album", "song")
+                self.assertEqual(f.variable("Aura_MusicReleaseDate"),
+                                 "$LOCALIZE[31955]: $INFO[ListItem.ReleaseDate]"
+                                 if supported and release else "")
+                self.assertEqual(f.variable("Aura_MusicOriginalDate"),
+                                 "$LOCALIZE[31971]: $INFO[ListItem.OriginalDate]"
+                                 if supported and original and original != release else "")
+                f.active_window = "movieinformation"
+                self.assertEqual(f.variable("Aura_MusicReleaseDate"), "")
+                self.assertEqual(f.variable("Aura_MusicOriginalDate"), "")
+        f = MusicContract()
+        dates = f.music.find(".//control[@description='Native music dates']")
+        self.assertEqual(dates.findtext("height"), "48")
+        self.assertEqual(dates.findtext("control/label"),
+                         "$VAR[Aura_MusicReleaseDate]$VAR[Aura_MusicOriginalDate,   ,]")
+        self.assertEqual(dates.findtext("control/scroll"), "true")
+        self.assertFalse(f.condition(dates.findtext("visible")))
+
+    def test_focus_and_existing_layout_and_local_fallback_contracts(self):
+        f = MusicContract()
+        self.assertEqual(f.music.findtext("defaultcontrol"), "300")
+        self.assertEqual(f.music.findtext(".//control[@id='300']/ondown"), "9601")
+        rows = f.music.find(".//control[@id='50']")
+        self.assertEqual((rows.findtext("onup"), rows.findtext("ondown"), rows.findtext("onback")),
+                         ("300", "9503", "300"))
+        # Native Left/Right, mouse Select, keyboard Select, context and paging
+        # remain unhandled by the skin. No forced close or Play on row selection.
+        for event in ("onleft", "onright", "onclick", "oninfo", "oncontextmenu"):
+            self.assertIsNone(rows.find(event))
+        management = f.music.find(".//control[@id='9503']")
+        self.assertEqual([(n.get("condition"), n.text) for n in management.findall("onup")],
+                         [("Control.IsVisible(50)", "50"), ("!Control.IsVisible(50)", "300")])
+        self.assertEqual(management.findtext("ondown"), "SetFocus(300)")
+        hero = f.music.find(".//control[@id='9000']/control")
+        self.assertEqual(hero.findtext("height"), "380")
+        self.assertEqual(hero.find(".//include[@content='Object_Info']/param[@name='plot_height']").get("value"),
+                         "170")
+        properties = [n.get("value") for n in f.music.findall(".//param[@name='label2']")]
+        self.assertIn("ListItem.Property(Album_Label)", properties)
+        for ident in ("6", "7", "10"):
+            button = f.music.find(".//control[@id='%s']" % ident)
+            self.assertEqual(button.findtext("include"), "Defs_Hidden_Button")
+            self.assertEqual(button.findall("onclick"), [])
+            self.assertIsNone(button.find("enable"))
+        plot = f.includes.find("variable[@name='Label_Plot']")
+        plot_text = ET.tostring(plot, encoding="unicode")
+        self.assertIn("ListItem.Property(Artist_Description)", plot_text)
+        self.assertIn("ListItem.Property(Album_Description)", plot_text)
+        self.assertIn("$VAR[Image_Poster]", ET.tostring(hero, encoding="unicode"))
+        self.assertIn("$VAR[Image_DiscArt]", ET.tostring(f.music, encoding="unicode"))
+
+    def test_compilations_keep_track_artists_and_native_context_without_name_guessing(self):
+        f = MusicContract("album", **{"ListItem.Artist": "Various Artists",
+                                     "ListItem.AlbumArtist": "Various Artists"})
+        self.assertTrue(f.condition("$EXP[Aura.MusicRows]"))
+        self.assertTrue(f.condition("$EXP[Aura.MusicPlayable]"))
+        self.assertTrue(f.condition("$EXP[Aura.MusicContextAction]"))
+        self.assertEqual(f.variable("Aura_MusicContext"), "$LOCALIZE[31969]")
+        # Inside the row layout, the native song's own artist wins; do not
+        # substitute albumartist, first album artist, Home properties or a search.
+        f.labels.update({"ListItem.DBType": "song", "ListItem.Artist": "Track Artist",
+                         "ListItem.AlbumArtist": "Various Artists"})
+        self.assertEqual(f.variable("Aura_MusicRowDetail"),
+                         "$INFO[ListItem.Artist]$INFO[ListItem.Duration, · ,]")
+        context = f.music.find(".//control[@id='12']")
+        self.assertEqual(context.findall("onclick"), [])  # first credited album artist is core's decision
+        self.assertEqual(f.music.findall("onload"), [])
+        self.assertEqual(f.music.findall("onunload"), [])
+        controls = [n.get("id") for n in f.music.findall(".//control[@id]")]
+        self.assertEqual(len(controls), len(set(controls)))
+        self.assertEqual(set(controls), {"300", "9560", "9000", "50", "9503", "9003",
+                                         "6", "7", "8", "10", "12", "9001", "9011"})
+
+    def test_new_music_nodes_have_no_provider_lifecycle_or_settings(self):
+        f = MusicContract()
+        authored = "".join(ET.tostring(n, encoding="unicode") for n in f.includes
+                           if n.get("name", "").startswith(("Aura.Music", "Aura_Music")))
+        for node in f.music.findall(".//control[@description='Native music dates']") + f.music.findall(
+                ".//control[@description='Native music context']"):
+            authored += ET.tostring(node, encoding="unicode")
+        for forbidden in ("RunScript", "RunPlugin", "plugin://", "http", "SkinInfo.",
+                          "Window(Home)", "Skin.HasSetting", "System.Addon", "onload", "onfocus"):
+            self.assertNotIn(forbidden, authored)
+        # Existing explicit artwork review/download remains gated and unchanged.
+        for ident, action in (("9001", "review_artwork"), ("9011", "download_artwork")):
+            button = f.music.find(".//control[@id='%s']" % ident)
+            self.assertEqual(button.findtext("onclick"),
+                             "RunScript(script.skin.info.service,action=%s,dbtype=$INFO[ListItem.DBType],"
+                             "dbid=$INFO[ListItem.DBID])" % action)
+            self.assertEqual(button.find("onclick").get("condition"),
+                             "System.AddonIsEnabled(script.skin.info.service) + Skin.HasSetting(Aura.OnlineEnrichment) + "
+                             "Integer.IsGreater(ListItem.DBID,0) + [String.IsEqual(ListItem.DBType,artist) | "
+                             "String.IsEqual(ListItem.DBType,album)]")
+        english = (ROOT / "language/resource.language.en_gb/strings.po").read_text()
+        for ident, text in enumerate(("Discography", "Album tracks", "Song contributors",
+                                      "Original release date"), 31968):
+            self.assertEqual(english.count('msgctxt "#%s"' % ident), 1)
+            self.assertIn('msgctxt "#%s"\nmsgid "%s"\nmsgstr "%s"' % (ident, text, text), english)
 
 
 if __name__ == "__main__":
