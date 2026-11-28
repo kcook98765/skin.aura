@@ -21,6 +21,10 @@
     <onload>SetProperty(Aura.Info.Episode,$INFO[ListItem.Episode])</onload>
     <onload>SetProperty(Aura.Info.Director,$ESCINFO[ListItem.Director],movieinformation)</onload>
     <onload>SetProperty(Aura.Info.Writer,$ESCINFO[ListItem.Writer],movieinformation)</onload>
+    <!-- Stage 8A: native subject association, not the focused cast/Similar card.
+         Escape free text; empty snapshots overwrite previous dialog subjects. -->
+    <onload>SetProperty(Aura.Info.MovieTitle,$ESCINFO[ListItem.Title],movieinformation)</onload>
+    <onload>SetProperty(Aura.Info.MoviePath,$ESCINFO[ListItem.FileNameAndPath],movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onload>
     <onload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onload>
@@ -37,6 +41,8 @@
     <onunload>ClearProperty(Aura.Info.Episode)</onunload>
     <onunload>ClearProperty(Aura.Info.Director,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Writer,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.MovieTitle,movieinformation)</onunload>
+    <onunload>ClearProperty(Aura.Info.MoviePath,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Name,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Role,movieinformation)</onunload>
     <onunload>ClearProperty(Aura.Info.Cast50.Position,movieinformation)</onunload>
@@ -163,6 +169,10 @@
                                     <param name="visible" value="true" />
                                     <param name="plot_height" value="95" />
                                     <param name="titleright" value="300" />
+                                    <!-- Named native pairs have one presentation below.
+                                         Keep stars, unnamed/default and other ratings intact. -->
+                                    <param name="imdb" value="![$EXP[Aura.MovieSubject] + !String.IsEmpty(ListItem.Rating(imdb))]" />
+                                    <param name="tmdb" value="![$EXP[Aura.MovieSubject] + [!String.IsEmpty(ListItem.Rating(themoviedb)) | !String.IsEmpty(ListItem.Rating(tmdb))]]" />
                                 </include>
                                 <control type="image">
                                     <texture colordiffuse="main_fg_100">$INFO[ListItem.Studio,resource://resource.images.studios.white/,.png]</texture>
@@ -183,6 +193,34 @@
                                     <param name="visible" value="true" />
                                     <param name="plot_height" value="170" />
                                 </include>
+                            </control>
+                        </control>
+                        <!-- Stage 8A: two compact lines in the existing 410px block,
+                             below the native plot. No fetch, focus action or playback claim.
+                             Kodi 21.3 VideoGUIInfo localizes Premiered and pairs each
+                             RatingAndVotes(source); Rating(source) guards missing material. -->
+                        <control type="group" id="9580">
+                            <left>270</left>
+                            <right>0</right>
+                            <top>360</top>
+                            <height>48</height>
+                            <visible>$EXP[Aura.MovieSubject]</visible>
+                            <control type="label" id="9581">
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_MovieContext]$INFO[ListItem.Premiered,   $LOCALIZE[31955]: ,]</label>
+                            </control>
+                            <control type="label" id="9582">
+                                <top>24</top>
+                                <right>0</right>
+                                <height>24</height>
+                                <font>font_tiny</font>
+                                <textcolor>main_fg_70</textcolor>
+                                <scroll>true</scroll>
+                                <label>$VAR[Aura_MovieIMDB]$VAR[Aura_MovieTMDB,   ,]</label>
                             </control>
                         </control>
                         <!-- Audio Flags -->

@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+    <!-- Stage 8A: GUIInfoManager resolves unqualified ListItem in the window's
+         native context. Fail closed if it no longer matches the captured movie;
+         never read Home service ratings or a cast/Similar container as this title. -->
+    <expression name="Aura.MovieSubject">Window.IsVisible(movieinformation) + String.IsEqual(Window(movieinformation).Property(Aura.Info.DBType),movie) + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(Window(movieinformation).Property(Aura.Info.MovieTitle)) + String.IsEqual(ListItem.Title,Window(movieinformation).Property(Aura.Info.MovieTitle)) + String.IsEqual(ListItem.FileNameAndPath,Window(movieinformation).Property(Aura.Info.MoviePath)) + String.IsEqual(ListItem.DBID,Window(movieinformation).Property(Aura.Info.DBID)) + String.IsEqual(ListItem.UniqueID(tmdb),Window(movieinformation).Property(Aura.Info.TMDB))</expression>
+    <!-- Positive captured IDs only. Both Discovery markers remain exclusively
+         on Stage 7's exact-title action, even when a Discovery item has a DBID.
+         Audited SIS 2.0.2 script.py/video.py fetch on Select and restore focus 300. -->
+    <expression name="Aura.MovieDetails">$EXP[Aura.MovieSubject] + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.DBID),0) + Integer.IsGreater(Window(movieinformation).Property(Aura.Info.TMDB),0) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery) + !String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery TV) + System.AddonIsEnabled(script.skin.info.service) + String.IsEqual(System.AddonVersion(script.skin.info.service),2.0.2)</expression>
+    <variable name="Aura_MovieContext">
+        <value condition="Integer.IsGreater(Window(movieinformation).Property(Aura.Info.DBID),0)">$LOCALIZE[31956]</value>
+        <value condition="String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery) | String.IsEqual(Window(movieinformation).Property(Aura.Info.Category),Aura Online Discovery TV)">$LOCALIZE[31957]</value>
+    </variable>
+    <variable name="Aura_MovieIMDB">
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.IMDB) + !String.IsEmpty(ListItem.Rating(imdb))">$LOCALIZE[31958]: $INFO[ListItem.RatingAndVotes(imdb)]</value>
+    </variable>
+    <!-- Exact stored alias only: prefer themoviedb; do not mix one alias's
+         rating with the other's votes, default rating, or online properties. -->
+    <variable name="Aura_MovieTMDB">
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.TheMovieDB) + !String.IsEmpty(ListItem.Rating(themoviedb))">$LOCALIZE[31959]: $INFO[ListItem.RatingAndVotes(themoviedb)]</value>
+        <value condition="$EXP[Aura.MovieSubject] + !Skin.HasSetting(Ratings.TheMovieDB) + !String.IsEmpty(ListItem.Rating(tmdb))">$LOCALIZE[31959]: $INFO[ListItem.RatingAndVotes(tmdb)]</value>
+    </variable>
     <!-- Library is the baseline. Never enable the broad SkinInfo.Service switch.
          Positive native IDs suppress the published service's ID-less stale-property case.
          Player-online 2.0.0 has no per-result identity/clear contract: rapid item changes
