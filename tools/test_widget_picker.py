@@ -70,7 +70,7 @@ CATEGORIES = [
     ("$LOCALIZE[31940]", "MovieNodes TvShowNodes MusicNodes"),
     ("32040", ""),
     ("24001", "addon addon addon addon addon"),
-    ("$LOCALIZE[31942]", "AuraDiscoverTrendingMovies"),
+    ("$LOCALIZE[31942]", "AuraDiscoverTrendingMovies AuraDiscoverTrendingTVShows"),
 ]
 
 
@@ -91,10 +91,11 @@ class WidgetPicker(unittest.TestCase):
             self.assertTrue(all(n.tag == "shortcut" for n in node))
 
     def test_retained_count_unique_paths_and_native_bindings(self):
-        historical = [n for n in self.leaves if n.get("widget") != "AuraDiscoverTrendingMovies"]
+        curated = {"AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"}
+        historical = [n for n in self.leaves if n.get("widget") not in curated]
         self.assertEqual(len(historical), 51)
         self.assertEqual(len({n.text for n in historical}), 51)
-        self.assertEqual(len(self.leaves), 52)
+        self.assertEqual(len(self.leaves), 53)
         for row in NATIVE.strip().splitlines():
             widget, label, icon, path = row.split("|")
             if path.startswith("@"):
@@ -124,7 +125,7 @@ class WidgetPicker(unittest.TestCase):
         providers = [n for n in self.leaves if n.text.startswith("plugin://script.skin.info.service/")]
         self.assertEqual(len(providers), 7)
         self.assertEqual(visible_leaves(self.group, True), self.leaves)
-        self.assertEqual(visible_leaves(self.group, False), [n for n in self.leaves if n not in providers and n.get("widget") != "AuraDiscoverTrendingMovies"])
+        self.assertEqual(visible_leaves(self.group, False), [n for n in self.leaves if n not in providers and n.get("widget") not in {"AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"}])
         self.assertEqual(self.group[4].attrib, dict(label="$LOCALIZE[31938]", condition=GUARD))
         for index in (0, 1):
             self.assertNotIn("condition", self.group[index].attrib)

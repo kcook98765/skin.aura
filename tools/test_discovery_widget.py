@@ -4,14 +4,16 @@ import unittest
 from urllib.parse import parse_qsl, urlsplit
 import xml.etree.ElementTree as ET
 
-from check_omega import po_messages
+from check_omega import OFFICIAL_MINIMUMS, po_messages
 
 ROOT = Path(__file__).resolve().parents[1]
 URL = ("plugin://plugin.video.themoviedb.helper/?info=trending_week&tmdb_type=movie"
        "&widget=true&limit=12&nextpage=false&cacheonly=true&fanarttv=false"
        "&plugin_category=Aura%20Online%20Discovery&reload=0")
-MATCH = "String.IsEqual($PARAM[content]," + URL + ")"
-EMPTY = (MATCH + " + !Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
+TV_URL = URL.replace("tmdb_type=movie", "tmdb_type=tv").replace(
+    "Aura%20Online%20Discovery&", "Aura%20Online%20Discovery%20TV&")
+MATCH = " | ".join("String.IsEqual($PARAM[content]," + url + ")" for url in (URL, TV_URL))
+EMPTY = ("[" + MATCH + "] + !Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
          " + !Container($PARAM[id]).IsUpdating")
 
 
@@ -25,20 +27,31 @@ class DiscoveryWidget(unittest.TestCase):
         node = group[-1]
         self.assertEqual(node.attrib, {"label": "$LOCALIZE[31942]", "condition":
                          "System.AddonIsEnabled(plugin.video.themoviedb.helper)"})
-        self.assertEqual(len(node), 1)
+        self.assertEqual(len(node), 2)
         leaf = node[0]
         self.assertEqual(leaf.text, URL)
         self.assertEqual(leaf.attrib, dict(widget="AuraDiscoverTrendingMovies",
                          label="$LOCALIZE[31943]", widgetName="$LOCALIZE[31943]",
                          icon="DefaultMovies.png", widgetType="movies", widgetTarget="videos"))
+        self.assertEqual(node[1].text, TV_URL)
+        self.assertEqual(node[1].attrib, dict(widget="AuraDiscoverTrendingTVShows",
+                         label="$LOCALIZE[31945]", widgetName="$LOCALIZE[31945]",
+                         icon="DefaultTVShows.png", widgetType="tvshows", widgetTarget="videos"))
         messages, duplicates = po_messages((ROOT / "language/resource.language.en_gb/strings.po").read_bytes())
         self.assertFalse(duplicates)
-        self.assertEqual([messages[i] for i in (31942, 31943, 31944)], [
+        self.assertEqual([messages[i] for i in (31942, 31943, 31944, 31945)], [
             "Online Discovery (TMDb)", "Trending Movies (Online, TMDb)",
-            "Unavailable or no results. Check your connection."])
+            "Unavailable or no results. Check your connection.",
+            "Trending TV Shows (Online, TMDb)"])
+
+    def test_direct_requirements_remain_the_reviewed_twelve(self):
+        imports = ET.parse(ROOT / "addon.xml").findall("requires/import")
+        self.assertEqual(len(imports), 12)
+        self.assertCountEqual([n.attrib for n in imports], [
+            dict(addon=addon, version=version) for addon, version in OFFICIAL_MINIMUMS.items()])
 
     def test_no_implicit_assignment_or_monitor(self):
-        # One route in picker only; existing provider integrations are not hooks
+        # Two routes in picker only; existing provider integrations are not hooks
         # for this opt-in source. Templates/defaults/settings remain independent.
         for parent in self.overrides:
             if parent.tag != "widget-groupings":
@@ -51,24 +64,28 @@ class DiscoveryWidget(unittest.TestCase):
                 text = path.read_text()
                 self.assertNotIn("trending_week", text, str(path))
                 self.assertNotIn("AuraDiscoverTrendingMovies", text, str(path))
+                self.assertNotIn("AuraDiscoverTrendingTVShows", text, str(path))
         self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='AuraDiscoverTrendingMovies']")), 1)
-        self.assertNotIn("RunScript", URL)
+        self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='AuraDiscoverTrendingTVShows']")), 1)
+        for url in (URL, TV_URL):
+            self.assertNotIn("RunScript", url)
 
     def test_assignment_reload_is_literal_and_inert(self):
-        path = self.overrides.find(".//shortcut[@widget='AuraDiscoverTrendingMovies']").text
         # Shortcuts 2.0.3 preserves paths already containing reload= rather than
         # appending its variable library-refresh trigger. No Kodi execution.
-        self.assertTrue(path.endswith("&reload=0"))
-        self.assertEqual([(key, value) for key, value in parse_qsl(urlsplit(path).query)
-                          if key == "reload"], [("reload", "0")])
-        self.assertNotIn("$INFO[", path)
-        self.assertNotIn("$VAR[", path)
-        self.assertNotIn("$", path)
+        for widget_id in ("AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"):
+            path = self.overrides.find(".//shortcut[@widget='%s']" % widget_id).text
+            self.assertTrue(path.endswith("&reload=0"))
+            self.assertEqual([(key, value) for key, value in parse_qsl(urlsplit(path).query)
+                              if key == "reload"], [("reload", "0")])
+            self.assertNotIn("$", path)
 
     def test_category_fingerprint_is_unique_and_all_uri_guards_follow_it(self):
         self.assertIn("plugin_category=Aura%20Online%20Discovery&reload=0", URL)
         self.assertEqual(dict(parse_qsl(urlsplit(URL).query))["plugin_category"],
                          "Aura Online Discovery")
+        self.assertEqual(dict(parse_qsl(urlsplit(TV_URL).query))["plugin_category"],
+                         "Aura Online Discovery TV")
         guards = []
         for node in self.widgets.iter():
             for text in [node.text or "", *node.attrib.values()]:
@@ -78,12 +95,12 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertEqual(len(guards), 3)
         routes = [n.text for n in self.overrides.iter()
                   if "plugin_category=" in (n.text or "")]
-        self.assertEqual(routes, [URL])
-        for other in (URL.replace("&plugin_category=Aura%20Online%20Discovery", ""),
-                      URL.replace("trending_week", "popular"),
-                      URL.replace("tmdb_type=movie", "tmdb_type=tv"),
-                      URL.replace("Aura%20Online%20Discovery", "Other%20Widget")):
-            self.assertNotEqual(other, URL)
+        self.assertEqual(routes, [URL, TV_URL])
+        for url in routes:
+            for other in (url.replace("trending_week", "popular"),
+                          url.replace("&reload=0", ""),
+                          url.replace("Aura%20Online%20Discovery", "Other%20Widget")):
+                self.assertNotIn(other, routes)
 
     def test_info_subject_category_lifecycle_and_stock_play(self):
         dialog = ET.parse(ROOT / "1080i/DialogVideoInfo.xml").getroot()
@@ -108,23 +125,26 @@ class DiscoveryWidget(unittest.TestCase):
         play = items.find("include[@name='Items_Info']/content/item")
         self.assertEqual(play.findtext("onclick"), "SendClick(8)")
         enabled = "Control.IsEnabled(8)"
-        tagged = "String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery)"
+        categories = ("Aura Online Discovery", "Aura Online Discovery TV")
+        tagged = "[" + " | ".join(
+            "String.IsEqual(Window.Property(Aura.Info.Category)," + category + ")"
+            for category in categories) + "]"
         local = "Integer.IsGreater(Window.Property(Aura.Info.DBID),0)"
         gate = play.findtext("visible")
         self.assertEqual(gate, enabled + " + ![" + tagged + " + !" + local + "]")
         # Bounded Boolean translation of this exact source expression only;
         # not a Kodi condition evaluator or native visibility acceptance.
-        for category in ("Aura Online Discovery", "", "Trending Movies", "Other Widget"):
+        for category in (*categories, "", "Trending Movies", "Aura Online Discovery TV Other"):
             for dbid in ("", "-1", "0", "1", "42"):
                 positive = bool(dbid) and int(dbid) > 0
                 for stock_enabled in (False, True):
                     with self.subTest(category=category, dbid=dbid, enabled=stock_enabled):
                         expression = gate.replace(enabled, str(stock_enabled)).replace(
-                            tagged, str(category == "Aura Online Discovery")).replace(local, str(positive))
+                            tagged, str(category in categories)).replace(local, str(positive))
                         expression = expression.replace("+", " and ").replace("!", " not ").replace(
                             "[", "(").replace("]", ")")
                         self.assertEqual(eval(expression, {"__builtins__": {}}),
-                                         stock_enabled and (category != "Aura Online Discovery" or positive))
+                                         stock_enabled and (category not in categories or positive))
 
     def test_empty_state_reuses_header_and_is_row_scoped(self):
         widget = self.widgets.find("include[@name='Widget']/definition")
@@ -171,8 +191,8 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertNotIn("Container(", condition)
         self.assertNotIn("$PARAM[", condition)
         # Bounded source-expression scope, not native condition evaluation.
-        for category in ("Aura Online Discovery", "", "Trending Movies", "Other Widget"):
-            for dbtype in ("movie", "tvshow", "episode", ""):
+        for category in ("Aura Online Discovery", "Aura Online Discovery TV", "", "Other Widget"):
+            for dbtype in ("movie", "tvshow", "season", "episode", ""):
                 for dbid in ("", "-1", "0", "1", "42"):
                     with self.subTest(category=category, dbtype=dbtype, dbid=dbid):
                         positive = bool(dbid) and int(dbid) > 0
@@ -229,7 +249,7 @@ class DiscoveryWidget(unittest.TestCase):
         content = self.widgets.find("include[@name='Widget_ContentInclude']")
         self.assertEqual(content.find("content").get("limit"), "$PARAM[limit]")
         self.assertEqual(content.find("content").text, "$PARAM[widgetContent]")
-        self.assertIn("!" + MATCH, [v.text for v in content.findall("content/item/visible")])
+        self.assertIn("![" + MATCH + "]", [v.text for v in content.findall("content/item/visible")])
         limit = self.widgets.find("include[@name='Widget_Items']//include[@content='Widget_ContentInclude']/param[@name='limit']")
         self.assertEqual(limit.get("value"), "$VAR[Label_WidgetItemLimit]")
 

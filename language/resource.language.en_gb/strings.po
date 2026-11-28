@@ -2127,3 +2127,8 @@ msgstr "Trending Movies (Online, TMDb)"
 msgctxt "#31944"
 msgid "Unavailable or no results. Check your connection."
 msgstr "Unavailable or no results. Check your connection."
+
+#: /shortcuts/overrides.xml
+msgctxt "#31945"
+msgid "Trending TV Shows (Online, TMDb)"
+msgstr "Trending TV Shows (Online, TMDb)"
