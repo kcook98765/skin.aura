@@ -327,14 +327,15 @@
                 <visible>!Skin.HasSetting(global.kioskmode)</visible>
             </item>
 
-            <!-- Stage 8A: last, after existing priority controls. SIS 2.0.2
-                 opens this captured movie only on Select; no enrichment toggle,
+            <!-- Stage 8A/8B: last, after existing priority controls. SIS 2.0.2
+                 opens this captured movie/show only on Select; no enrichment toggle,
                  ID guessing, parallel provider or automatic monitoring. -->
             <item id="9583">
                 <label>$LOCALIZE[31954]</label>
                 <icon>special://skin/extras/icons/infobubble.png</icon>
                 <onclick condition="$EXP[Aura.MovieDetails]">RunScript(script.skin.info.service,action=dialog_video_info,dbtype=movie,tmdb_id=$INFO[Window(movieinformation).Property(Aura.Info.TMDB)],focus=300)</onclick>
-                <visible>$EXP[Aura.MovieDetails]</visible>
+                <onclick condition="$EXP[Aura.ShowDetails]">RunScript(script.skin.info.service,action=dialog_video_info,dbtype=tvshow,tmdb_id=$INFO[Window(movieinformation).Property(Aura.Info.TMDB)],focus=300)</onclick>
+                <visible>$EXP[Aura.MovieDetails] | $EXP[Aura.ShowDetails]</visible>
             </item>
 
         </content>

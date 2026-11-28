@@ -2202,3 +2202,35 @@ msgstr "Stored IMDb"
 msgctxt "#31959"
 msgid "Stored TMDb"
 msgstr "Stored TMDb"
+
+msgctxt "#31960"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "#31961"
+msgid "First aired"
+msgstr "First aired"
+
+msgctxt "#31962"
+msgid "Season"
+msgstr "Season"
+
+msgctxt "#31963"
+msgid "Episode"
+msgstr "Episode"
+
+msgctxt "#31964"
+msgid "Episodes"
+msgstr "Episodes"
+
+msgctxt "#31965"
+msgid "Watched"
+msgstr "Watched"
+
+msgctxt "#31966"
+msgid "Resumable"
+msgstr "Resumable"
+
+msgctxt "#31967"
+msgid "Unwatched"
+msgstr "Unwatched"
