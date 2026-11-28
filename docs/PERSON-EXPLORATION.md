@@ -1,7 +1,7 @@
 # Person exploration — Stages 7A and 7B
 
 Target: **Kodi 21.3 Omega / Aura 2.1.1**. Stages 7A and 7B passed native
-acceptance on exact disposable Flathub Kodi 21.3. This is not a release announcement.
+acceptance on the retained disposable Flathub Kodi 21.3 pilot.
 
 ## Verified native results
 
@@ -142,17 +142,9 @@ including on discovery items with a local match. That provider view's exact pers
 crew includes directors, writers, producers and other credits. Online-title
 crew exploration remains there, not a new Aura route or Stage 8 redesign.
 
-Stage 7B starts from `a71dc93653b8f18b196cb999325a72efc793cd6f`, initially clean.
-Tests cover exact roles/type/IDs, missing credits/unsupported media, focus,
-hidden-action navigation, consent and preserved discovery routing. They are
-authored-XML/synthetic-label checks, not provider execution or native rendering.
-**78 focused tests passed**: 28 actor/crew, 5 actor-artwork, 3 isolated actor
-checker regressions, 13 search, 6 widget-picker, 17 discovery-widget and 6
-local-library-widget tests. `git diff --check` passed.
-The prescribed Omega `stub-lanes` command was again denied by session command
-permissions. No fresh Toolkit/checker/cache qualification is claimed. Historical
-full-suite source-reference/approval-gate limits below remain separate from the
-verified native results above.
+Focused source tests cover exact roles and typed IDs, missing credits, unsupported
+media, focus, hidden-action navigation, consent, and preserved Discovery routing.
+Native execution and return paths are recorded above.
 
 ## Exact provider comparison
 
@@ -166,7 +158,7 @@ has these dialog APIs.
 | Component | Cast, biography and pictures | Filmography / crew and identity |
 | --- | --- | --- |
 | Kodi 21.3 | Existing native 50 supplies actor names, roles and portraits/icons. No new online biography or image gallery is supplied by this change. | Core Select remains local appearances, based on library cast identity/name, not a TMDb-person guarantee. Director/writer display remains unchanged. Kodi/local art and texture caching are separate from provider caches. Tagged-core behavior is inherited from the earlier source audit, not a new native-core audit here. |
-| Skin Info Service 2.0.2 | `dialog_actor_info` supplies biography, profile and images. `lib/plugin/cast.py:75–106` maps name/role to Label/Label2, icon/thumb (DefaultActor fallback), and online numeric `person_id`. | Actor dialog supplies library movies/TV, online movies/TV/all acting credits, crew credits and images. Exact person ID avoids matching. Typed DBID+name/role resolves against title/episode credits with auto-search disabled. Within-credit exact/name/fuzzy matching is still possible, not strict identity proof. Crew resolution supports director/writer/creator, but Stage 7A adds no native crew buttons. |
+| Skin Info Service 2.0.2 | `dialog_actor_info` supplies biography, profile and images. `lib/plugin/cast.py:75–106` maps name/role to Label/Label2, icon/thumb (DefaultActor fallback), and online numeric `person_id`. | Actor dialog supplies library movies/TV, online movies/TV/all acting credits, crew credits and images. Exact person ID avoids matching. Typed DBID+name/role resolves against title/episode credits with auto-search disabled. Within-credit exact/name/fuzzy matching is still possible, not strict identity proof. Crew resolution supports director, writer and creator. Aura exposes director and writer actions for identified local movies. |
 | Embuary Info 2.0.8 | Own person/video dialogs provide biography/profile images, cast roles, filmography and title crew. | Actual `tmdb_id` supports exact `call=person/movie/tv`. README examples misspell it `tmbd_id`. Implementation reads `tmdb_id`. DBID resolution can fall back to title/year, and person queries use global search. Person filmography in this version uses movie/TV **cast** credits (with filtering/local-match annotations). That is not a dedicated person crew-filmography list. A second dialog stack/cache would duplicate the chosen SIS experience. No new route added. |
 | Embuary Helper 2.0.8 | Local cast utilities expose names, roles, thumbnails, not the rich person-biography/gallery dialog used here. | `info=getitemsbyactor` with `dblabel` filters local movies/shows. With DBID it selects a random top cast member, not the selected card. `info=getdirectedby` supplies local director movies. These name/library routes do not establish numeric online-person identity. |
 | TMDb Helper 5.4.16 | Typed title `info=cast` / `info=crew` return person listings. Person details/images and acting/crew directories exist. | `info=details&tmdb_type=person&tmdb_id=…`, `stars_in_movies/tvshows/both`, `crew_in_movies/tvshows/both`, `credits_in_both`, `images` are relevant alternatives. Typed movie/TV/person IDs matter because namespaces overlap. Existing discovery listings remain here. Adding parallel person directories/dialogs would split navigation/provider requests. |
@@ -223,36 +215,19 @@ does not prohibit explicit Info traffic. Global Search/local library filtering
 does not add an online metadata cache. Provider account options and cache,
 language, matching, filtering and automatic-enrichment settings remain untouched.
 
-## Source verification and limits (2026-11-28)
+## Source verification and release packaging
 
-Source base: `dfe4836e1885322fef18d2f84ec70b579c2ad0d1`, isolated
-`feature/omega-person-exploration`, initially clean. Focused tests parse the
-authored XML and use synthetic infolabels/conditions. They do not execute Kodi
-or providers, prove rendering, network success, ESCINFO's native implementation,
-or runtime focus/card preservation.
+The independent comparison used Stage 6C merge base
+`dfe4836e1885322fef18d2f84ec70b579c2ad0d1`. All **75 focused tests passed**:
+28 actor and crew, 5 actor artwork, 13 search, 6 widget picker, 17 discovery,
+and 6 local widget. All **128 packaged XML files** parsed. Toolkit syntax,
+manifest, path and package checks passed. Type checks were inapplicable to
+this skin package. `git diff --check` passed.
 
-Requested checks: **63 passed** — 16 actor exploration, 5 previous actor-artwork,
-13 Global Search, 6 widget picker, 17 discovery widget and 6 local-library widget
-tests. The old actor-artwork suite passed all 5 tests before edits.
-
-Toolkit addon-development/validation workflows were loaded. The prescribed
-Omega lane uses branch `omega` and an explicit metadata cache.
-Executing its prerequisite `stub-lanes`
-was **denied by this session's command permissions**. Therefore interpreter,
-stub/mypy/checker versions and cache provenance could not be verified. Toolkit
-syntax/manifest/path/package/mypy/official-checker stages were **not run**.
-Do not reuse historical checker results as a new PASS.
-
-Supplementary `test_omega.py`: 25 tests reported, 3 errors (including class
-setup), blocked by **Runtime manifest digest differs from reviewed approval**.
-That file-list/digest gate is untouched by Stage 7A. After explicit review
-authorization, only `actor_checks` and its corresponding regressions were
-aligned with SIS, replacing the legacy Embuary query expectations. They retain
-native-card comparison (allowing only the exact approved Down link), literal
-library fallback and forbidden-async-lock checks, and add exact typed route,
-ID-gate, escaping, auto-search and return-focus checks. The history-backed
-actor regressions remain behind the same full-suite setup blocker. No
-approval/digest or unrelated diagnostic gate was relaxed. Historical
-screenshot/checker warnings in `TESTING.md` remain separate and unresolved.
-The verified native outcomes are recorded above. They do not replace these
-separate static audit limits.
+The comparison reported the same inherited full-suite failures and error
+signatures, Toolkit official checker diagnostics, and kdk diagnostics as Stage
+6C. The existing packaging-approval gate still requires owner approval for
+`1080i/Custom_1141_SearchCategories.xml` at final release. Stage 7 adds no runtime
+paths. The updated legacy actor check covers the existing native cast card,
+literal local fallback and the new typed SIS action. Other checker rules remain
+as established at the merge base.
