@@ -185,6 +185,46 @@ class DiscoveryWidget(unittest.TestCase):
                                          and dbtype == "movie" and not positive)
         self.assertFalse(self.widgets.findall("include[@name='Widget_Submenu']//onclick"))
 
+    def test_settled_empty_reload_keeps_vertical_action_and_scope(self):
+        widget = self.widgets.find("include[@name='Widget']/definition")
+        # Native campaign verified focus; this only guards the XML structure.
+        outer = self.widgets.find("include[@name='Widgets_Grouplist']/control")
+        self.assertEqual(outer.findtext("orientation"), "vertical")
+        self.assertEqual(outer.findtext("usecontrolcoords"), "true")
+        button = widget.find("control[@type='button'][@id='3$PARAM[id]']")
+        self.assertEqual(button.findtext("label"), "$LOCALIZE[20183]")
+        self.assertEqual([c.text for c in button.findall("onclick")], ["ReloadSkin()"])
+        self.assertEqual(button.findtext("onback"), "300")
+        self.assertEqual(button.findtext("onfocus"), "SetProperty(WidgetFocus,1,Home)")
+        header = widget.find("control[@id='2$PARAM[id]']")
+        items = "Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
+        updating = "Container($PARAM[id]).IsUpdating"
+        self.assertEqual([n.text for n in header.findall("visible")],
+                         ["$PARAM[visible]", items + " | " + updating + " | " + MATCH])
+        self.assertEqual(button.findtext("visible"),
+                         "Control.IsVisible(2$PARAM[id]) + !" + items + " + !" + updating)
+        self.assertEqual([n.text for n in self.widgets.findall(".//onclick")
+                          if "ReloadSkin" in (n.text or "")], ["ReloadSkin()"])
+
+    def test_empty_action_reserves_scroll_extent_only_while_visible(self):
+        widget = self.widgets.find("include[@name='Widget']/definition")
+        controls = widget.findall("control")
+        button = widget.find("control[@id='3$PARAM[id]']")
+        # Reserve the normal row extent after the action, without enlarging its
+        # focus texture or changing the populated list / shared end spacer.
+        spacer = controls[controls.index(button) + 1]
+        self.assertEqual(spacer.get("type"), "group")
+        # Direct grouplist children need unique nonzero navigation IDs even
+        # when hidden or nonfocusable (Kodi 21.3 AddControl).
+        self.assertEqual(spacer.get("id"), "4$PARAM[id]")
+        self.assertEqual([c.get("id") for c in controls].count("4$PARAM[id]"), 1)
+        self.assertEqual(spacer.findtext("height"), "widget_poster_spacer")
+        self.assertEqual([n.text for n in spacer.findall("visible")],
+                         ["Control.IsVisible(3$PARAM[id])"])
+        self.assertFalse(spacer.findall(".//onclick"))
+        tail = self.widgets.find("include[@name='Widgets_Grouplist']//control[@id='332']")
+        self.assertEqual(tail.findtext("height"), "widget_spacer_bottom")
+
     def test_bounded_show_more_keeps_user_limit(self):
         content = self.widgets.find("include[@name='Widget_ContentInclude']")
         self.assertEqual(content.find("content").get("limit"), "$PARAM[limit]")

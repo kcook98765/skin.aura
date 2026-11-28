@@ -78,7 +78,7 @@ without an item; `ExecuteActions` then evaluates the same condition with the
 clicked `CFileItem`. Cross-container conditions are unsafe across those two
 contexts. An idle empty row retains its heading with
 “Unavailable or no results. Check your connection.” This is not diagnosis of a
-specific network/provider error and creates no fake focusable result or retry.
+specific network/provider error and creates no fake provider result.
 
 Templates expose `content` as the active menu's slot path InfoLabel, not the
 shortcut widget ID. The three widget label/empty-state and duplicate Show More
@@ -90,6 +90,54 @@ including their offsets, styling and visibility. One new noninteractive label
 shows the unavailable message only for this exact online URL when the container
 has no items and is not updating. Other widget sources retain their existing
 empty-state behaviour.
+
+## Stage 6B Movies reliability — explicit Reload skin
+
+The current native Flathub campaign found the assigned last Movies widget
+empty during an outage. Its noninteractive message was not reachable or visible
+while navigating populated local rows. In the same Kodi process, connectivity
+returned, but one ordinary revisit still left it empty. Aura's existing **Power
+menu → Reload skin** then repopulated ten movies plus Kodi's own More folder,
+using the normal TMDb cache. All 171 Aura settings were confirmed semantically
+unchanged. This observation does not establish that every revisit stays empty
+or that a reload guarantees recovery.
+
+The source correction adds one **Reload skin** button to that assigned widget's
+settled empty state. The campaign verified vertical controller focus from local
+rows: generated slot `03009` resolves to button control `303009`. However, on
+default non-mouse Home the focused button remained below the viewport. The
+screenshot showed Stage Four Queue local cards clipped at the bottom, with
+neither the unavailable message nor Reload skin visible. Focus reachability
+alone therefore did not establish readability.
+
+This source revision adds a nonfocusable spacer immediately after the action,
+visible only when that action is visible. It reserves `widget_poster_spacer`,
+the normal row extent, so the short empty state has room to scroll its heading
+and focused action into view despite the non-mouse Home end spacers of `-250`
+and `-210` (Big Submenu). Shared constants and populated/local row layouts are
+unchanged; hidden, loading, populated or unassigned online slots add no space.
+Native viewport verification of this extent correction remains outstanding.
+
+Select explicitly invokes the same Kodi `ReloadSkin()` action as the existing Power
+menu, reloading the whole skin, not just the provider row. Back returns to the
+Home menu. The button is a direct child of the vertical widget grouplist with a
+slot-derived control ID, not a child of the decorative horizontal heading
+grouplist. The original title, BasedOnLabel and status label remain unchanged.
+Its visibility requires the existing exact-curated-URI header to be visible,
+zero items and no container update. Thus hidden slots, populated/loading rows,
+local widgets and other Helper URLs gain no focus stop or action. There is no
+synthetic provider item, automatic retry, timer or cache busting; the literal
+URI (including inert `reload=0`), normal caching and automatic enrichment remain
+unchanged, as do local bindings/defaults, dependencies and playback predicates.
+
+Helper 5.4.16 with request library 0.2.28 has a 15-second connection-error
+backoff. Restore connectivity and allow that backoff to expire before explicitly
+reloading; reloading immediately during an outage/backoff may still yield no
+results. Aura adds no waiting logic, network probe or automatic recovery.
+The focused regressions guard vertical XML placement, action, combined
+visibility scope and conditional scroll extent, not styling. They do not execute
+Kodi or establish viewport readability. No install or Kodi run is part of this
+source-only revision. No TV discovery is added.
 
 ## Existing Video Info buttons — visible Play gate
 
