@@ -39,7 +39,8 @@
         <control type="list" id="300">
             <top>30</top>
             <onup condition="Skin.HasSetting(EnablePressingUp)">9601</onup>
-            <ondown>9500</ondown>
+            <ondown condition="!Control.IsVisible(50) + !Control.IsVisible(9550) + Control.IsVisible(9551)">9551</ondown>
+            <ondown condition="Control.IsVisible(50) | Control.IsVisible(9550) | !Control.IsVisible(9551)">9500</ondown>
             <include>Topbar_Menu_Layout</include>
             <include>Items_Info</include>
         </control>
@@ -331,12 +332,12 @@
                         <!-- Cast -->
                         <control type="group" id="9500">
                             <onup>9570</onup>
-                            <ondown>9501</ondown>
+                            <ondown>SetFocus($VAR[Aura_PersonDown])</ondown>
                             <control type="button" id="9950">
                                 <visible>Control.IsVisible(50)</visible>
                                 <include>Defs_Hidden_Button</include>
                                 <onup>9570</onup>
-                                <ondown>9501</ondown>
+                                <ondown>SetFocus($VAR[Aura_PersonDown])</ondown>
                                 <onleft>SetFocus(50)</onleft>
                                 <onleft>Left</onleft>
                                 <onleft>SetFocus(9950)</onleft>
@@ -351,7 +352,7 @@
                                 <include>Animation_FadeInOut</include>
                                 <visible>Integer.IsGreater(Container(50).NumItems,0) | Container(50).IsUpdating</visible>
                                 <onup>9570</onup>
-                                <ondown>9501</ondown>
+                                <ondown>SetFocus($VAR[Aura_PersonDown])</ondown>
                                 <orientation>horizontal</orientation>
                                 <animation effect="fade" start="100" end="0" time="0" condition="Container(50).IsUpdating">Conditional</animation>
                                 <include content="View_Actor_Layout">
@@ -378,7 +379,7 @@
                             <include content="Object_VideoInfo_CastList">
                                 <param name="onup" value="9570" />
                                 <param name="id" value="9550" />
-                                <param name="ondown" value="9501" />
+                                <param name="ondown" value="SetFocus($VAR[Aura_PersonDown])" />
                                 <param name="label" value="$LOCALIZE[206]" />
                                 <param name="content" value="$VAR[Aura_InfoCast]" />
                                 <param name="visible" value="Integer.IsEqual(Container(50).NumItems,0) + !Container(50).IsUpdating + [Integer.IsGreater(Window.Property(Aura.Info.DBID),0) | Skin.HasSetting(Aura.OnlineEnrichment)]" />
@@ -389,6 +390,37 @@
                                 <param name="pad" value="0" />
                                 <param name="top" value="0" />
                             </include>
+                        </control>
+                    </control>
+
+                    <!-- Explicit online request only on Select. No replacement
+                         person window, preload, focus request or enrichment toggle.
+                         This separate compact row also works without native cast. -->
+                    <control type="group" id="9552">
+                        <left>view_pad</left>
+                        <right>view_pad</right>
+                        <height>60</height>
+                        <visible>$EXP[Aura.PersonAction]</visible>
+                        <control type="button" id="9551">
+                            <width>400</width>
+                            <height>40</height>
+                            <font>font_tiny</font>
+                            <textcolor>main_fg_100</textcolor>
+                            <texturefocus border="8" colordiffuse="$VAR[ColorHighlight]">common/box.png</texturefocus>
+                            <texturenofocus border="8" colordiffuse="main_fg_12">common/box.png</texturenofocus>
+                            <label>$VAR[Aura_PersonLabel]</label>
+                            <visible>$EXP[Aura.PersonAction]</visible>
+                            <onup condition="Control.IsVisible(50)">50</onup>
+                            <onup condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onup>
+                            <onup condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onup>
+                            <onback condition="Control.IsVisible(50)">50</onback>
+                            <onback condition="!Control.IsVisible(50) + Control.IsVisible(9550)">9550</onback>
+                            <onback condition="!Control.IsVisible(50) + !Control.IsVisible(9550)">9570</onback>
+                            <ondown>9501</ondown>
+                            <onclick condition="$EXP[Aura.PersonAction] + $EXP[Aura.PersonDiscovery]">RunScript(script.skin.info.service,action=dialog_video_info,dbtype=$INFO[Window.Property(Aura.Info.DBType)],tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)],focus=9551)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonExact]">RunScript(script.skin.info.service,action=dialog_actor_info,person_id=$INFO[Container(9550).ListItem.Property(person_id)],name=$ESCINFO[Container(9550).ListItem.Label],auto_search=false,separator=,focus=9550)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + $EXP[Aura.PersonNativeCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],name=$ESCINFO[Container(50).ListItem.Label],role=$ESCINFO[Container(50).ListItem.Label2],auto_search=false,separator=,focus=50)</onclick>
+                            <onclick condition="$EXP[Aura.PersonAction] + !$EXP[Aura.PersonDiscovery] + !$EXP[Aura.PersonExact] + $EXP[Aura.PersonContext] + !$EXP[Aura.PersonNativeCard] + $EXP[Aura.PersonFallbackCard]">RunScript(script.skin.info.service,action=dialog_actor_info,dbid=$INFO[Window.Property(Aura.Info.DBID)],dbtype=$INFO[Window.Property(Aura.Info.DBType)],name=$ESCINFO[Container(9550).ListItem.Label],role=$ESCINFO[Container(9550).ListItem.Label2],auto_search=false,separator=,focus=9550)</onclick>
                         </control>
                     </control>
 
@@ -961,9 +993,8 @@
                         <onback>9950</onback>
                         <width>458</width>
                         <label>$LOCALIZE[31178]</label>
-                        <onclick>SetFocus(9950)</onclick>
-                        <onclick condition="Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + !String.IsEmpty(Container(50).ListItem.Label)">RunScript(script.embuary.info,call=person,query=$ESCINFO[Container(50).ListItem.Label,'&quot;,&quot;'])</onclick>
-                        <visible>Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info) + !String.IsEmpty(Container(50).ListItem.Label)</visible>
+                        <onclick condition="$EXP[Aura.ActorOnline]">SendClick(9551)</onclick>
+                        <visible>$EXP[Aura.ActorOnline]</visible>
                         <include>Defs_Context_Button</include>
                     </control>
                 </control>

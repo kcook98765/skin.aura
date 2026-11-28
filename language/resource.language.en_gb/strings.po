@@ -2152,3 +2152,13 @@ msgstr "Popular TV Shows (Online, TMDb)"
 msgctxt "#31949"
 msgid "Upcoming Movies (Online, TMDb)"
 msgstr "Upcoming Movies (Online, TMDb)"
+
+#: /1080i/Includes_Object.xml
+msgctxt "#31950"
+msgid "Online cast (TMDb)"
+msgstr "Online cast (TMDb)"
+
+#: /1080i/Includes_Object.xml
+msgctxt "#31951"
+msgid "Online person (TMDb)"
+msgstr "Online person (TMDb)"

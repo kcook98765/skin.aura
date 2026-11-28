@@ -375,15 +375,33 @@
     </include>
 
     <!-- Native control 50 keeps Kodi's direct actor search. Fallback control 9550
-         uses opt-in online details or a name-independent native actor browser.
+         uses opt-in SIS details or a name-independent native actor browser.
          Kodi snapshots these conditions before closing the info dialog, so the
          captured subject type still selects the correct literal browser URL. -->
-    <expression name="Aura.ActorOnline">Skin.HasSetting(Aura.OnlineEnrichment) + System.AddonIsEnabled(script.embuary.info)</expression>
+    <!-- Stage 7A: these gates read captured subject identity and explicit cast
+         containers only. Evaluating/focusing them performs no provider request. -->
+    <expression name="Aura.PersonDiscovery">String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery) | String.IsEqual(Window.Property(Aura.Info.Category),Aura Online Discovery TV)</expression>
+    <expression name="Aura.PersonTitleType">String.IsEqual(Window.Property(Aura.Info.DBType),movie) | String.IsEqual(Window.Property(Aura.Info.DBType),tvshow)</expression>
+    <expression name="Aura.PersonLibraryType">$EXP[Aura.PersonTitleType] | String.IsEqual(Window.Property(Aura.Info.DBType),episode)</expression>
+    <expression name="Aura.PersonTitleID">Integer.IsGreater(Window.Property(Aura.Info.TMDB),0) | String.StartsWith(Window.Property(Aura.Info.IMDB),tt)</expression>
+    <expression name="Aura.PersonExact">Control.IsVisible(9550) + Integer.IsGreater(Container(9550).NumItems,0) + !Container(9550).IsUpdating + Integer.IsGreater(Container(9550).ListItem.Property(person_id),0)</expression>
+    <expression name="Aura.PersonContext">Integer.IsGreater(Window.Property(Aura.Info.DBID),0) + $EXP[Aura.PersonLibraryType] + [String.IsEqual(Window.Property(Aura.Info.DBType),episode) | $EXP[Aura.PersonTitleID]]</expression>
+    <expression name="Aura.PersonNativeCard">Control.IsVisible(50) + Integer.IsGreater(Container(50).NumItems,0) + !Container(50).IsUpdating + !String.IsEmpty(Container(50).ListItem.Label)</expression>
+    <expression name="Aura.PersonFallbackCard">Control.IsVisible(9550) + Integer.IsGreater(Container(9550).NumItems,0) + !Container(9550).IsUpdating + !String.IsEmpty(Container(9550).ListItem.Label)</expression>
+    <expression name="Aura.PersonAction">System.AddonIsEnabled(script.skin.info.service) + !Skin.HasSetting(VideoInfo.CastList) + [[$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonTitleType] + Integer.IsGreater(Window.Property(Aura.Info.TMDB),0)] | [!$EXP[Aura.PersonDiscovery] + $EXP[Aura.PersonLibraryType] + [$EXP[Aura.PersonExact] | [$EXP[Aura.PersonContext] + [$EXP[Aura.PersonNativeCard] | $EXP[Aura.PersonFallbackCard]]]]]]</expression>
+    <variable name="Aura_PersonLabel">
+        <value condition="$EXP[Aura.PersonDiscovery]">$LOCALIZE[31950]</value>
+        <value>$LOCALIZE[31951]</value>
+    </variable>
+    <variable name="Aura_PersonDown">
+        <value condition="Control.IsVisible(9551)">9551</value>
+        <value>9501</value>
+    </variable>
+    <expression name="Aura.ActorOnline">Skin.HasSetting(Aura.OnlineEnrichment) + $EXP[Aura.PersonAction]</expression>
     <include name="Object_Aura_Actor_OnClick">
-        <onclick condition="$EXP[Aura.ActorOnline] + Integer.IsGreater(ListItem.Property(person_id),0)">RunScript(script.embuary.info,call=person,tmdb_id=$INFO[ListItem.Property(person_id)])</onclick>
-        <!-- One helper remove_quotes layer surrounds query; ESCINFO handles Kodi
-             commas/quotes/backslashes. ESCINFO is NOT URL encoding. -->
-        <onclick condition="$EXP[Aura.ActorOnline] + !Integer.IsGreater(ListItem.Property(person_id),0) + !String.IsEmpty(ListItem.Label)">RunScript(script.embuary.info,call=person,query=$ESCINFO[ListItem.Label,'&quot;,&quot;'])</onclick>
+        <!-- Keep the old explicitly enabled fallback Select, using the same
+             single SIS dispatch as the secondary button; no name-only search. -->
+        <onclick condition="$EXP[Aura.ActorOnline]">SendClick(9551)</onclick>
         <onclick condition="!$EXP[Aura.ActorOnline]">Dialog.Close(movieinformation)</onclick>
         <onclick condition="!$EXP[Aura.ActorOnline] + [String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)]">ActivateWindow(Videos,videodb://tvshows/actors/,return)</onclick>
         <onclick condition="!$EXP[Aura.ActorOnline] + ![String.IsEqual(Window.Property(Aura.Info.DBType),tvshow) | String.IsEqual(Window.Property(Aura.Info.DBType),season) | String.IsEqual(Window.Property(Aura.Info.DBType),episode)]">ActivateWindow(Videos,videodb://movies/actors/,return)</onclick>

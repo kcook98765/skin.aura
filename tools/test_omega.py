@@ -541,14 +541,15 @@ class StaticRegressions(unittest.TestCase):
                 self.assertEqual(count, 1)
             self.assertFails(self.report(empty), "locale:migration-references:" + path)
 
-    def test_actor_native_browser_fallback_and_online_quotes(self):
+    def test_actor_native_browser_fallback_and_online_sis(self):
         baseline = self.report()
-        for name in ("online-quoted-query", "offline-literal-native-browsers", "no-async-lock-or-confirmation-panel", "fallback9550-wired",
-                     "native-cast50-core-selection", "container50-online-quoted-query", "manual-browser-help"):
+        for name in ("online-sis-dispatch", "sis-identity-gates", "sis-typed-dialog-routes", "cast-return-focus",
+                     "offline-literal-native-browsers", "no-async-lock-or-confirmation-panel", "fallback9550-wired",
+                     "native-cast50-core-selection", "container50-online-sis-dispatch", "manual-browser-help"):
             self.assertPasses(baseline, "actor:" + name)
         path = "1080i/Includes_Object.xml"
         for old, new, check in (
-            (b"query=$ESCINFO[ListItem.Label,", b"query=$INFO[ListItem.Label,", "online-quoted-query"),
+            (b"SendClick(9551)", b"RunScript(script.embuary.info,call=person,query=guess)", "online-sis-dispatch"),
             (b"videodb://movies/actors/", b"videodb://movies/actors/$INFO[ListItem.Label]/", "offline-literal-native-browsers"),
             (b"videodb://tvshows/actors/", b"plugin://script.embuary.helper/?info=getitemsbyactor", "offline-literal-native-browsers"),
             (b"Dialog.Close(movieinformation)", b"noop", "offline-literal-native-browsers"),
@@ -559,13 +560,46 @@ class StaticRegressions(unittest.TestCase):
             with self.subTest(check=check):
                 self.assertFails(self.report(mutate), "actor:" + check)
         self.assertFails(self.report(lambda data: self.edit(data, path,
-            "include[@name='Object_Aura_Actor_OnClick']/onclick[4]", "condition", "!$EXP[Aura.ActorOnline]")), "actor:offline-literal-native-browsers")
+            "include[@name='Object_Aura_Actor_OnClick']/onclick[3]", "condition", "!$EXP[Aura.ActorOnline]")), "actor:offline-literal-native-browsers")
         video = "1080i/DialogVideoInfo.xml"
         self.assertFails(self.report(lambda data: data.update({video: data[video].replace(
-            b"query=$ESCINFO[Container(50).ListItem.Label,", b"query=$INFO[Container(50).ListItem.Label,")})), "actor:container50-online-quoted-query")
+            b"SendClick(9551)", b"RunScript(script.embuary.info,call=person,query=guess)")})), "actor:container50-online-sis-dispatch")
         self.assertFails(self.report(lambda data: self.edit(data, video, ".//control[@id='50']/orientation", value="vertical")), "actor:native-cast50-core-selection")
+        self.assertFails(self.report(lambda data: self.edit(data, video, ".//control[@id='50']/ondown", value="9501")), "actor:native-cast50-core-selection")
+        self.assertFails(self.report(lambda data: self.edit(data, video,
+            ".//control[@id='50']/include[@content='View_Actor_Layout']/param[@name='artTexture']", "value", "$VAR[Image_Poster]")), "actor:native-cast50-core-selection")
         self.assertFails(self.report(lambda data: self.edit(data, video,
             ".//include[@content='Object_VideoInfo_CastList']/param[@name='actoronclick'][@value='true']", remove=True)), "actor:fallback9550-wired")
+
+    def test_actor_sis_identity_escaping_and_no_search_regressions(self):
+        path = "1080i/Includes_Object.xml"
+        expressions = ET.fromstring(self.data[path]).findall("expression")
+        for expression in expressions:
+            name = expression.get("name", "")
+            if name.startswith("Aura.Person"):
+                with self.subTest(gate=name):
+                    self.assertFails(self.report(lambda data: self.edit(data, path,
+                        "expression[@name='%s']" % name, value="true")), "actor:sis-identity-gates")
+        video = "1080i/DialogVideoInfo.xml"
+        for old, new in (
+            (b"auto_search=false", b"auto_search=true"),
+            (b"name=$ESCINFO[", b"name=$INFO["),
+            (b"role=$ESCINFO[", b"role=$INFO["),
+            (b"dbid=$INFO[Window.Property(Aura.Info.DBID)]", b"dbid=$INFO[ListItem.DBID]"),
+            (b"dbtype=$INFO[Window.Property(Aura.Info.DBType)]", b"dbtype=tvshow"),
+            (b"tmdb_id=$INFO[Window.Property(Aura.Info.TMDB)]", b"tmdb_id=$INFO[Window.Property(Aura.Info.ShowTMDB)]"),
+            (b"person_id=$INFO[Container(9550).ListItem.Property(person_id)]", b"person_id=$INFO[Container(50).ListItem.DBID]"),
+            (b"separator=,focus=50", b"separator= / ,focus=9550"),
+        ):
+            def mutate(data):
+                self.assertIn(old, data[video])
+                data[video] = data[video].replace(old, new)
+            with self.subTest(route_mutation=old):
+                self.assertFails(self.report(mutate), "actor:sis-typed-dialog-routes")
+        self.assertFails(self.report(lambda data: self.edit(data, video,
+            ".//control[@id='9551']/onclick[3]", "condition", "$EXP[Aura.PersonAction]")), "actor:sis-typed-dialog-routes")
+        self.assertFails(self.report(lambda data: self.edit(data, video,
+            ".//control[@id='9551']/onback[1]", value="SetFocus(50,0)")), "actor:cast-return-focus")
 
     def test_removed_actor_lock_and_overlay_cannot_return(self):
         path = "1080i/Includes_Object.xml"
@@ -651,6 +685,39 @@ class StaticRegressions(unittest.TestCase):
         self.assertFails(self.report(lambda data: self.edit(data, "1080i/Includes_Object.xml",
             "include[@name='Object_VideoInfo_InfoSection']/definition/control/visible[.='$PARAM[visible]']", remove=True)),
             "enrichment:info-section-visible-param")
+
+
+class ActorCheckerRegressions(unittest.TestCase):
+    """Actor predicate/mutation tests independent of the historical Source gate.
+
+    The reference here is a synthetic pre-secondary-link native control, NOT a
+    replacement for the history-backed baseline in StaticRegressions. Its full
+    audit, approval digests and missing references remain unchanged.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.data = {name: (ROOT / name).read_bytes() for name in (
+            "1080i/Includes_Object.xml", "1080i/DialogVideoInfo.xml")}
+        cls.reference = ET.fromstring(cls.data["1080i/DialogVideoInfo.xml"])
+        cls.reference.find(".//control[@id='50']/ondown").text = "9501"
+
+    def report(self, mutate=None):
+        from check_omega import actor_checks
+        data = dict(self.data)
+        if mutate:
+            mutate(data)
+        checks = Checks()
+        actor_checks(checks, {name: ET.fromstring(raw) for name, raw in data.items()},
+                     lambda name: self.reference)
+        return {"checks": checks.results}
+
+    edit = StaticRegressions.edit
+    assertFails = StaticRegressions.assertFails
+    assertPasses = StaticRegressions.assertPasses
+    test_actor_native_browser_fallback_and_online_sis = StaticRegressions.test_actor_native_browser_fallback_and_online_sis
+    test_actor_sis_identity_escaping_and_no_search_regressions = StaticRegressions.test_actor_sis_identity_escaping_and_no_search_regressions
+    test_removed_actor_lock_and_overlay_cannot_return = StaticRegressions.test_removed_actor_lock_and_overlay_cannot_return
 
 
 class EnglishCatalogRegressions(unittest.TestCase):
