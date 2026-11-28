@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
     <variable name="AiringCalendar_Content">
-        <value condition="System.AddonIsEnabled(script.embuary.info)">plugin://script.embuary.info/nextaired/$INFO[Window.Property(Aura.Calendar.Day)]</value>
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + Library.HasContent(tvshows)">$VAR[AiringCalendar_Route]$VAR[AiringCalendar_Range]</value>
         <value />
+    </variable>
+    <!-- Both parameter orders are the same documented next_aired request.
+         DirectoryProvider::UpdateURL reloads changed URLs. Retry changes only
+         the order, not the date, provider cache policy or library scope. -->
+    <variable name="AiringCalendar_Route">
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + Library.HasContent(tvshows) + String.IsEqual(Window.Property(Aura.Calendar.Retry),alternate)">plugin://script.skin.info.service/?shows=library&amp;action=next_aired&amp;</value>
+        <value condition="System.AddonIsEnabled(script.skin.info.service) + Library.HasContent(tvshows)">plugin://script.skin.info.service/?action=next_aired&amp;shows=library&amp;</value>
+        <value />
+    </variable>
+    <variable name="AiringCalendar_RetryNext">
+        <value condition="String.IsEqual(Window.Property(Aura.Calendar.Retry),alternate)">normal</value>
+        <value>alternate</value>
+    </variable>
+    <variable name="AiringCalendar_Range">
+        <value condition="String.IsEqual(Window.Property(Aura.Calendar.Day),today)">day=0&amp;days=1</value>
+        <value condition="String.IsEqual(Window.Property(Aura.Calendar.Day),tomorrow)">day=1&amp;days=1</value>
+        <value condition="!String.IsEqual(Window.Property(Aura.Calendar.Day),week)">weekday=$INFO[Window.Property(Aura.Calendar.Day)]&amp;days=1</value>
+        <value>day=0&amp;days=7</value>
     </variable>
     <!-- ====== -->
     <!-- Common -->

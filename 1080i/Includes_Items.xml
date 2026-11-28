@@ -740,7 +740,7 @@
             <item>
                 <icon>special://skin/extras/icons/settings.png</icon>
                 <label>$LOCALIZE[10140]</label>
-                <onclick condition="System.AddonIsEnabled(script.embuary.info)">Addon.OpenSettings(script.embuary.info)</onclick>
+                <onclick condition="System.AddonIsEnabled(script.skin.info.service)">Addon.OpenSettings(script.skin.info.service)</onclick>
                 <visible>!Skin.HasSetting(global.kioskmode)</visible>
             </item>
         </content>

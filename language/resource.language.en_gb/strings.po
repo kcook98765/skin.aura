@@ -2254,3 +2254,32 @@ msgstr "Song contributors"
 msgctxt "#31971"
 msgid "Original release date"
 msgstr "Original release date"
+
+#: /1080i/Custom_1140_AiringCalendar.xml
+msgctxt "#31972"
+msgid "The TV show library is empty."
+msgstr "The TV show library is empty."
+
+msgctxt "#31973"
+msgid "Scheduled"
+msgstr "Scheduled"
+
+msgctxt "#31974"
+msgid "Retry schedule"
+msgstr "Retry schedule"
+
+msgctxt "#31975"
+msgid "No schedule results, or schedule unavailable."
+msgstr "No schedule results, or schedule unavailable."
+
+msgctxt "#31976"
+msgid "Select a schedule row to browse its library series. Schedule dates do not indicate playable availability."
+msgstr "Select a schedule row to browse its library series. Schedule dates do not indicate playable availability."
+
+msgctxt "#31977"
+msgid "Library airing schedule • Today can include earlier airings"
+msgstr "Library airing schedule • Today can include earlier airings"
+
+msgctxt "#31978"
+msgid "Schedule unavailable while Skin Info Service is disabled."
+msgstr "Schedule unavailable while Skin Info Service is disabled."

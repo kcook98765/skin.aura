@@ -631,7 +631,7 @@
                             <visible>Integer.IsEqual(Window.Property(CurrentFocus),9006)</visible>
                             <include>Defs_Settings_Button</include>
                             <label>$LOCALIZE[31920]</label>
-                            <enable>System.AddonIsEnabled(script.embuary.info)</enable>
+                            <enable>System.AddonIsEnabled(script.skin.info.service)</enable>
                             <onclick>ActivateWindow(1140)</onclick>
                         </control>
 
@@ -879,7 +879,7 @@
                         <control type="button" id="9814" description="Airing calendar">
                             <visible>Integer.IsEqual(Window.Property(CurrentFocus),9008)</visible>
                             <label>$LOCALIZE[31920]</label>
-                            <enable>System.AddonIsEnabled(script.embuary.info)</enable>
+                            <enable>System.AddonIsEnabled(script.skin.info.service)</enable>
                             <onclick>ActivateWindow(1140)</onclick>
                             <include>Defs_Settings_Button</include>
                         </control>
