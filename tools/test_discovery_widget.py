@@ -1,5 +1,6 @@
 """Focused Omega 21.3 source contracts; does not execute Kodi or providers."""
 from pathlib import Path
+import re
 import unittest
 from urllib.parse import parse_qsl, urlsplit
 import xml.etree.ElementTree as ET
@@ -12,7 +13,18 @@ URL = ("plugin://plugin.video.themoviedb.helper/?info=trending_week&tmdb_type=mo
        "&plugin_category=Aura%20Online%20Discovery&reload=0")
 TV_URL = URL.replace("tmdb_type=movie", "tmdb_type=tv").replace(
     "Aura%20Online%20Discovery&", "Aura%20Online%20Discovery%20TV&")
-MATCH = " | ".join("String.IsEqual($PARAM[content]," + url + ")" for url in (URL, TV_URL))
+POPULAR_MOVIES = URL.replace("info=trending_week", "info=popular")
+POPULAR_TV = TV_URL.replace("info=trending_week", "info=popular")
+UPCOMING_MOVIES = URL.replace("info=trending_week", "info=upcoming")
+ROUTES = (URL, TV_URL, POPULAR_MOVIES, POPULAR_TV, UPCOMING_MOVIES)
+CHOICES = (
+    ("AuraDiscoverTrendingMovies", 31943, "movie", "trending_week"),
+    ("AuraDiscoverTrendingTVShows", 31945, "tv", "trending_week"),
+    ("AuraDiscoverPopularMovies", 31947, "movie", "popular"),
+    ("AuraDiscoverPopularTVShows", 31948, "tv", "popular"),
+    ("AuraDiscoverUpcomingMovies", 31949, "movie", "upcoming"),
+)
+MATCH = " | ".join("String.IsEqual($PARAM[content]," + url + ")" for url in ROUTES)
 EMPTY = ("[" + MATCH + "] + !Integer.IsGreater(Container($PARAM[id]).NumItems,0)"
          " + !Container($PARAM[id]).IsUpdating")
 
@@ -27,7 +39,7 @@ class DiscoveryWidget(unittest.TestCase):
         node = group[-1]
         self.assertEqual(node.attrib, {"label": "$LOCALIZE[31942]", "condition":
                          "System.AddonIsEnabled(plugin.video.themoviedb.helper)"})
-        self.assertEqual(len(node), 2)
+        self.assertEqual(len(node), 5)
         leaf = node[0]
         self.assertEqual(leaf.text, URL)
         self.assertEqual(leaf.attrib, dict(widget="AuraDiscoverTrendingMovies",
@@ -43,6 +55,33 @@ class DiscoveryWidget(unittest.TestCase):
             "Online Discovery (TMDb)", "Trending Movies (Online, TMDb)",
             "Unavailable or no results. Check your connection.",
             "Trending TV Shows (Online, TMDb)"])
+
+    def test_supported_mix_exact_params_types_markers_and_online_labels(self):
+        node = self.overrides.find("widget-groupings")[-1]
+        messages, duplicates = po_messages((ROOT / "language/resource.language.en_gb/strings.po").read_bytes())
+        self.assertFalse(duplicates)
+        self.assertEqual([messages[i] for i in (31947, 31948, 31949)], [
+            "Popular Movies (Online, TMDb)", "Popular TV Shows (Online, TMDb)",
+            "Upcoming Movies (Online, TMDb)"])
+        self.assertEqual([leaf.tag for leaf in node], ["shortcut"] * 5)
+        for leaf, url, (widget, label, media, info) in zip(node, ROUTES, CHOICES):
+            with self.subTest(widget=widget):
+                tv = media == "tv"
+                self.assertEqual(leaf.text, url)
+                self.assertEqual(leaf.attrib, dict(
+                    widget=widget, label="$LOCALIZE[%d]" % label,
+                    widgetName="$LOCALIZE[%d]" % label,
+                    icon="DefaultTVShows.png" if tv else "DefaultMovies.png",
+                    widgetType="tvshows" if tv else "movies", widgetTarget="videos"))
+                # Ordered pairs reject duplicate/extra params, date filters,
+                # account paths, dynamic reloads and an accidental upcoming TV.
+                self.assertEqual(parse_qsl(urlsplit(leaf.text).query), [
+                    ("info", info), ("tmdb_type", media), ("widget", "true"),
+                    ("limit", "12"), ("nextpage", "false"), ("cacheonly", "true"),
+                    ("fanarttv", "false"),
+                    ("plugin_category", "Aura Online Discovery TV" if tv else "Aura Online Discovery"),
+                    ("reload", "0")])
+                self.assertIn("(Online, TMDb)", messages[label])
 
     def test_direct_requirements_remain_the_reviewed_twelve(self):
         imports = ET.parse(ROOT / "addon.xml").findall("requires/import")
@@ -82,12 +121,12 @@ class DiscoveryWidget(unittest.TestCase):
                         self.assertNotIn("31946", text, str(path))
                         self.assertNotIn("Discover (Online)", text, str(path))
         # Every existing default widget/property binding is independently pinned
-        # by test_widget_picker; neither curated route can acquire another role.
+        # by test_widget_picker; no curated route can acquire another role.
         for node in self.overrides:
             if node.tag != "widget-groupings":
                 text = ET.tostring(node, encoding="unicode")
-                self.assertNotIn(URL, text)
-                self.assertNotIn(TV_URL, text)
+                for url in ROUTES:
+                    self.assertNotIn(url, text)
 
     def test_inert_anchor_keeps_existing_horizontal_home_down_path(self):
         home = ET.parse(ROOT / "1080i/Home.xml").getroot()
@@ -101,7 +140,7 @@ class DiscoveryWidget(unittest.TestCase):
         # Structural navigation evidence only; not Kodi focus/runtime acceptance.
 
     def test_no_implicit_assignment_or_monitor(self):
-        # Two routes in picker only; existing provider integrations are not hooks
+        # Five routes in picker only; existing provider integrations are not hooks
         # for this opt-in source. Templates/defaults/settings remain independent.
         for parent in self.overrides:
             if parent.tag != "widget-groupings":
@@ -113,17 +152,18 @@ class DiscoveryWidget(unittest.TestCase):
                     continue
                 text = path.read_text()
                 self.assertNotIn("trending_week", text, str(path))
-                self.assertNotIn("AuraDiscoverTrendingMovies", text, str(path))
-                self.assertNotIn("AuraDiscoverTrendingTVShows", text, str(path))
-        self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='AuraDiscoverTrendingMovies']")), 1)
-        self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='AuraDiscoverTrendingTVShows']")), 1)
-        for url in (URL, TV_URL):
+                self.assertNotIn("AuraDiscover", text, str(path))
+                for url in ROUTES:
+                    self.assertNotIn(url, text, str(path))
+        for widget, *_ in CHOICES:
+            self.assertEqual(len(self.overrides.findall(".//shortcut[@widget='%s']" % widget)), 1)
+        for url in ROUTES:
             self.assertNotIn("RunScript", url)
 
     def test_assignment_reload_is_literal_and_inert(self):
         # Shortcuts 2.0.3 preserves paths already containing reload= rather than
         # appending its variable library-refresh trigger. No Kodi execution.
-        for widget_id in ("AuraDiscoverTrendingMovies", "AuraDiscoverTrendingTVShows"):
+        for widget_id, *_ in CHOICES:
             path = self.overrides.find(".//shortcut[@widget='%s']" % widget_id).text
             self.assertTrue(path.endswith("&reload=0"))
             self.assertEqual([(key, value) for key, value in parse_qsl(urlsplit(path).query)
@@ -145,12 +185,43 @@ class DiscoveryWidget(unittest.TestCase):
         self.assertEqual(len(guards), 3)
         routes = [n.text for n in self.overrides.iter()
                   if "plugin_category=" in (n.text or "")]
-        self.assertEqual(routes, [URL, TV_URL])
+        self.assertEqual(routes, list(ROUTES))
         for url in routes:
-            for other in (url.replace("trending_week", "popular"),
+            for other in (re.sub(r"info=[^&]+", "info=top_rated", url),
                           url.replace("&reload=0", ""),
                           url.replace("Aura%20Online%20Discovery", "Other%20Widget")):
                 self.assertNotIn(other, routes)
+
+    def test_runtime_uri_allowlist_is_exact_not_provider_or_marker_wide(self):
+        # Inspect all content-based comparisons, not only ones with trending in
+        # them. These three guards feed header/reload, status and Show More.
+        guards = [n.text for n in self.widgets.iter("visible")
+                  if "$PARAM[content]" in (n.text or "")]
+        # The unrelated historical Top250 badge still uses its original test.
+        self.assertEqual(guards.count("String.Contains($PARAM[content],Top250)"), 1)
+        guards.remove("String.Contains($PARAM[content],Top250)")
+        self.assertEqual(len(guards), 3)
+        for guard in guards:
+            accepted = re.findall(r"String\.IsEqual\(\$PARAM\[content\],([^)]*)\)", guard)
+            self.assertEqual(accepted, list(ROUTES))
+            self.assertNotIn("String.Contains", guard)
+            for url in ROUTES:
+                # These are deliberately unsupported *literal* URLs, even
+                # where the provider would accept a reordered equivalent.
+                others = [url + "&extra=true", url.replace("&reload=0", ""),
+                          url.replace("limit=12", "limit=20"),
+                          url.replace("nextpage=false", "nextpage=true"),
+                          url.replace("cacheonly=true", "cacheonly=false"),
+                          url.replace("fanarttv=false", "fanarttv=true"),
+                          url.replace("reload=0", "reload=1"),
+                          url.replace("&widget=true", ""),
+                          url.replace("plugin_category=Aura", "plugin_category=Other"),
+                          url.replace("&widget=true&limit=12", "&limit=12&widget=true")]
+                for info in ("airing_today", "on_the_air", "now_playing", "discover", "genres", "top_rated"):
+                    others.append(re.sub(r"info=[^&]+", "info=" + info, url))
+                for other in others:
+                    self.assertNotIn(other, accepted)
+            self.assertNotIn(UPCOMING_MOVIES.replace("tmdb_type=movie", "tmdb_type=tv"), accepted)
 
     def test_info_subject_category_lifecycle_and_stock_play(self):
         dialog = ET.parse(ROOT / "1080i/DialogVideoInfo.xml").getroot()
